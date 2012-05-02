@@ -1,0 +1,12 @@
+Sweeper
+Copyright (C) 2012 Bogdan Pistol
+
+This product depends on the logging library SLF4J (http://www.slf4j.org/),
+it is open source software licensed under the MIT License.
+License: LICENSE.slf4j.txt
+
+This product depends on the logging library Logback (http://logback.qos.ch/),
+it is open source software dual-licensed under the Eclipse Public License version 1 or
+the GNU Lesser General Public License version 2.1.
+The chosen license if the Eclipse Public License version 1.
+License: LICENSE.logback.txt
