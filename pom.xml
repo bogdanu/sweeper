@@ -58,6 +58,7 @@
         <!-- Dependency versions -->
         <version.slf4j.api>1.6.4</version.slf4j.api>
         <version.logback.classic>1.0.2</version.logback.classic>
+        <version.lumberjack>0.0.1</version.lumberjack>
         
         <version.junit>4.10</version.junit>
         <version.mockito.core>1.9.0</version.mockito.core>
@@ -84,6 +85,11 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${version.logback.classic}</version>
+        </dependency>
+        <dependency>
+            <groupId>gg.pistol</groupId>
+            <artifactId>lumberjack</artifactId>
+            <version>${version.lumberjack}</version>
         </dependency>
         
         <!-- Test dependencies -->

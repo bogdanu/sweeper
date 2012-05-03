@@ -10,3 +10,7 @@ it is open source software dual-licensed under the Eclipse Public License versio
 the GNU Lesser General Public License version 2.1.
 The chosen license if the Eclipse Public License version 1.
 License: LICENSE.logback.txt
+
+This product depends on the logging library Lumberjack (https://github.com/bogdanu/lumberjack),
+it is open source software licensed under the MIT License.
+License: LICENSE.lumberjack.txt
