@@ -60,9 +60,11 @@
         <version.logback.classic>1.0.2</version.logback.classic>
         <version.lumberjack>0.0.2</version.lumberjack>
         <version.joda.time>2.1</version.joda.time>
+        <version.guava>r09</version.guava>
         
         <version.junit>4.10</version.junit>
         <version.mockito.core>1.9.0</version.mockito.core>
+        <version.powermock>1.4.12</version.powermock>
         
         <!-- Plugin versions -->
         <version.maven.compiler.plugin>2.3.2</version.maven.compiler.plugin>
@@ -97,6 +99,12 @@
             <artifactId>joda-time</artifactId>
             <version>${version.joda.time}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${version.guava}</version>
+        </dependency>
+            
         
         <!-- Test dependencies -->
         <dependency>
@@ -110,6 +118,20 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${version.mockito.core}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>${version.powermock}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>${version.powermock}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
