@@ -18,7 +18,7 @@ package gg.pistol.sweeper.core;
 
 import java.io.File;
 
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 /**
  * A file or a folder that is a possible sweep candidate.
@@ -33,14 +33,16 @@ public interface SweeperTarget {
 
     long getSize();
     
-    LocalDateTime getModificationDate();
+    DateTime getModificationDate();
     
-    File getFile();
+    File getResource();
     
     Mark getMark();
     
+    String getHash();
+    
     enum Type {
-        FILE, FOLDER
+        FILE, FOLDER, ROOT
     }
     
     enum Mark {
