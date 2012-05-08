@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 <!--
     Sweeper
     Copyright (C) 2012 Bogdan Pistol
@@ -15,30 +16,30 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>gg.pistol</groupId>
-  <artifactId>sweeper</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>Sweeper</name>
-  <url>https://github.com/bogdanu/sweeper</url>
-  <description>Duplicate file/folder cleaner</description>
-  
-  <packaging>jar</packaging>
-  
-  <licenses>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>gg.pistol</groupId>
+    <artifactId>sweeper</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Sweeper</name>
+    <url>https://github.com/bogdanu/sweeper</url>
+    <description>Duplicate file/folder cleaner</description>
+
+    <packaging>jar</packaging>
+
+    <licenses>
         <license>
             <name>GNU General Public License version 3</name>
             <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
         </license>
     </licenses>
     <inceptionYear>2012</inceptionYear>
-    
+
     <scm>
         <url>https://github.com/bogdanu/sweeper</url>
         <connection>scm:git:git://github.com/bogdanu/sweeper.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/bogdanu/sweeper.git</developerConnection>
     </scm>
-    
+
     <developers>
         <developer>
             <id>bogdan</id>
@@ -47,25 +48,25 @@
             <url>http://www.linkedin.com/in/bogdanpistol</url>
         </developer>
     </developers>
-    
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.javaVersion>1.6</project.javaVersion>
         <project.cobertura.minBranchCoverage>95</project.cobertura.minBranchCoverage>
         <project.cobertura.minLineCoverage>95</project.cobertura.minLineCoverage>
-        
-        
+
+
         <!-- Dependency versions -->
         <version.slf4j.api>1.6.4</version.slf4j.api>
         <version.logback.classic>1.0.2</version.logback.classic>
         <version.lumberjack>0.0.2</version.lumberjack>
         <version.joda.time>2.1</version.joda.time>
         <version.guava>r09</version.guava>
-        
+
         <version.junit>4.10</version.junit>
         <version.mockito.core>1.9.0</version.mockito.core>
         <version.powermock>1.4.12</version.powermock>
-        
+
         <!-- Plugin versions -->
         <version.maven.compiler.plugin>2.3.2</version.maven.compiler.plugin>
         <version.maven.surefire.plugin>2.12</version.maven.surefire.plugin>
@@ -76,7 +77,7 @@
         <version.maven.pmd.plugin>2.7.1</version.maven.pmd.plugin>
         <version.findbugs.maven.plugin>2.4.0</version.findbugs.maven.plugin>
     </properties>
-    
+
     <dependencies>
         <!-- Compile dependencies -->
         <dependency>
@@ -104,8 +105,8 @@
             <artifactId>guava</artifactId>
             <version>${version.guava}</version>
         </dependency>
-            
-        
+
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>junit</groupId>
@@ -120,14 +121,14 @@
             <version>${version.mockito.core}</version>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
             <version>${version.powermock}</version>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
@@ -135,7 +136,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -188,7 +189,7 @@
                     </execution>
                 </executions>
             </plugin>
-    
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -218,7 +219,7 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <reporting>
         <plugins>
             <plugin>
@@ -234,13 +235,13 @@
                     <locale>en_US</locale>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
                 <version>${version.maven.jxr.plugin}</version>
             </plugin>
-        
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
@@ -259,7 +260,7 @@
                     </rulesets>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
