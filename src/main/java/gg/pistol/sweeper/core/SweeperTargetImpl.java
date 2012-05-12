@@ -34,13 +34,19 @@ import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ComparisonChain;
 
-public class SweeperTargetImpl implements SweeperTarget, Comparable<SweeperTargetImpl> {
+public class SweeperTargetImpl implements SweeperTarget {
     
-    private static final int BUFFER_SIZE = 8192;
+    public static final long DEFAULT_SIZE = -1L;
     
-    private static MessageDigest sha1Hash;
+    public static final String DEFAULT_HASH = "-";
+    
+    private static final int COMPUTE_SHA1_BUFFER_SIZE = 8192;
+    
+    private static MessageDigest sha1Algorithm;
     
     private final String name;
     
@@ -48,40 +54,39 @@ public class SweeperTargetImpl implements SweeperTarget, Comparable<SweeperTarge
     
     private final File resource;
     
+    private final SweeperTargetImpl parent;
+    
     private List<SweeperTargetImpl> children;
     
-    private long size;
+    private long size = DEFAULT_SIZE;
     
     private DateTime modificationDate;
     
-    private String hash;
+    private String hash = DEFAULT_HASH;
     
     private boolean expanded = false;
     
-    private boolean computed = false;
+    private boolean sizeComputed = false;
+    
+    private boolean hashComputed = false;
     
     private Mark mark = Mark.DECIDE_LATER;
     
-    public SweeperTargetImpl(List<File> targetResources) throws IOException {
+    public SweeperTargetImpl(List<File> targetResources, SweeperOperationListener listener) {
         Preconditions.checkNotNull(targetResources);
         Preconditions.checkArgument(!targetResources.isEmpty(), "targetResources is empty");
-        name = null;
+        parent = null;
+        name = "";
         resource = null;
         type = Type.ROOT;
         children = new ArrayList<SweeperTargetImpl>();
-        Set<SweeperTargetImpl> set = new TreeSet<SweeperTargetImpl>();
-        for (File file : targetResources) {
-            SweeperTargetImpl child = new SweeperTargetImpl(file);
-            if (!set.contains(child)) {
-                set.add(child);
-                children.add(child);
-            }
-        }
-        expanded = true;
+        doExpand(targetResources, listener);
     }
     
-    public SweeperTargetImpl(File targetResource) throws IOException {
+    public SweeperTargetImpl(File targetResource, SweeperTargetImpl parent) throws IOException {
         Preconditions.checkNotNull(targetResource);
+        Preconditions.checkNotNull(parent);
+        this.parent = parent;
         resource = targetResource.getCanonicalFile();
         name = resource.getPath();
         if (resource.isFile()) {
@@ -104,14 +109,14 @@ public class SweeperTargetImpl implements SweeperTarget, Comparable<SweeperTarge
     }
 
     public long getSize() throws IllegalStateException {
-        if (!isComputed()) {
+        if (!isSizeComputed()) {
             throw new IllegalStateException("not computed");
         }
         return size;
     }
 
     public DateTime getModificationDate() {
-        if (!isComputed()) {
+        if (!isHashComputed()) {
             throw new IllegalStateException("not computed");
         }
         return modificationDate;
@@ -126,7 +131,7 @@ public class SweeperTargetImpl implements SweeperTarget, Comparable<SweeperTarge
     }
 
     public String getHash() {
-        if (!isComputed()) {
+        if (!isHashComputed()) {
             throw new IllegalStateException("not computed");
         }
         return hash;
@@ -136,8 +141,12 @@ public class SweeperTargetImpl implements SweeperTarget, Comparable<SweeperTarge
         return expanded;
     }
 
-    public boolean isComputed() {
-        return computed;
+    public boolean isSizeComputed() {
+        return sizeComputed;
+    }
+    
+    public boolean isHashComputed() {
+        return hashComputed;
     }
 
     public void setMark(Mark mark) {
@@ -147,50 +156,97 @@ public class SweeperTargetImpl implements SweeperTarget, Comparable<SweeperTarge
     
     /**
      * Expands the immediate children
-     * 
-     * @throws IOException
      */
-    public void expand() throws IOException {
+    public void expand(SweeperOperationListener listener) {
         if (isExpanded()) {
             return;
         }
-        List<File> files = Arrays.asList(resource.listFiles());
-        for (File file : files) {
-            children.add(new SweeperTargetImpl(file));
+        File[] files;
+        try {
+            files = resource.listFiles();
+        } catch(SecurityException e) {
+            listener.updateTargetException(this, SweeperTargetAction.EXPAND, new SweeperException(e));
+            return;
+        }
+        if (files == null) {
+            listener.updateTargetException(this, SweeperTargetAction.EXPAND, new SweeperException("I/O error while listing files"));
+            return;
+        }
+        listener.updateTargetAction(this, SweeperTargetAction.EXPAND);
+        doExpand(Arrays.asList(files), listener);
+    }
+    
+    private void doExpand(List<File> targetResources, SweeperOperationListener listener) {
+        Set<SweeperTargetImpl> set = new TreeSet<SweeperTargetImpl>();
+        for (File file : targetResources) {
+            SweeperTargetImpl child;
+            try {
+                child = new SweeperTargetImpl(file, this);
+            } catch(Exception e) {
+                listener.updateTargetException(new MockTarget(file), SweeperTargetAction.OPEN, new SweeperException(e));
+                continue;
+            }
+            if (!set.contains(child)) {
+                set.add(child);
+                children.add(child);
+                listener.updateTargetAction(child, SweeperTargetAction.OPEN);
+            }
         }
         Collections.sort(children);
         expanded = true;
     }
     
     /**
-     * Computes the size, the last modified date and the hash.
+     * Computes the size.
      * <p>
      * The expand method must be called before this one.
-     * 
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
      */
-    public void compute() throws IOException, NoSuchAlgorithmException {
+    public void computeSize(SweeperOperationListener listener) {
         if (!isExpanded()) {
             throw new IllegalStateException("Should be expanded");
         }
-        if (isComputed()) {
+        if (isSizeComputed()) {
             return;
         }
-        switch (type) {
-        case ROOT:
-        case FOLDER:
-            computeFolder();
-            break;
-        case FILE:
-            computeFile();
-            break;
+        try {
+            if (type == Type.FILE) {
+                size = resource.length();
+            } else {
+                computeFolderSize();
+            }
+        } catch (Exception e) {
+            listener.updateTargetException(this, SweeperTargetAction.COMPUTE_SIZE, new SweeperException(e));
         }
-        computed = true;
+        sizeComputed = true;
+        listener.updateTargetAction(this, SweeperTargetAction.COMPUTE_SIZE);
+    }
+    
+    /**
+     * Computes the hash and the last modified date.
+     * <p>
+     * The expand method must be called before this one.
+     */
+    public void computeHash(SweeperOperationListener listener) {
+        if (!isExpanded()) {
+            throw new IllegalStateException("Should be expanded");
+        }
+        if (isHashComputed()) {
+            return;
+        }
+        try {
+            if (type == Type.FILE) {
+                computeFileHash();
+            } else {
+                computeFolderHash();
+            }
+        } catch (Exception e) {
+            listener.updateTargetException(this, SweeperTargetAction.COMPUTE_HASH, new SweeperException(e));
+        }
+        hashComputed = true;
+        listener.updateTargetAction(this, SweeperTargetAction.COMPUTE_HASH);
     }
 
-    private void computeFile() throws IOException, NoSuchAlgorithmException {
-        size = resource.length();
+    private void computeFileHash() throws IOException, NoSuchAlgorithmException {
         modificationDate = new DateTime(resource.lastModified());
         InputStream stream = getResourceInputStream();
         try {
@@ -205,17 +261,17 @@ public class SweeperTargetImpl implements SweeperTarget, Comparable<SweeperTarge
     }
 
     private String computeSha1(InputStream stream) throws NoSuchAlgorithmException, IOException {
-        MessageDigest sha = getSha1Hash();
-        if (sha == null) {
+        MessageDigest sha1 = getSha1Algorithm();
+        if (sha1 == null) {
             throw new NoSuchAlgorithmException("SHA-1 algorithm provider not found");
         }
-        byte[] buf = new byte[BUFFER_SIZE];
+        byte[] buf = new byte[COMPUTE_SHA1_BUFFER_SIZE];
         int len;
         while ((len = stream.read(buf)) != -1) {
-            sha.update(buf, 0, len);
+            sha1.update(buf, 0, len);
         }
-        byte[] digest = sha.digest();
-        sha.reset();
+        byte[] digest = sha1.digest();
+        sha1.reset();
         Formatter formatter = new Formatter();
         for (byte b : digest) {
             formatter.format("%02x", b);
@@ -223,36 +279,50 @@ public class SweeperTargetImpl implements SweeperTarget, Comparable<SweeperTarge
         return formatter.toString();
     }
     
-    private MessageDigest getSha1Hash() {
-        if (sha1Hash == null) {
+    private MessageDigest getSha1Algorithm() {
+        if (sha1Algorithm == null) {
             try {
-                sha1Hash = MessageDigest.getInstance("SHA-1");
+                sha1Algorithm = MessageDigest.getInstance("SHA-1");
             } catch(NoSuchAlgorithmException e) {
                 // ignore
             }
         }
-        return sha1Hash;
+        return sha1Algorithm;
     }
 
-    private void computeFolder() throws NoSuchAlgorithmException, IOException {
-        List<String> hashes = new ArrayList<String>();
+    private void computeFolderSize() {
+        size = 0;
         for (SweeperTargetImpl child : getChildren()) {
-            if (!child.isComputed()) {
-                throw new IllegalStateException("All the children need to be computed");
+            if (!child.isSizeComputed()) {
+                size = -1;
+                throw new IllegalStateException("All the children need to be size computed");
             }
             size += child.getSize();
+        }
+    }
+    
+    private void computeFolderHash() throws NoSuchAlgorithmException, IOException {
+        List<String> hashes = new ArrayList<String>();
+        for (SweeperTargetImpl child : getChildren()) {
+            if (!child.isHashComputed()) {
+                throw new IllegalStateException("All the children need to be hash computed");
+            }
             if (modificationDate == null || child.getModificationDate().isAfter(modificationDate)) {
                 modificationDate = child.getModificationDate();
             }
             hashes.add(child.getHash());
         }
-        Collections.sort(hashes);
-        StringBuilder sb = new StringBuilder();
-        for (String s : hashes) {
-            sb.append(s);
+        if (hashes.size() == 1) {
+            hash = hashes.get(0);
+        } else {
+            Collections.sort(hashes);
+            StringBuilder sb = new StringBuilder();
+            for (String s : hashes) {
+                sb.append(s);
+            }
+            ByteArrayInputStream stream = new ByteArrayInputStream(sb.toString().getBytes());
+            hash = computeSha1(stream);
         }
-        ByteArrayInputStream stream = new ByteArrayInputStream(sb.toString().getBytes());
-        hash = computeSha1(stream);
     }
     
     public List<SweeperTargetImpl> getChildren() {
@@ -261,7 +331,7 @@ public class SweeperTargetImpl implements SweeperTarget, Comparable<SweeperTarge
 
     @Override
     public int hashCode() {
-        return name == null ? 0 : name.hashCode();
+        return name.hashCode();
     }
 
     @Override
@@ -270,55 +340,23 @@ public class SweeperTargetImpl implements SweeperTarget, Comparable<SweeperTarge
             return false;
         }
         SweeperTargetImpl other = (SweeperTargetImpl) obj;
-        if (name == null ^ other.name == null || name != null && !name.equals(other.name)) {
-            return false;
-        }
-        return true;
+        return name.equals(other.name);
     }
 
     @Override
     public String toString() {
-        String printName;
-        if (name == null) {
-            printName = "/";
-        } else if (name.equals("/")) {
-            printName = "\\/";
-        } else {
-            printName = name;
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append("[");
-        sb.append(printName);
-        sb.append(", ");
-        sb.append(type);
-        sb.append(", ");
-        sb.append(mark);
-        sb.append(", expanded=");
-        sb.append(expanded);
-        sb.append(", computed=");
-        sb.append(computed);
-        sb.append(", size=");
-        sb.append(size);
-        sb.append(", modificationDate=");
-        sb.append(modificationDate);
-        sb.append(", hash=");
-        sb.append(hash);
-        sb.append("]");
-        return sb.toString();
+        return Objects.toStringHelper(this).add("name", name).add("type", type).add("mark", mark)
+                .add("expanded", expanded).add("sizeComputed", sizeComputed).add("hashComputed", hashComputed)
+                .add("size", size).add("modificationDate", modificationDate).add("hash", hash).toString();
     }
 
-    public int compareTo(SweeperTargetImpl other) {
-        if (other == null || name != null && other.name == null) {
-            return 1;
-        }
-        if (name == null && other.name != null) {
-            return -1;
-        }
-        if (name == null && other.name == null) {
-            return 0;
-        }
-        return name.compareTo(other.name);
+    public int compareTo(SweeperTarget other) {
+        Preconditions.checkNotNull(other);
+        return ComparisonChain.start().compare(name, other.getName()).result();
+    }
+
+    public SweeperTargetImpl getParent() {
+        return parent;
     }
 
 }

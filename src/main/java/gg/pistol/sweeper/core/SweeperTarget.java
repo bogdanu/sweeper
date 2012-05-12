@@ -25,7 +25,7 @@ import org.joda.time.DateTime;
  * 
  * @author Bogdan Pistol
  */
-public interface SweeperTarget {
+public interface SweeperTarget extends Comparable<SweeperTarget> {
     
     String getName();
 
@@ -38,8 +38,6 @@ public interface SweeperTarget {
     File getResource();
     
     Mark getMark();
-    
-    String getHash();
     
     enum Type {
         FILE, FOLDER, ROOT

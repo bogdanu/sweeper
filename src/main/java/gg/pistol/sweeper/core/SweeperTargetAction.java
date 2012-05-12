@@ -17,22 +17,12 @@
 package gg.pistol.sweeper.core;
 
 /**
- * Listener for {@link Sweeper} operation progress.
+ * An individual action that applies to a target.
+ * <p>
+ * The target actions are executed in the scope of {@link SweeperOperationPhase}s.
  * 
  * @author Bogdan Pistol
  */
-public interface SweeperOperationListener {
-
-    void updateOperationProgress(int percent);
-
-    void updateOperationPhase(SweeperOperationPhase phase);
-    
-    void updateTargetAction(SweeperTarget target, SweeperTargetAction action);
-
-    void updateTargetException(SweeperTarget target, SweeperTargetAction action, SweeperException e);
-
-    void operationFinished();
-
-    void operationAborted();
-
+public enum SweeperTargetAction {
+    OPEN, EXPAND, COMPUTE_SIZE, COMPUTE_HASH, DELETE
 }

@@ -38,9 +38,9 @@ public interface Sweeper {
     
     long getSolvedDuplicateSize();
     
-    int getQuestionCount();
+    int getPollCount();
     
-    int getQuestionIndex();
+    int getPollIndex();
     
     SweeperPoll nextPoll();
     

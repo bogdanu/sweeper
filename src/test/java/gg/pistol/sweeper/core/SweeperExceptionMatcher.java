@@ -16,11 +16,20 @@
  */
 package gg.pistol.sweeper.core;
 
-/**
- * The detailed actions that the {@link Sweeper} can do while executing one of its main operations (analyze or delete).
- * 
- * @author Bogdan Pistol
- */
-public enum SweeperAction {
-    FILESYSTEM_TRAVERSING, SIZE_COMPUTATION, SIZE_DEDUPLICATION, HASH_DEDUPLICATION, FILESYSTEM_DELETION
+import org.mockito.ArgumentMatcher;
+
+public class SweeperExceptionMatcher extends ArgumentMatcher<SweeperException> {
+
+    private Class<? extends Exception> expectedCause;
+
+    public SweeperExceptionMatcher(Class<? extends Exception> expectedCause) {
+        this.expectedCause = expectedCause;
+    }
+
+    @Override
+    public boolean matches(Object exception) {
+        return exception.getClass() == SweeperException.class
+                && ((SweeperException) exception).getCause().getClass() == expectedCause;
+    }
+
 }

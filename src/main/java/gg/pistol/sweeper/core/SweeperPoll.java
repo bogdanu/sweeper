@@ -21,9 +21,10 @@ import gg.pistol.sweeper.core.SweeperTarget.Mark;
 import java.util.List;
 
 /**
- * Resolution of duplicate content, the list of duplicates can be retrieved with {@link #getTargets()} and then
- * every target can be marked with {@link Mark} values. When finished marking the {@link #endPoll()} method must be called
- * to notify the {@link Sweeper} that the poll is over.
+ * Resolution of duplicate content.
+ * The list of duplicates can be retrieved with {@link #getTargets()} and then every target can be marked with
+ * {@link Mark} values. When finished marking the {@link #endPoll()} method must be called to notify
+ * the {@link Sweeper} that the poll is over.
  * 
  * @author Bogdan Pistol
  */
