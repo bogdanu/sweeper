@@ -167,6 +167,11 @@ public class SweeperTargetImplTest {
         target1.getSize();
     }
     
+    @Test(expected = IllegalStateException.class)
+    public void testGetTotalFilesException() {
+        target1.getTotalFiles();
+    }
+    
     @Test
     public void testComputeSizeFile() throws Exception {
         when(file1.length()).thenReturn(10L);
@@ -178,6 +183,7 @@ public class SweeperTargetImplTest {
             
             assertTrue(target1.isSizeComputed());
             assertEquals(10L, target1.getSize());
+            assertEquals(1, target1.getTotalFiles());
         }
         verify(listener).updateTargetAction(target1, SweeperTargetAction.COMPUTE_SIZE);
     }
@@ -187,6 +193,7 @@ public class SweeperTargetImplTest {
         when(file1.lastModified()).thenReturn(20L);
         target1 = PowerMockito.spy(target1);
         PowerMockito.doReturn(new ByteArrayInputStream("foo".getBytes())).when(target1, "getResourceInputStream");
+        when(target1.isSizeComputed()).thenReturn(true);
         assertFalse(target1.isHashComputed());
         
         for (int i = 0; i < 2; i++) {
@@ -194,7 +201,7 @@ public class SweeperTargetImplTest {
             
             assertTrue(target1.isHashComputed());
             assertEquals(20L, target1.getModificationDate().getMillis());
-            assertEquals("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", target1.getHash());
+            assertEquals("0--1-0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", target1.getHash());
         }
         verify(listener).updateTargetAction(target1, SweeperTargetAction.COMPUTE_HASH);
     }
@@ -205,7 +212,14 @@ public class SweeperTargetImplTest {
     }
     
     @Test(expected = IllegalStateException.class)
-    public void testComputeHashException() throws Exception {
+    public void testComputeHashExpandException() throws Exception {
+        targetFolder1.computeHash(listener);
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void testComputeHashSizeException() throws Exception {
+        targetFolder1 = spy(targetFolder1);
+        when(targetFolder1.isExpanded()).thenReturn(true);
         targetFolder1.computeHash(listener);
     }
     
@@ -214,6 +228,7 @@ public class SweeperTargetImplTest {
         target1 = PowerMockito.spy(target1);
         PowerMockito.doReturn(null).when(target1, "getSha1Algorithm");
         PowerMockito.doReturn(new ByteArrayInputStream(new byte[] {})).when(target1, "getResourceInputStream");
+        when(target1.isSizeComputed()).thenReturn(true);
         
         target1.computeHash(listener);
         verify(listener).updateTargetException(eq(target1), eq(SweeperTargetAction.COMPUTE_HASH),
@@ -221,7 +236,7 @@ public class SweeperTargetImplTest {
     }
     
     @Test
-    public void testComputeFolderSizeException() throws Exception {
+    public void testComputeSizeFolderException() throws Exception {
         targetFolder1 = spy(targetFolder1);
         doReturn(Arrays.asList(new SweeperTargetImpl[] {target1})).when(targetFolder1).getChildren();
         doReturn(true).when(targetFolder1).isExpanded();
@@ -233,10 +248,11 @@ public class SweeperTargetImplTest {
     }
     
     @Test
-    public void testComputeFolderHashException() throws Exception {
+    public void testComputeHashFolderException() throws Exception {
         targetFolder1 = spy(targetFolder1);
         doReturn(Arrays.asList(new SweeperTargetImpl[] {target1})).when(targetFolder1).getChildren();
         doReturn(true).when(targetFolder1).isExpanded();
+        doReturn(true).when(targetFolder1).isSizeComputed();
         
         targetFolder1.computeHash(listener);
         verify(listener).updateTargetException(eq(targetFolder1), eq(SweeperTargetAction.COMPUTE_HASH),
@@ -250,9 +266,11 @@ public class SweeperTargetImplTest {
         target2 = spy(target2);
         targetFolder1 = spy(targetFolder1);
         doReturn(10L).when(target1).getSize();
+        doReturn(3).when(target1).getTotalFiles();
         doReturn(true).when(target1).isSizeComputed();
         
         doReturn(11L).when(target2).getSize();
+        doReturn(4).when(target2).getTotalFiles();
         doReturn(true).when(target2).isSizeComputed();
         
         doReturn(Arrays.asList(new SweeperTargetImpl[] {target1, target2})).when(targetFolder1).getChildren();
@@ -264,6 +282,7 @@ public class SweeperTargetImplTest {
             
             assertTrue(targetFolder1.isSizeComputed());
             assertEquals(21L, targetFolder1.getSize());
+            assertEquals(7, targetFolder1.getTotalFiles());
         }
     }
     
@@ -285,6 +304,8 @@ public class SweeperTargetImplTest {
         doReturn(Arrays.asList(new SweeperTargetImpl[] {target1})).when(targetFolder2).getChildren();
         doReturn(true).when(targetFolder1).isExpanded();
         doReturn(true).when(targetFolder2).isExpanded();
+        doReturn(true).when(targetFolder1).isSizeComputed();
+        doReturn(true).when(targetFolder2).isSizeComputed();
         assertFalse(targetFolder1.isHashComputed());
         assertFalse(targetFolder2.isHashComputed());
         
@@ -292,7 +313,7 @@ public class SweeperTargetImplTest {
             targetFolder1.computeHash(listener);
             assertTrue(targetFolder1.isHashComputed());
             assertEquals(21L, targetFolder1.getModificationDate().getMillis());
-            assertEquals("60518c1c11dc0452be71a7118a43ab68e3451b82", targetFolder1.getHash());
+            assertEquals("0--1-60518c1c11dc0452be71a7118a43ab68e3451b82", targetFolder1.getHash());
             
             targetFolder2.computeHash(listener);
             assertTrue(targetFolder2.isHashComputed());
@@ -378,4 +399,3 @@ public class SweeperTargetImplTest {
     }
 
 }
-

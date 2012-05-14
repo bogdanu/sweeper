@@ -42,9 +42,11 @@ public class SweeperTargetImpl implements SweeperTarget {
     
     public static final long DEFAULT_SIZE = -1L;
     
-    public static final String DEFAULT_HASH = "-";
+    public static final String DEFAULT_HASH = "#";
     
     private static final int COMPUTE_SHA1_BUFFER_SIZE = 8192;
+    
+    private static final String HASH_SEPARATOR = "-";
     
     private static MessageDigest sha1Algorithm;
     
@@ -71,6 +73,8 @@ public class SweeperTargetImpl implements SweeperTarget {
     private boolean hashComputed = false;
     
     private Mark mark = Mark.DECIDE_LATER;
+    
+    private int totalFiles = 0;
     
     public SweeperTargetImpl(List<File> targetResources, SweeperOperationListener listener) {
         Preconditions.checkNotNull(targetResources);
@@ -211,6 +215,7 @@ public class SweeperTargetImpl implements SweeperTarget {
         try {
             if (type == Type.FILE) {
                 size = resource.length();
+                totalFiles = 1;
             } else {
                 computeFolderSize();
             }
@@ -224,11 +229,14 @@ public class SweeperTargetImpl implements SweeperTarget {
     /**
      * Computes the hash and the last modified date.
      * <p>
-     * The expand method must be called before this one.
+     * The {@link #expand()} and {@link #computeSize()} methods must be called before this one.
      */
     public void computeHash(SweeperOperationListener listener) {
         if (!isExpanded()) {
             throw new IllegalStateException("Should be expanded");
+        }
+        if (!isSizeComputed()) {
+            throw new IllegalStateException("Size not computed");
         }
         if (isHashComputed()) {
             return;
@@ -250,7 +258,7 @@ public class SweeperTargetImpl implements SweeperTarget {
         modificationDate = new DateTime(resource.lastModified());
         InputStream stream = getResourceInputStream();
         try {
-            hash = computeSha1(stream);
+            hash = getTotalFiles() + HASH_SEPARATOR + getSize() + HASH_SEPARATOR + computeSha1(stream);
         } finally {
             stream.close();
         }
@@ -298,6 +306,7 @@ public class SweeperTargetImpl implements SweeperTarget {
                 throw new IllegalStateException("All the children need to be size computed");
             }
             size += child.getSize();
+            totalFiles += child.getTotalFiles();
         }
     }
     
@@ -321,7 +330,7 @@ public class SweeperTargetImpl implements SweeperTarget {
                 sb.append(s);
             }
             ByteArrayInputStream stream = new ByteArrayInputStream(sb.toString().getBytes());
-            hash = computeSha1(stream);
+            hash = getTotalFiles() + HASH_SEPARATOR + getSize() + HASH_SEPARATOR + computeSha1(stream);
         }
     }
     
@@ -347,7 +356,8 @@ public class SweeperTargetImpl implements SweeperTarget {
     public String toString() {
         return Objects.toStringHelper(this).add("name", name).add("type", type).add("mark", mark)
                 .add("expanded", expanded).add("sizeComputed", sizeComputed).add("hashComputed", hashComputed)
-                .add("size", size).add("modificationDate", modificationDate).add("hash", hash).toString();
+                .add("size", size).add("modificationDate", modificationDate).add("hash", hash)
+                .add("totalFiles", totalFiles).toString();
     }
 
     public int compareTo(SweeperTarget other) {
@@ -357,6 +367,13 @@ public class SweeperTargetImpl implements SweeperTarget {
 
     public SweeperTargetImpl getParent() {
         return parent;
+    }
+
+    public int getTotalFiles() {
+        if (!isSizeComputed()) {
+            throw new IllegalStateException("not computed");
+        }
+        return totalFiles;
     }
 
 }
