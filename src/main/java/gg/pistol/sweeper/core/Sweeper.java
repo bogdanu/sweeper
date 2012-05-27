@@ -16,44 +16,37 @@
  */
 package gg.pistol.sweeper.core;
 
-import java.io.File;
-import java.util.List;
+import gg.pistol.sweeper.core.resource.Resource;
+
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 /**
- * Duplicate file/folder cleaner
+ * Duplicate file/directory cleaner
  * 
  * @author Bogdan Pistol
  */
 public interface Sweeper {
-    
-    void analyze(List<File> targets, SweeperOperationListener listener);
-    
+
+    void analyze(Set<Resource> resources, SweeperOperationListener listener);
+
     void abortAnalysis();
-    
-    int getDuplicateCount();
-    
-    int getSolvedDuplicateCount();
-    
-    long getDuplicateSize();
-    
-    long getSolvedDuplicateSize();
-    
-    int getPollCount();
-    
-    int getPollIndex();
-    
+
+    boolean isAnalyzed();
+
+    @Nullable
     SweeperPoll nextPoll();
-    
+
+    @Nullable
     SweeperPoll previousPoll();
-    
+
+    boolean rewindUndecidedPolls();
+
     void delete(SweeperOperationListener listener);
-    
+
     void abortDeletion();
-    
-    State getState();
-    
-    enum State {
-        BEFORE_ANALYSIS, ANALYSIS, POLL, DELETION, AFTER_DELETION
-    }
+
+    SweeperCount getCount();
 
 }

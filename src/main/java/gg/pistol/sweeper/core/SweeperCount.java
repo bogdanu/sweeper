@@ -16,18 +16,35 @@
  */
 package gg.pistol.sweeper.core;
 
-import gg.pistol.sweeper.core.SweeperTarget.Mark;
-
-import java.util.Collection;
-
 /**
- * Resolution of duplicate content. The collection of duplicates can be retrieved with {@link #getTargets()} and then
- * every target can be marked with {@link Mark} values.
+ * Counters for different Sweeper target types.
  * 
  * @author Bogdan Pistol
  */
-public interface SweeperPoll {
+public interface SweeperCount {
 
-    Collection<SweeperTarget> getTargets();
+    int getTotalTargets();
+
+    int getTotalTargetFiles();
+
+    int getTotalTargetDirectories();
+
+    long getTotalSize();
+
+    int getDuplicateTargets();
+
+    int getDuplicateTargetFiles();
+
+    int getDuplicateTargetDirectories();
+
+    long getDuplicateSize();
+
+    int getToDeleteTargets();
+
+    int getToDeleteTargetFiles();
+
+    int getToDeleteTargetDirectories();
+
+    long getToDeleteSize();
 
 }

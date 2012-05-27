@@ -24,5 +24,5 @@ package gg.pistol.sweeper.core;
  * @author Bogdan Pistol
  */
 public enum SweeperTargetAction {
-    OPEN, EXPAND, COMPUTE_SIZE, COMPUTE_HASH, DELETE
+    EXPAND, COMPUTE_SIZE, COMPUTE_HASH, DELETE
 }

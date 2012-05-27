@@ -1,0 +1,2 @@
+The JSR 305 reference implementation project (http://code.google.com/p/jsr-305/) specifies that it
+is licensed under the New BSD License available at http://www.opensource.org/licenses/bsd-license.php.

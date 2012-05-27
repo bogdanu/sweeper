@@ -14,22 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gg.pistol.sweeper.core;
+package gg.pistol.sweeper.core.resource;
 
-import org.mockito.ArgumentMatcher;
+import java.io.IOException;
+import java.io.InputStream;
 
-public class SweeperExceptionMatcher extends ArgumentMatcher<SweeperException> {
+import org.joda.time.DateTime;
 
-    private Class<? extends Exception> expectedCause;
+/**
+ * A resource item which contains byte data.
+ * 
+ * @author Bogdan Pistol
+ */
+public interface ResourceFile extends Resource {
 
-    public SweeperExceptionMatcher(Class<? extends Exception> expectedCause) {
-        this.expectedCause = expectedCause;
-    }
+    InputStream getInputStream() throws IOException;
 
-    @Override
-    public boolean matches(Object exception) {
-        return exception.getClass() == SweeperException.class
-                && ((SweeperException) exception).getCause().getClass() == expectedCause;
-    }
+    long getSize();
+
+    DateTime getModificationDate();
 
 }

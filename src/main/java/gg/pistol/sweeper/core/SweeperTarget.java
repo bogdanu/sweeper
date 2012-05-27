@@ -16,35 +16,39 @@
  */
 package gg.pistol.sweeper.core;
 
-import java.io.File;
+import gg.pistol.sweeper.core.resource.Resource;
 
 import org.joda.time.DateTime;
 
 /**
- * A file or a folder that is a possible sweep candidate.
+ * A resource that is a possible sweep candidate.
  * 
  * @author Bogdan Pistol
  */
 public interface SweeperTarget extends Comparable<SweeperTarget> {
-    
+
     String getName();
 
     Type getType();
 
     long getSize();
-    
+
     DateTime getModificationDate();
-    
-    File getResource();
-    
+
+    Resource getResource();
+
     Mark getMark();
-    
+
+    void setMark(Mark mark);
+
+    boolean isPoll();
+
     enum Type {
-        FILE, FOLDER, ROOT
+        FILE, DIRECTORY, ROOT
     }
-    
+
     enum Mark {
         RETAIN, DELETE, DECIDE_LATER
     }
-    
+
 }

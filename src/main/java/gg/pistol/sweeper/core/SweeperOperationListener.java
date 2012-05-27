@@ -26,7 +26,7 @@ public interface SweeperOperationListener {
     void updateOperationProgress(int percent);
 
     void updateOperationPhase(SweeperOperationPhase phase);
-    
+
     void updateTargetAction(SweeperTarget target, SweeperTargetAction action);
 
     void updateTargetException(SweeperTarget target, SweeperTargetAction action, SweeperException e);

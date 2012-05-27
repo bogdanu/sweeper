@@ -14,20 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gg.pistol.sweeper.core;
-
-import gg.pistol.sweeper.core.SweeperTarget.Mark;
+package gg.pistol.sweeper.core.resource;
 
 import java.util.Collection;
 
 /**
- * Resolution of duplicate content. The collection of duplicates can be retrieved with {@link #getTargets()} and then
- * every target can be marked with {@link Mark} values.
+ * A resource container that can have sub-resources.
  * 
  * @author Bogdan Pistol
  */
-public interface SweeperPoll {
+public interface ResourceDirectory extends Resource {
 
-    Collection<SweeperTarget> getTargets();
+    ResourceCollectionResponse getSubresources();
+
+    interface ResourceCollectionResponse {
+
+        Collection<Resource> getResources();
+
+        Collection<Exception> getExceptions();
+
+    }
 
 }

@@ -16,10 +16,20 @@
  */
 package gg.pistol.sweeper.core;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Exception thrown in case a sweeper operation is aborted.
  * 
  * @author Bogdan Pistol
  */
 public class SweeperAbortException extends Exception {
+    private static final long serialVersionUID = 1L;
+
+    public SweeperAbortException() {
+    }
+
+    public SweeperAbortException(String msg) {
+        super(Preconditions.checkNotNull(msg));
+    }
 }

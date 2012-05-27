@@ -8,9 +8,36 @@ License: LICENSE.slf4j.txt
 This product depends on the logging library Logback (http://logback.qos.ch/),
 it is open source software dual-licensed under the Eclipse Public License version 1 or
 the GNU Lesser General Public License version 2.1.
-The chosen license if the Eclipse Public License version 1.
+The chosen license is the GNU Lesser General Public License version 2.1.
 License: LICENSE.logback.txt
 
 This product depends on the logging library Lumberjack (https://github.com/bogdanu/lumberjack),
 it is open source software licensed under the MIT License.
 License: LICENSE.lumberjack.txt
+
+This product depends on the Joda Time library (http://joda-time.sourceforge.net/),
+it is open source software licensed under the Apache License version 2.0.
+License: LICENSE.jodatime.txt
+
+This product depends on the Google Guava library (http://code.google.com/p/guava-libraries/),
+it is open source software licensed under the Apache License version 2.0.
+License: LICENSE.guava.txt
+
+This product depends on the Java Specification Requests (JSR) 305: Annotations for Software Defect Detection (http://code.google.com/p/jsr-305/),
+it is open source software licensed under the New BSD License.
+License: LICENSE.jsr305.txt
+
+
+-- Test dependencies --
+
+This product has test dependency on the JUnit testing framework (http://junit.sourceforge.net/),
+it is open source software licensed under the CPL License version 1.0.
+License: LICENSE.junit.txt
+
+This product has test dependency on the Mockito library (http://code.google.com/p/mockito/),
+it is open source software licensed under the MIT License.
+License: LICENSE.mockito.txt
+
+This product has test dependency on the PowerMock library (http://code.google.com/p/powermock/),
+it is open source software licensed under the Apache License version 2.0.
+License: LICENSE.powermock.txt

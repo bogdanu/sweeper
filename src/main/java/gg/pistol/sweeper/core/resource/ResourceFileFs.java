@@ -14,59 +14,51 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gg.pistol.sweeper.core;
+package gg.pistol.sweeper.core.resource;
+
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.joda.time.DateTime;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ComparisonChain;
 
 /**
- * Simple implementation that only provides the name of the resource.
+ * File-system file
  * 
  * @author Bogdan Pistol
  */
-public class MockTarget implements SweeperTarget {
-    
+public class ResourceFileFs extends AbstractResource implements ResourceFile {
+
+    private final File resource;
+
     private final String name;
 
-    public MockTarget(File file) {
-        name = file.getPath();
-    }
-
-    public int compareTo(SweeperTarget other) {
-        Preconditions.checkNotNull(other);
-        return ComparisonChain.start().compare(name, other.getName()).result();
+    public ResourceFileFs(File file) throws IOException {
+        Preconditions.checkNotNull(file);
+        Preconditions.checkArgument(file.isFile(), "The provided File <" + file.getPath() + "> is not representing a normal file");
+        resource = file.getCanonicalFile();
+        name = resource.getPath();
     }
 
     public String getName() {
         return name;
     }
 
-    public Type getType() {
-        return null;
+    public InputStream getInputStream() throws FileNotFoundException {
+        return new FileInputStream(resource);
     }
 
     public long getSize() {
-        return 0;
+        return resource.length();
     }
 
     public DateTime getModificationDate() {
-        return null;
-    }
-
-    public File getResource() {
-        return null;
-    }
-
-    public Mark getMark() {
-        return null;
-    }
-
-    public String getHash() {
-        return null;
+        return new DateTime(resource.lastModified());
     }
 
 }
