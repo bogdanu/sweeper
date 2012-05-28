@@ -22,7 +22,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>Sweeper</name>
     <url>https://github.com/bogdanu/sweeper</url>
-    <description>Duplicate file/folder cleaner</description>
+    <description>Duplicate file/directory cleaner</description>
 
     <packaging>jar</packaging>
 

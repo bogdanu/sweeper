@@ -156,7 +156,7 @@ class SweeperTargetImpl implements SweeperTarget {
                 totalTargetFiles = 1;
                 size = ((ResourceFile) resource).getSize();
             } else {
-                computeFolderSize();
+                computeDirectorySize();
             }
         } catch (IllegalStateException e) {
             partiallySized = false;
@@ -168,7 +168,7 @@ class SweeperTargetImpl implements SweeperTarget {
         }
     }
 
-    private void computeFolderSize() {
+    private void computeDirectorySize() {
         size = 0;
         totalTargets = 1;
         totalTargetFiles = 0;

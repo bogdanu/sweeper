@@ -1,3 +1,3 @@
 Sweeper
 
-Duplicate file/folder cleaner
+Duplicate file/directory cleaner
