@@ -159,6 +159,30 @@ public class SweeperAnalyzerTest {
         assertTrue(ImmutableSet.of(2, 3, 4).contains(count.getDuplicateTargetDirectories()));
         assertEquals(3L, count.getDuplicateSize());
     }
+    
+    @Test
+    public void testComputeException() throws Exception {
+        try {
+            analyzer.compute(null, listener);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+        
+        try {
+            analyzer.compute(Collections.<Resource>emptySet(), null);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+        
+        try {
+            analyzer.compute(Collections.<Resource>emptySet(), listener);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
 
     @Test
     public void testAbort() throws Exception {
