@@ -34,12 +34,16 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(SweeperAnalyzer.class)
 public class SweeperAnalyzerTest {
     
     private SweeperAnalyzer analyzer;
@@ -154,6 +158,22 @@ public class SweeperAnalyzerTest {
         assertTrue(ImmutableSet.of(3, 4).contains(count.getDuplicateTargetFiles()));
         assertTrue(ImmutableSet.of(2, 3, 4).contains(count.getDuplicateTargetDirectories()));
         assertEquals(3L, count.getDuplicateSize());
+    }
+
+    @Test
+    public void testAbort() throws Exception {
+        ResourceDirectory dir = mockDirectory("dir");
+        Resource root = mockDirectory("root", dir);
+        analyzer = PowerMockito.spy(analyzer);
+        PowerMockito.when(analyzer, "checkAbortFlag").thenThrow(new SweeperAbortException());
+        
+        try {
+            analyzer.compute(ImmutableSet.of(root), listener);
+            fail();
+        } catch (SweeperAbortException e) {
+            // expected
+            assertNull(analyzer.getCount());
+        }
     }
 
 }
