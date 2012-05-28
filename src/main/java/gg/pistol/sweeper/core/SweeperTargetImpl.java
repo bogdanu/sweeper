@@ -187,12 +187,16 @@ class SweeperTargetImpl implements SweeperTarget {
      */
     void computeHash(SweeperOperationListener listener) {
         Preconditions.checkNotNull(listener);
-        Preconditions.checkState(isSized(), "Size not computed");
+        Preconditions.checkState(isPartiallySized(), "Size not computed");
         if (isPartiallyHashed()) {
             return;
         }
         partiallyHashed = true;
         listener.updateTargetAction(this, SweeperTargetAction.COMPUTE_HASH);
+        if (!isSized()) {
+            listener.updateTargetException(this, SweeperTargetAction.COMPUTE_HASH, new SweeperException("Cannot compute hash as the size operation failed"));
+            return;
+        }
 
         hashed = true;
         try {

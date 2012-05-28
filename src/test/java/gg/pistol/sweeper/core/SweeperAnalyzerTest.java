@@ -108,7 +108,8 @@ public class SweeperAnalyzerTest {
         ResourceDirectory dir1Copy = mockDirectory("dir1Copy", file1Copy, file2Copy);
         ResourceDirectory dir1CopyUpper = mockDirectory("dir1CopyUpper", dir1Copy);
 
-        ResourceFile file3 = mockFile("file3", 5L, 12L, "file3");
+        ResourceFile file3 = mockFile("file3", 0L, 12L, "file3");
+        when(file3.getSize()).thenThrow(new RuntimeException());
         ResourceDirectory dir2 = mockDirectory("dir2", dir1, file3);
 
         ResourceFile emptyFile = mockFile("emptyFile", 0L, 13L, "");
@@ -152,7 +153,7 @@ public class SweeperAnalyzerTest {
         assertEquals(16, count.getTotalTargets());
         assertEquals(8, count.getTotalTargetFiles());
         assertEquals(8, count.getTotalTargetDirectories());
-        assertEquals(12L, count.getTotalSize());
+        assertEquals(7L, count.getTotalSize());
 
         assertTrue(ImmutableSet.of(5, 6, 7).contains(count.getDuplicateTargets()));
         assertTrue(ImmutableSet.of(3, 4).contains(count.getDuplicateTargetFiles()));

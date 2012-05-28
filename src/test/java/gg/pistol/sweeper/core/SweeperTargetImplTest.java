@@ -288,8 +288,9 @@ public class SweeperTargetImplTest {
         when(resource1.getModificationDate()).thenReturn(new DateTime(100L));
         when(resource1.getInputStream()).thenReturn(new ByteArrayInputStream("foo".getBytes("UTF-8")));
         target1 = spy(target1);
+        when(target1.isPartiallySized()).thenReturn(true);
         when(target1.isSized()).thenReturn(true);
-        doReturn(20L).when(target1).getSize();
+        when(target1.getSize()).thenReturn(20L);
 
         assertFalse(target1.isPartiallyHashed());
         assertFalse(target1.isHashed());
@@ -317,8 +318,9 @@ public class SweeperTargetImplTest {
 
     private SweeperTargetImpl prepareDirToHash(SweeperTargetImpl target, long size, SweeperTargetImpl... children) {
         target = spy(target);
+        when(target.isPartiallySized()).thenReturn(true);
         when(target.isSized()).thenReturn(true);
-        doReturn(size).when(target).getSize();
+        when(target.getSize()).thenReturn(size);
         when(target.getChildren()).thenReturn(ImmutableList.copyOf(children));
         return target;
     }
