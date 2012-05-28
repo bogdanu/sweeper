@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 
-class SweeperImpl implements Sweeper {
+public class SweeperImpl implements Sweeper {
 
     private final SweeperAnalyzer analyzer = new SweeperAnalyzer();
 

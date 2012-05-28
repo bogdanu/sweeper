@@ -33,7 +33,7 @@ import com.google.common.base.Preconditions;
  */
 public class Sha1Sum {
 
-    private static final int BUFFER_SIZE = 8192;
+    private static final int BUFFER_SIZE = 8 * (1 << 20);
 
     @Nullable private static MessageDigest sha1Algorithm;
 
