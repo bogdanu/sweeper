@@ -22,7 +22,7 @@ import org.joda.time.DateTime;
 
 /**
  * A resource that is a possible sweep candidate.
- * 
+ *
  * @author Bogdan Pistol
  */
 public interface SweeperTarget extends Comparable<SweeperTarget> {

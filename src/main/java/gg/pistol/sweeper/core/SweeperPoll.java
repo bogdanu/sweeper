@@ -23,7 +23,7 @@ import java.util.Collection;
 /**
  * Resolution of duplicate content. The collection of duplicates can be retrieved with {@link #getTargets()} and then
  * every target can be marked with {@link Mark} values.
- * 
+ *
  * @author Bogdan Pistol
  */
 public interface SweeperPoll {

@@ -35,10 +35,10 @@ public class ResourceFileFsTest {
         File file = mockFile("foo");
         File canonicalFile = mockFile("bar");
         when(file.getCanonicalFile()).thenReturn(canonicalFile);
-        
+
         ResourceFileFs res = new ResourceFileFs(file);
         assertEquals("bar", res.getName());
-        
+
         when(file.isFile()).thenReturn(false);
         try {
             new ResourceDirectoryFs(file);
@@ -47,7 +47,7 @@ public class ResourceFileFsTest {
             // expected
         }
     }
-    
+
     private File mockFile(String name) throws Exception {
         File file = mock(File.class);
         when(file.isFile()).thenReturn(true);
@@ -61,7 +61,7 @@ public class ResourceFileFsTest {
         File file = mockFile("foo");
         when(file.length()).thenReturn(10L);
         ResourceFileFs res = new ResourceFileFs(file);
-        
+
         assertEquals(10L, res.getSize());
     }
 
@@ -71,7 +71,7 @@ public class ResourceFileFsTest {
         DateTime time = new DateTime();
         when(file.lastModified()).thenReturn(time.getMillis());
         ResourceFileFs res = new ResourceFileFs(file);
-        
+
         assertEquals(time, res.getModificationDate());
     }
 

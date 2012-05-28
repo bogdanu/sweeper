@@ -18,7 +18,7 @@ package gg.pistol.sweeper.core.resource;
 
 /**
  * A named entity that represents an abstract resource.
- * 
+ *
  * @author Bogdan Pistol
  */
 public interface Resource extends Comparable<Resource> {

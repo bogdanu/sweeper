@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * Exception thrown in case a sweeper operation is aborted.
- * 
+ *
  * @author Bogdan Pistol
  */
 public class SweeperAbortException extends Exception {

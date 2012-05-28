@@ -55,5 +55,5 @@ public class ObjectVerifier {
         assertNotNull(obj.toString());
         assertTrue(obj.toString().length() > 0);
     }
-    
+
 }

@@ -28,9 +28,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class OperationTrackingListenerTest {
-    
+
     private SweeperOperationListener listener;
-    
+
     private OperationTrackingListener wrapper;
 
     @Before
@@ -38,7 +38,7 @@ public class OperationTrackingListenerTest {
         listener = mock(SweeperOperationListener.class);
         wrapper = new OperationTrackingListener(listener);
     }
-    
+
     @Test(expected = NullPointerException.class)
     public void testConstructor() {
         new OperationTrackingListener(null);
@@ -86,17 +86,17 @@ public class OperationTrackingListenerTest {
     @Test
     public void testIncrementPhase() {
         wrapper.incrementOperation(SweeperOperationPhase.SIZE_COMPUTATION);
-        
+
         long maxProgress = 50L;
-        
+
         wrapper.incrementPhase(SweeperOperationPhase.SIZE_DEDUPLICATION, 10L, maxProgress);
         wrapper.incrementPhase(SweeperOperationPhase.SIZE_DEDUPLICATION, 40L, maxProgress);
         wrapper.incrementPhase(SweeperOperationPhase.SIZE_DEDUPLICATION, 40L, maxProgress);
         wrapper.incrementPhase(SweeperOperationPhase.SIZE_DEDUPLICATION, 0, 0);
-        
+
         int expectedPercent1 = (int) (SweeperOperationPhase.SIZE_COMPUTATION.getPercentQuota() + SweeperOperationPhase.SIZE_DEDUPLICATION.getPercentQuota() * 10L / maxProgress);
         int expectedPercent2 = (int) (SweeperOperationPhase.SIZE_COMPUTATION.getPercentQuota() + SweeperOperationPhase.SIZE_DEDUPLICATION.getPercentQuota() * 40L / maxProgress);
-        
+
         verify(listener).updateOperationProgress(expectedPercent1);
         verify(listener).updateOperationProgress(expectedPercent2);
     }
@@ -105,7 +105,7 @@ public class OperationTrackingListenerTest {
     public void testIncrementOperation() {
         wrapper.incrementOperation(SweeperOperationPhase.SIZE_COMPUTATION);
         verify(listener).updateOperationProgress(SweeperOperationPhase.SIZE_COMPUTATION.getPercentQuota());
-        
+
         wrapper.incrementOperation(SweeperOperationPhase.SIZE_DEDUPLICATION);
         verify(listener).updateOperationProgress(SweeperOperationPhase.SIZE_COMPUTATION.getPercentQuota() + SweeperOperationPhase.SIZE_DEDUPLICATION.getPercentQuota());
 

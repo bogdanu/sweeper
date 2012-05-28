@@ -26,7 +26,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * File-system directory
- * 
+ *
  * @author Bogdan Pistol
  */
 public class ResourceDirectoryFs extends AbstractResource implements ResourceDirectory {
@@ -49,7 +49,7 @@ public class ResourceDirectoryFs extends AbstractResource implements ResourceDir
     public ResourceDirectory.ResourceCollectionResponse getSubresources() {
         Collection<Resource> resources = new ArrayList<Resource>();
         Collection<Exception> exceptions = new ArrayList<Exception>();
-        
+
         File[] files = null;
         try {
             files = getFiles(resource);
@@ -69,7 +69,7 @@ public class ResourceDirectoryFs extends AbstractResource implements ResourceDir
 
         return createResponse(resources, exceptions);
     }
-    
+
     private File[] getFiles(File directory) throws IOException {
         File[] ret = directory.listFiles();
         if (ret == null) {

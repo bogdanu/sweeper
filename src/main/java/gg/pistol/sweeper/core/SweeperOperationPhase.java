@@ -24,11 +24,11 @@ package gg.pistol.sweeper.core;
  * <li>The analysis operation (calling the method {@link Sweeper#analyze()}) is composed by the
  * {@link #FILESYSTEM_TRAVERSING}, {@link #SIZE_COMPUTATION}, {@link #SIZE_DEDUPLICATION}, {@link #HASH_COMPUTATION},
  * {@link #HASH_DEDUPLICATION}, {@link #COUNTING} and {@link #DUPLICATE_GROUPING} phases.</li>
- * 
+ *
  * <li>The deletion operation (calling the method {@link Sweeper#delete()}) is composed by the
  * {@link #FILESYSTEM_DELETION} phase.</li>
  * </ul>
- * 
+ *
  * @author Bogdan Pistol
  */
 public enum SweeperOperationPhase {

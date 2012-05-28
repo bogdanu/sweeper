@@ -31,10 +31,10 @@ public class Sha1SumTest {
         Sha1Sum sha1 = new Sha1Sum();
         ByteArrayInputStream stream = new ByteArrayInputStream("foo".getBytes("UTF-8"));
         assertEquals("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", sha1.compute(stream));
-        
+
         stream = new ByteArrayInputStream("bar".getBytes("UTF-8"));
         assertEquals("62cdb7020ff920e5aa642c3d4066950dd1f01f4d", sha1.compute(stream));
-        
+
         stream = new ByteArrayInputStream("".getBytes("UTF-8"));
         assertEquals("da39a3ee5e6b4b0d3255bfef95601890afd80709", sha1.compute(stream));
     }

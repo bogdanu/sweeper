@@ -23,7 +23,7 @@ import org.joda.time.DateTime;
 
 /**
  * A resource item which contains byte data.
- * 
+ *
  * @author Bogdan Pistol
  */
 public interface ResourceFile extends Resource {

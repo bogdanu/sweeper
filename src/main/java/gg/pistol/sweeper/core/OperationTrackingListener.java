@@ -21,11 +21,11 @@ import com.google.common.base.Preconditions;
 
 /**
  * Extends SweeperOperationListener to track the operation and phase progress.
- * 
+ *
  * @author Bogdan Pistol
  */
 class OperationTrackingListener implements SweeperOperationListener {
-    
+
     static final OperationTrackingListener IGNORE_OPERATION_LISTENER = new OperationTrackingListener(new SweeperOperationListener() {
         public void updateOperationProgress(int percent) { }
         public void updateOperationPhase(SweeperOperationPhase phase) { }

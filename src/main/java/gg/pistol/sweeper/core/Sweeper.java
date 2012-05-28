@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 
 /**
  * Duplicate file/directory cleaner
- * 
+ *
  * @author Bogdan Pistol
  */
 public interface Sweeper {

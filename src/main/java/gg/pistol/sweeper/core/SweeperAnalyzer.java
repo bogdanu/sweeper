@@ -281,10 +281,10 @@ class SweeperAnalyzer {
         int duplicateTargets = 0;
         int duplicateTargetFiles = 0;
         long duplicateSize = 0;
-        
+
         List<SweeperTargetImpl> hashDupUpperTargets = filterUpperTargets(hashDups.values());
         Multimap<String, SweeperTargetImpl> dups = filterDuplicateHash(hashDupUpperTargets, OperationTrackingListener.IGNORE_OPERATION_LISTENER);
-        
+
         for (String key : dups.keySet()) {
             Iterator<SweeperTargetImpl> iterator = dups.get(key).iterator();
             iterator.next();
@@ -293,11 +293,11 @@ class SweeperAnalyzer {
                 duplicateTargets += target.getTotalTargets();
                 duplicateTargetFiles += target.getTotalFiles();
                 duplicateSize += target.getSize();
-                
+
                 checkAbortFlag();
             }
         }
-        
+
         SweeperCountImpl count = new SweeperCountImpl(totalTargets, totalTargetFiles, totalSize, duplicateTargets,
                 duplicateTargetFiles, duplicateSize);
 

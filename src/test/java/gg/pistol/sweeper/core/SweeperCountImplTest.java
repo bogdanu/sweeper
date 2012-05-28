@@ -23,17 +23,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class SweeperCountImplTest {
-        
+
     private int totalTargets = 10;
     private int totalTargetFiles = 6;
     private long totalSize = 100;
-    
+
     private int duplicateTargets = 3;
     private int duplicateTargetFiles = 2;
     private long duplicateSize = 30;
-    
+
     private SweeperCountImpl count;
-    
+
     @Before
     public void setUp() {
         count = new SweeperCountImpl(totalTargets, totalTargetFiles, totalSize, duplicateTargets, duplicateTargetFiles, duplicateSize);

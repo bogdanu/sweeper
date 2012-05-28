@@ -29,7 +29,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * File-system file
- * 
+ *
  * @author Bogdan Pistol
  */
 public class ResourceFileFs extends AbstractResource implements ResourceFile {

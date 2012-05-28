@@ -28,15 +28,15 @@ import com.google.common.base.Preconditions;
 
 /**
  * SHA-1 hash
- * 
+ *
  * @author Bogdan Pistol
  */
 public class Sha1Sum {
 
     private static final int BUFFER_SIZE = 8192;
-    
+
     @Nullable private static MessageDigest sha1Algorithm;
-    
+
     public String compute(InputStream stream) throws NoSuchAlgorithmException, IOException {
         Preconditions.checkNotNull(stream);
         MessageDigest sha1 = getSha1Algorithm();
@@ -53,12 +53,12 @@ public class Sha1Sum {
         }
         return formatter.toString();
     }
-    
+
     protected MessageDigest getSha1Algorithm() throws NoSuchAlgorithmException {
         if (sha1Algorithm == null) {
             sha1Algorithm = MessageDigest.getInstance("SHA-1");
         }
         return sha1Algorithm;
     }
-    
+
 }

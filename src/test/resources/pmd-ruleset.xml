@@ -2,7 +2,7 @@
 <!--
     Sweeper
     Copyright (C) 2012 Bogdan Pistol
-    
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License version 3
     as published by the Free Software Foundation.
@@ -28,13 +28,13 @@
         <exclude name="EmptySynchronizedBlock" />
         <exclude name="AvoidThreadGroup" />
     </rule>
-    
+
     <rule ref="rulesets/braces.xml"></rule>
-    
+
     <rule ref="rulesets/clone.xml">
         <exclude name="CloneThrowsCloneNotSupportedException" />
     </rule>
-    
+
     <rule ref="rulesets/codesize.xml">
         <exclude name="ExcessiveClassLength" />
         <exclude name="ExcessivePublicCount" />
@@ -54,7 +54,7 @@
             <property name="minimum" value="6" />
         </properties>
     </rule>
-    
+
     <rule ref="rulesets/controversial.xml">
         <exclude name="OnlyOneReturn" />
         <exclude name="AssignmentInOperand" />
@@ -70,12 +70,12 @@
         <exclude name="CallSuperInConstructor" />
         <exclude name="AvoidFinalLocalVariable" />
     </rule>
-    
+
     <rule ref="rulesets/coupling.xml">
         <exclude name="CouplingBetweenObjects" />
         <exclude name="ExcessiveImports" />
     </rule>
-    
+
     <rule ref="rulesets/design.xml">
         <exclude name="UseSingleton" />
         <exclude name="SwitchStmtsShouldHaveDefault" />
@@ -102,22 +102,22 @@
             <property name="minimum" value="6" />
         </properties>
     </rule>
-    
+
     <rule ref="rulesets/finalizers.xml"></rule>
-    
+
     <rule ref="rulesets/imports.xml">
         <exclude name="TooManyStaticImports" />
     </rule>
-    
+
     <rule ref="rulesets/junit.xml">
         <exclude name="JUnitAssertionsShouldIncludeMessage" />
         <exclude name="JUnitTestsShouldIncludeAssert" />
         <exclude name="TestClassWithoutTestCases" />
         <exclude name="JUnitSpelling" />
     </rule>
-    
+
     <rule ref="rulesets/migrating.xml"></rule>
-    
+
     <rule ref="rulesets/naming.xml">
         <exclude name="ShortVariable" />
         <exclude name="LongVariable" />
@@ -126,25 +126,25 @@
         <exclude name="AvoidFieldNameMatchingMethodName" />
         <exclude name="AbstractNaming" />
     </rule>
-    
+
     <rule ref="rulesets/strictexception.xml">
         <exclude name="AvoidThrowingNullPointerException" />
         <exclude name="AvoidCatchingGenericException" />
         <exclude name="SignatureDeclareThrowsException" />
         <exclude name="AvoidRethrowingException" />
     </rule>
-    
+
     <rule ref="rulesets/strings.xml">
         <exclude name="AvoidDuplicateLiterals" />
         <exclude name="InefficientEmptyStringCheck" />
         <exclude name="InsufficientStringBufferDeclaration" />
         <exclude name="AvoidStringBufferField" />
     </rule>
-    
+
     <rule ref="rulesets/typeresolution.xml">
         <exclude name="UnusedImports" />
         <exclude name="SignatureDeclareThrowsException" />
     </rule>
-    
+
     <rule ref="rulesets/unusedcode.xml"></rule>
 </ruleset>

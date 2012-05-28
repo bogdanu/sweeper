@@ -20,7 +20,7 @@ import java.util.Collection;
 
 /**
  * A resource container that can have sub-resources.
- * 
+ *
  * @author Bogdan Pistol
  */
 public interface ResourceDirectory extends Resource {

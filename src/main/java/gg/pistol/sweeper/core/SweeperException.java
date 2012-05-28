@@ -22,7 +22,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * A wrapper around the possible exceptions that could happen while executing the {@link Sweeper} operations.
- * 
+ *
  * @author Bogdan Pistol
  */
 public class SweeperException extends Exception {

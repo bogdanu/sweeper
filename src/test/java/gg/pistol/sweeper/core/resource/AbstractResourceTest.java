@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class AbstractResourceTest {
-    
+
     private AbstractResource resource1;
     private AbstractResource resource1Copy;
     private AbstractResource resource2;
@@ -39,7 +39,7 @@ public class AbstractResourceTest {
         resource1Copy = createResource("bar");
         resource2 = createResource("foo");
     }
-    
+
     private AbstractResource createResource(String name) throws Exception {
         File file = mock(File.class);
         when(file.isFile()).thenReturn(true);
@@ -52,7 +52,7 @@ public class AbstractResourceTest {
     public void testCompareTo() {
         verifyCompareTo(resource1, resource1Copy, resource2);
     }
-    
+
     @Test
     public void testHashCode() {
         verifyHashCode(resource1, resource1Copy);

@@ -20,7 +20,7 @@ package gg.pistol.sweeper.core;
  * An individual action that applies to a target.
  * <p>
  * The target actions are executed in the scope of {@link SweeperOperationPhase}s.
- * 
+ *
  * @author Bogdan Pistol
  */
 public enum SweeperTargetAction {

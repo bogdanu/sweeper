@@ -18,7 +18,7 @@ package gg.pistol.sweeper.core;
 
 /**
  * Counters for different Sweeper target types.
- * 
+ *
  * @author Bogdan Pistol
  */
 public interface SweeperCount {

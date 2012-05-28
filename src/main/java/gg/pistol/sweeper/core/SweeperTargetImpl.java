@@ -55,7 +55,7 @@ class SweeperTargetImpl implements SweeperTarget {
     private long size;
     private int totalTargets;
     private int totalTargetFiles;
-    
+
     @Nullable private String hash;
     @Nullable private DateTime modificationDate;
 
@@ -362,10 +362,10 @@ class SweeperTargetImpl implements SweeperTarget {
     void setPoll(boolean poll) {
         this.poll = poll;
     }
-    
+
     void setDuplicateTargetGroup(DuplicateTargetGroup duplicateTargetGroup) {
         Preconditions.checkNotNull(duplicateTargetGroup);
         this.duplicateTargetGroup = duplicateTargetGroup;
     }
-    
+
 }

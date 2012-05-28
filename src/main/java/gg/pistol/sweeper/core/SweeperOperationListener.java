@@ -18,7 +18,7 @@ package gg.pistol.sweeper.core;
 
 /**
  * Listener for {@link Sweeper} operation progress.
- * 
+ *
  * @author Bogdan Pistol
  */
 public interface SweeperOperationListener {

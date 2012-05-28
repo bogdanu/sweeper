@@ -29,16 +29,16 @@ import java.util.Iterator;
 import org.junit.Test;
 
 public class ResourceDirectoryFsTest {
-    
+
     @Test
     public void testConstructor() throws Exception {
         File dir = mockFile("foo", true);
         File canonicalDir = mockFile("bar", true);
         when(dir.getCanonicalFile()).thenReturn(canonicalDir);
-        
+
         ResourceDirectoryFs res = new ResourceDirectoryFs(dir);
         assertEquals("bar", res.getName());
-        
+
         when(dir.isDirectory()).thenReturn(false);
         try {
             new ResourceDirectoryFs(dir);
@@ -47,7 +47,7 @@ public class ResourceDirectoryFsTest {
             // expected
         }
     }
-    
+
     private File mockFile(String name, boolean isDirectory) throws Exception {
         File file = mock(File.class);
         if (isDirectory) {
@@ -63,11 +63,11 @@ public class ResourceDirectoryFsTest {
     @Test
     public void testGetSubresources() throws Exception {
         File dir = mockFile("foo", true);
-        
+
         File child1 = mockFile("child1", true);
         File child2 = mockFile("child2", false);
         when(dir.listFiles()).thenReturn(new File[] {child1, child2});
-        
+
         ResourceDirectoryFs res = new ResourceDirectoryFs(dir);
         Iterator<Resource> iterator = res.getSubresources().getResources().iterator();
         assertEquals("child1", ((ResourceDirectoryFs) iterator.next()).getName());
@@ -77,7 +77,7 @@ public class ResourceDirectoryFsTest {
         when(child1.isDirectory()).thenReturn(false);
         assertEquals(1, res.getSubresources().getResources().size());
         assertEquals(1, res.getSubresources().getExceptions().size());
-        
+
         when(dir.listFiles()).thenReturn(null);
         assertTrue(res.getSubresources().getResources().isEmpty());
         assertEquals(1, res.getSubresources().getExceptions().size());
