@@ -174,24 +174,35 @@ class SweeperAnalyzer {
 
     private <T> Multimap<T, SweeperTargetImpl> filterDuplicates(Collection<SweeperTargetImpl> targets,
             Function<SweeperTargetImpl, T> indexFunction) throws SweeperAbortException {
-        Multimap<T, SweeperTargetImpl> dups = ArrayListMultimap.create();
+        Multimap<T, SweeperTargetImpl> map = ArrayListMultimap.create();
         for (SweeperTargetImpl target : targets) {
             T key = indexFunction.apply(target);
             if (key != null) {
-                dups.put(key, target);
+                map.put(key, target);
             }
             checkAbortFlag();
         }
 
-        Iterator<T> iterator = dups.keySet().iterator();
-        while (iterator.hasNext()) {
-            T key = iterator.next();
-            if (dups.get(key).size() == 1) {
-                iterator.remove();
-            }
+        Multimap<T, SweeperTargetImpl> ret = ArrayListMultimap.create();
+        for (T key : map.keySet()) {
             checkAbortFlag();
+
+            Collection<SweeperTargetImpl> collection = map.get(key);
+            if (collection.size() == 1) {
+                continue;
+            }
+
+            Collection<SweeperTargetImpl> values = new ArrayList<SweeperTargetImpl>();
+            for (SweeperTargetImpl target : collection) {
+                if (target.getParent() == null || target.getParent().getChildren().size() > 1) {
+                    values.add(target);
+                }
+            }
+            if (values.size() > 1) {
+                ret.putAll(key, values);
+            }
         }
-        return dups;
+        return ret;
     }
 
     private void computeHash(Collection<SweeperTargetImpl> targets, final OperationTrackingListener listener)
@@ -312,7 +323,6 @@ class SweeperAnalyzer {
         List<DuplicateTargetGroup> ret = new ArrayList<DuplicateTargetGroup>();
         for (String key : hashDups.keySet()) {
             Collection<SweeperTargetImpl> values = hashDups.get(key);
-            values = filterUpperTargets(values);
 
             DuplicateTargetGroup dup = new DuplicateTargetGroup(values);
             ret.add(dup);
