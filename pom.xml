@@ -52,8 +52,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.javaVersion>1.6</project.javaVersion>
-        <project.cobertura.minBranchCoverage>95</project.cobertura.minBranchCoverage>
-        <project.cobertura.minLineCoverage>95</project.cobertura.minLineCoverage>
+        <project.cobertura.minBranchCoverage>90</project.cobertura.minBranchCoverage>
+        <project.cobertura.minLineCoverage>90</project.cobertura.minLineCoverage>
 
 
         <!-- Dependency versions -->
