@@ -323,7 +323,7 @@ public class SweeperTargetImplTest {
         return target;
     }
     
-    private void computeHashDirectory(long expectedLastModified, String expectedHash, long dirSize, SweeperTargetImpl target, SweeperTargetImpl... children) throws Exception {
+    private void verifyComputeHashDirectory(long expectedLastModified, String expectedHash, long dirSize, SweeperTargetImpl target, SweeperTargetImpl... children) throws Exception {
         target = prepareDirToHash(target, dirSize, children);
         
         assertFalse(target.isPartiallyHashed());
@@ -344,10 +344,10 @@ public class SweeperTargetImplTest {
     public void testComputeHashDirectory() throws Exception {
         target1 = prepareChildToHash(target1, 100L, 150L, "foo");
         target2 = prepareChildToHash(target2, 200L, 250L, "bar");
-        computeHashDirectory(200L, 400L + "889ed5b4ac3cb37eb2a39531fb640e7d4d74c2c0", 400L, targetDir, target1, target2);
+        verifyComputeHashDirectory(200L, 400L + "889ed5b4ac3cb37eb2a39531fb640e7d4d74c2c0", 400L, targetDir, target1, target2);
         
         when(target2.getSize()).thenReturn(0L);
-        computeHashDirectory(100L, "foo", 150L, new SweeperTargetImpl(resourceDir, mockedParent), target1, target2);
+        verifyComputeHashDirectory(100L, "foo", 150L, new SweeperTargetImpl(resourceDir, mockedParent), target1, target2);
     }
     
     @Test

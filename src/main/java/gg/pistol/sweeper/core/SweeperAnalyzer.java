@@ -46,22 +46,23 @@ class SweeperAnalyzer {
 
     private int totalTargets;
 
-    List<DuplicateTargetGroup> compute(Set<Resource> targetResources, OperationTrackingListener listener)
+    List<DuplicateTargetGroup> compute(Set<Resource> targetResources, SweeperOperationListener listener)
             throws SweeperAbortException {
         Preconditions.checkNotNull(targetResources);
         Preconditions.checkNotNull(listener);
         Preconditions.checkArgument(!targetResources.isEmpty());
         abort = false;
+        OperationTrackingListener trackingListener = new OperationTrackingListener(listener);
 
-        SweeperTargetImpl root = traverseFilesystem(targetResources, listener);
-        Collection<SweeperTargetImpl> sized = computeSize(root, totalTargets, listener);
-        Multimap<Long, SweeperTargetImpl> sizeDups = filterDuplicateSize(sized, listener);
+        SweeperTargetImpl root = traverseFilesystem(targetResources, trackingListener);
+        Collection<SweeperTargetImpl> sized = computeSize(root, totalTargets, trackingListener);
+        Multimap<Long, SweeperTargetImpl> sizeDups = filterDuplicateSize(sized, trackingListener);
 
-        computeHash(sizeDups.values(), listener);
-        Multimap<String, SweeperTargetImpl> hashDups = filterDuplicateHash(sizeDups.values(), listener);
+        computeHash(sizeDups.values(), trackingListener);
+        Multimap<String, SweeperTargetImpl> hashDups = filterDuplicateHash(sizeDups.values(), trackingListener);
 
-        count = computeCount(root, hashDups, listener);
-        List<DuplicateTargetGroup> duplicates = createDuplicateGroups(hashDups, listener);
+        count = computeCount(root, hashDups, trackingListener);
+        List<DuplicateTargetGroup> duplicates = createDuplicateGroups(hashDups, trackingListener);
         return duplicates;
     }
 
@@ -274,24 +275,31 @@ class SweeperAnalyzer {
         listener.updateOperationPhase(SweeperOperationPhase.COUNTING);
 
         int totalTargets = root.getTotalTargets();
-        int totalFiles = root.getTotalFiles();
+        int totalTargetFiles = root.getTotalFiles();
         long totalSize = root.getSize();
 
-        int totalDuplicateTargets = 0;
-        int totalDuplicateFiles = 0;
-        long totalDuplicateSize = 0;
-        List<SweeperTargetImpl> dups = filterUpperTargets(hashDups.values());
-
-        for (SweeperTargetImpl target : dups) {
-            totalDuplicateTargets += target.getTotalTargets();
-            totalDuplicateFiles += target.getTotalFiles();
-            totalDuplicateSize += target.getSize();
-
-            checkAbortFlag();
+        int duplicateTargets = 0;
+        int duplicateTargetFiles = 0;
+        long duplicateSize = 0;
+        
+        List<SweeperTargetImpl> hashDupUpperTargets = filterUpperTargets(hashDups.values());
+        Multimap<String, SweeperTargetImpl> dups = filterDuplicateHash(hashDupUpperTargets, OperationTrackingListener.IGNORE_OPERATION_LISTENER);
+        
+        for (String key : dups.keySet()) {
+            Iterator<SweeperTargetImpl> iterator = dups.get(key).iterator();
+            iterator.next();
+            while (iterator.hasNext()) {
+                SweeperTargetImpl target = iterator.next();
+                duplicateTargets += target.getTotalTargets();
+                duplicateTargetFiles += target.getTotalFiles();
+                duplicateSize += target.getSize();
+                
+                checkAbortFlag();
+            }
         }
-
-        SweeperCountImpl count = new SweeperCountImpl(totalTargets, totalFiles, totalSize, totalDuplicateTargets,
-                totalDuplicateFiles, totalDuplicateSize);
+        
+        SweeperCountImpl count = new SweeperCountImpl(totalTargets, totalTargetFiles, totalSize, duplicateTargets,
+                duplicateTargetFiles, duplicateSize);
 
         listener.incrementOperation(SweeperOperationPhase.COUNTING);
         return count;

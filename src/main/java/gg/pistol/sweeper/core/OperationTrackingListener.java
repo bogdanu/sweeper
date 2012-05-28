@@ -25,6 +25,15 @@ import com.google.common.base.Preconditions;
  * @author Bogdan Pistol
  */
 class OperationTrackingListener implements SweeperOperationListener {
+    
+    static final OperationTrackingListener IGNORE_OPERATION_LISTENER = new OperationTrackingListener(new SweeperOperationListener() {
+        public void updateOperationProgress(int percent) { }
+        public void updateOperationPhase(SweeperOperationPhase phase) { }
+        public void updateTargetAction(SweeperTarget target, SweeperTargetAction action) { }
+        public void updateTargetException(SweeperTarget target, SweeperTargetAction action, SweeperException e) { }
+        public void operationFinished() { }
+        public void operationAborted() { }
+        });
 
     private final SweeperOperationListener listener;
 

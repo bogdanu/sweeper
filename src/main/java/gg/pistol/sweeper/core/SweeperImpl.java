@@ -41,7 +41,7 @@ class SweeperImpl implements Sweeper {
         count = null;
 
         try {
-            duplicates = analyzer.compute(targetResources, new OperationTrackingListener(listener));
+            duplicates = analyzer.compute(targetResources, listener);
             count = analyzer.getCount();
             listener.operationFinished();
         } catch (SweeperAbortException e) {
