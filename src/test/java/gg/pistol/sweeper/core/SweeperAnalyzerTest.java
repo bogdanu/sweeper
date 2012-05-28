@@ -30,6 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -41,6 +42,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SweeperAnalyzer.class)
@@ -120,7 +122,13 @@ public class SweeperAnalyzerTest {
         ResourceDirectory dir3 = mockDirectory("dir3", dir2, dir1CopyUpper, emptyFileDir, emptyDir, emptyFile2);
         ResourceFile file4 = mockFile("file4", 1L, 15L, "file4");
 
-        List<DuplicateTargetGroup> dups = analyzer.compute(ImmutableSet.of(dir3, file4), listener);
+        Set<Resource> set = Sets.newHashSet(dir3, file4);
+        for (int i = 0; i < 100; i++) {
+            ResourceFile file = mockFile("extraFile" + i, 0L, 0L, "");
+            when(file.getSize()).thenThrow(new RuntimeException());
+            set.add(file);
+        }
+        List<DuplicateTargetGroup> dups = analyzer.compute(set, listener);
 
         assertEquals(4, dups.size());
         assertEquals(3L + "24c6f5ec6943e59c19b08dd8f11c73ec8dd3b764", dups.get(0).getHash());
@@ -150,8 +158,8 @@ public class SweeperAnalyzerTest {
         verify(listener).updateOperationProgress(100);
 
         SweeperCountImpl count = analyzer.getCount();
-        assertEquals(16, count.getTotalTargets());
-        assertEquals(8, count.getTotalTargetFiles());
+        assertEquals(116, count.getTotalTargets());
+        assertEquals(108, count.getTotalTargetFiles());
         assertEquals(8, count.getTotalTargetDirectories());
         assertEquals(7L, count.getTotalSize());
 
