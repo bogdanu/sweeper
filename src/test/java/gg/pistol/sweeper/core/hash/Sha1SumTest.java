@@ -18,8 +18,6 @@ package gg.pistol.sweeper.core.hash;
 
 import static org.junit.Assert.*;
 
-import gg.pistol.sweeper.core.hash.Sha1Sum;
-
 import java.io.ByteArrayInputStream;
 
 import org.junit.Test;

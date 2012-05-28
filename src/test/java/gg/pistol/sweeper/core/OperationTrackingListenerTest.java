@@ -17,12 +17,6 @@
 package gg.pistol.sweeper.core;
 
 import static org.mockito.Mockito.*;
-import gg.pistol.sweeper.core.OperationTrackingListener;
-import gg.pistol.sweeper.core.SweeperException;
-import gg.pistol.sweeper.core.SweeperOperationListener;
-import gg.pistol.sweeper.core.SweeperOperationPhase;
-import gg.pistol.sweeper.core.SweeperTarget;
-import gg.pistol.sweeper.core.SweeperTargetAction;
 
 import org.junit.Before;
 import org.junit.Test;

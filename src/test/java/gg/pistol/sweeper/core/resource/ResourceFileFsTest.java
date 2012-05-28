@@ -20,9 +20,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import gg.pistol.sweeper.core.resource.ResourceDirectoryFs;
-import gg.pistol.sweeper.core.resource.ResourceFileFs;
-
 import java.io.File;
 
 import org.joda.time.DateTime;

@@ -19,9 +19,6 @@ package gg.pistol.sweeper.core;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import gg.pistol.sweeper.core.DuplicateTargetGroup;
-import gg.pistol.sweeper.core.OperationTrackingListener;
-import gg.pistol.sweeper.core.SweeperAnalyzer;
 import gg.pistol.sweeper.core.resource.Resource;
 import gg.pistol.sweeper.core.resource.ResourceDirectory;
 import gg.pistol.sweeper.core.resource.ResourceFile;

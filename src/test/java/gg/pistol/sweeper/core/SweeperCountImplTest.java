@@ -17,7 +17,6 @@
 package gg.pistol.sweeper.core;
 
 import static org.junit.Assert.*;
-import gg.pistol.sweeper.core.SweeperCountImpl;
 
 import org.junit.Before;
 import org.junit.Test;

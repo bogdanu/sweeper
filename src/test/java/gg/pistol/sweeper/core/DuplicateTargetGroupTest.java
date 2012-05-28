@@ -20,10 +20,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static gg.pistol.sweeper.test.ObjectVerifier.*;
 
-import gg.pistol.sweeper.core.DuplicateTargetGroup;
-import gg.pistol.sweeper.core.SweeperTarget;
-import gg.pistol.sweeper.core.SweeperTargetImpl;
-
 import java.util.Collections;
 import java.util.Iterator;
 

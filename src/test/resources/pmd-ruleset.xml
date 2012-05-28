@@ -51,7 +51,7 @@
     </rule>
     <rule ref="rulesets/codesize.xml/ExcessiveParameterList">
         <properties>
-            <property name="minimum" value="6" />
+            <property name="minimum" value="7" />
         </properties>
     </rule>
 
@@ -116,7 +116,9 @@
         <exclude name="JUnitSpelling" />
     </rule>
 
-    <rule ref="rulesets/migrating.xml"></rule>
+    <rule ref="rulesets/migrating.xml">
+        <exclude name="JUnitUseExpected" />
+    </rule>
 
     <rule ref="rulesets/naming.xml">
         <exclude name="ShortVariable" />

@@ -19,9 +19,6 @@ package gg.pistol.sweeper.core.resource;
 import static org.mockito.Mockito.*;
 import static gg.pistol.sweeper.test.ObjectVerifier.*;
 
-import gg.pistol.sweeper.core.resource.AbstractResource;
-import gg.pistol.sweeper.core.resource.ResourceFileFs;
-
 import java.io.File;
 
 import org.junit.Before;

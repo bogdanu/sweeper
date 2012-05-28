@@ -20,10 +20,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static gg.pistol.sweeper.test.ObjectVerifier.*;
 
-import gg.pistol.sweeper.core.SweeperException;
-import gg.pistol.sweeper.core.SweeperOperationListener;
-import gg.pistol.sweeper.core.SweeperTargetAction;
-import gg.pistol.sweeper.core.SweeperTargetImpl;
 import gg.pistol.sweeper.core.SweeperTarget.Mark;
 import gg.pistol.sweeper.core.SweeperTarget.Type;
 import gg.pistol.sweeper.core.resource.Resource;
