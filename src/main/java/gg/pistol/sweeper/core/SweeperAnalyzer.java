@@ -85,7 +85,7 @@ class SweeperAnalyzer {
         return root;
     }
 
-    private int expand(SweeperTargetImpl root, int limit, Collection<SweeperTargetImpl> nextTargets,
+    private int expand(SweeperTargetImpl root, int limit, @Nullable Collection<SweeperTargetImpl> nextTargets,
             OperationTrackingListener listener) throws SweeperAbortException {
         LinkedList<SweeperTargetImpl> next = new LinkedList<SweeperTargetImpl>();
         next.add(root);
@@ -163,7 +163,7 @@ class SweeperAnalyzer {
         listener.updateOperationPhase(SweeperOperationPhase.SIZE_DEDUPLICATION);
 
         Multimap<Long, SweeperTargetImpl> sizeDups = filterDuplicates(list, new Function<SweeperTargetImpl, Long>() {
-            public Long apply(SweeperTargetImpl input) {
+            @Nullable public Long apply(SweeperTargetImpl input) {
                 return input.isSized() ? input.getSize() : null;
             }
         });
@@ -261,7 +261,7 @@ class SweeperAnalyzer {
 
         Multimap<String, SweeperTargetImpl> hashDups = filterDuplicates(targets,
                 new Function<SweeperTargetImpl, String>() {
-                    public String apply(SweeperTargetImpl input) {
+                    @Nullable public String apply(SweeperTargetImpl input) {
                         return input.isHashed() ? input.getHash() : null;
                     }
                 });
