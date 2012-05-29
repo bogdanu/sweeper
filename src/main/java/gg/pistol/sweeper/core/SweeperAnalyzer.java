@@ -17,7 +17,6 @@
 package gg.pistol.sweeper.core;
 
 import gg.pistol.sweeper.core.SweeperTarget.Type;
-import gg.pistol.sweeper.core.hash.HashFunction;
 import gg.pistol.sweeper.core.resource.Resource;
 
 import java.security.NoSuchAlgorithmException;
@@ -30,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
 
@@ -44,7 +44,7 @@ class SweeperAnalyzer {
 
     private final HashFunction hashFunction;
 
-    private volatile boolean abort;
+    private final AtomicBoolean abort;
 
     @Nullable private SweeperCountImpl count;
 
@@ -56,6 +56,7 @@ class SweeperAnalyzer {
         } catch (NoSuchAlgorithmException e) {
             throw new SweeperException(e);
         }
+        abort = new AtomicBoolean();
     }
 
     List<DuplicateTargetGroup> compute(Set<Resource> targetResources, SweeperOperationListener listener)
@@ -63,7 +64,7 @@ class SweeperAnalyzer {
         Preconditions.checkNotNull(targetResources);
         Preconditions.checkNotNull(listener);
         Preconditions.checkArgument(!targetResources.isEmpty());
-        abort = false;
+        abort.set(false);
         OperationTrackingListener trackingListener = new OperationTrackingListener(listener);
 
         SweeperTargetImpl root = traverseFilesystem(targetResources, trackingListener);
@@ -125,7 +126,7 @@ class SweeperAnalyzer {
     }
 
     private void checkAbortFlag() throws SweeperAbortException {
-        if (abort) {
+        if (abort.get()) {
             throw new SweeperAbortException();
         }
     }
@@ -268,8 +269,8 @@ class SweeperAnalyzer {
         return new TargetVisitorMethod() {
             long currentSize = 0;
 
-            public void visit(SweeperTargetImpl target, int idx) {
-                target.computeHash(listener, hashFunction);
+            public void visit(SweeperTargetImpl target, int idx) throws SweeperAbortException {
+                target.computeHash(listener, hashFunction, abort);
                 if (target.getType() == Type.FILE) {
                     currentSize += target.getSize();
                     listener.incrementPhase(SweeperOperationPhase.HASH_COMPUTATION, currentSize, totalHashSize);
@@ -347,7 +348,7 @@ class SweeperAnalyzer {
     }
 
     void abort() {
-        abort = true;
+        abort.set(true);
     }
 
     SweeperCountImpl getCount() {
@@ -355,7 +356,7 @@ class SweeperAnalyzer {
     }
 
     private static interface TargetVisitorMethod {
-        void visit(SweeperTargetImpl target, int idx);
+        void visit(SweeperTargetImpl target, int idx) throws SweeperAbortException;
     }
 
 }

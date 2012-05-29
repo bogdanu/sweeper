@@ -14,13 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gg.pistol.sweeper.core.hash;
+package gg.pistol.sweeper.core;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 
@@ -29,7 +32,7 @@ import com.google.common.base.Preconditions;
  *
  * @author Bogdan Pistol
  */
-public class HashFunction {
+class HashFunction {
 
     private static final int BUFFER_SIZE = 8 * (1 << 20);
 
@@ -37,16 +40,21 @@ public class HashFunction {
 
     private final byte[] buf;
 
-    public HashFunction() throws NoSuchAlgorithmException {
+    HashFunction() throws NoSuchAlgorithmException {
         sha1Algorithm = MessageDigest.getInstance("SHA-1");
         buf = new byte[BUFFER_SIZE];
     }
 
-    public String compute(InputStream stream) throws IOException {
+    String compute(InputStream stream, @Nullable AtomicBoolean abort) throws IOException, SweeperAbortException {
         Preconditions.checkNotNull(stream);
         int len;
         while ((len = stream.read(buf)) != -1) {
             sha1Algorithm.update(buf, 0, len);
+
+            if (abort != null && abort.get()) {
+                sha1Algorithm.reset();
+                throw new SweeperAbortException();
+            }
         }
         byte[] digest = sha1Algorithm.digest();
         sha1Algorithm.reset();
@@ -55,6 +63,10 @@ public class HashFunction {
             formatter.format("%02x", b);
         }
         return formatter.toString();
+    }
+
+    String compute(InputStream stream) throws IOException, SweeperAbortException {
+        return compute(stream, null);
     }
 
 }

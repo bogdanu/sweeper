@@ -14,15 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gg.pistol.sweeper.core.hash;
+package gg.pistol.sweeper.core;
 
 import static org.junit.Assert.*;
+
+import gg.pistol.sweeper.core.HashFunction;
 
 import java.io.ByteArrayInputStream;
 
 import org.junit.Test;
 
-public class Sha1SumTest {
+public class HashFunctionTest {
 
     @Test
     public void testCompute() throws Exception {

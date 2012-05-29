@@ -16,7 +16,6 @@
  */
 package gg.pistol.sweeper.core;
 
-import gg.pistol.sweeper.core.hash.HashFunction;
 import gg.pistol.sweeper.core.resource.Resource;
 import gg.pistol.sweeper.core.resource.ResourceDirectory;
 import gg.pistol.sweeper.core.resource.ResourceFile;
@@ -29,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
 
@@ -182,9 +182,10 @@ class SweeperTargetImpl implements SweeperTarget {
      * <p>
      * The {@link #expand()} and {@link #computeSize()} methods must be called before this one.
      */
-    void computeHash(SweeperOperationListener listener, HashFunction hashFunction) {
+    void computeHash(SweeperOperationListener listener, HashFunction hashFunction, AtomicBoolean abort) throws SweeperAbortException {
         Preconditions.checkNotNull(listener);
         Preconditions.checkNotNull(hashFunction);
+        Preconditions.checkNotNull(abort);
         Preconditions.checkState(isPartiallySized(), "Size not computed");
         if (isPartiallyHashed()) {
             return;
@@ -199,10 +200,14 @@ class SweeperTargetImpl implements SweeperTarget {
         hashed = true;
         try {
             if (type == Type.FILE) {
-                computeFileHash(hashFunction);
+                computeFileHash(hashFunction, abort);
             } else {
                 computeDirectoryHash(hashFunction);
             }
+        } catch (SweeperAbortException e) {
+            partiallyHashed = false;
+            hashed = false;
+            throw e;
         } catch (IllegalStateException e) {
             partiallyHashed = false;
             hashed = false;
@@ -213,19 +218,19 @@ class SweeperTargetImpl implements SweeperTarget {
         }
     }
 
-    private void computeFileHash(HashFunction hashFunction) throws IOException {
+    private void computeFileHash(HashFunction hashFunction, AtomicBoolean abort) throws IOException, SweeperAbortException {
         ResourceFile res = (ResourceFile) resource;
 
         modificationDate = res.getModificationDate();
         InputStream stream = res.getInputStream();
         try {
-            hash = getSize() + hashFunction.compute(stream);
+            hash = getSize() + hashFunction.compute(stream, abort);
         } finally {
             Closeables.closeQuietly(stream);
         }
     }
 
-    private void computeDirectoryHash(HashFunction hashFunction) throws IOException {
+    private void computeDirectoryHash(HashFunction hashFunction) throws IOException, SweeperAbortException {
         modificationDate = null;
         List<String> hashes = new ArrayList<String>();
         for (SweeperTargetImpl child : getChildren()) {
