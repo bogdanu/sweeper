@@ -138,6 +138,8 @@ public class SweeperAnalyzerTest {
         assertTrue(areTargetsFromResources(dups.get(2).getTargets(), file1, file1Copy));
         assertTrue(areTargetsFromResources(dups.get(3).getTargets(), emptyFileDir, emptyDir, emptyFile2));
 
+        assertFalse(((SweeperTargetImpl) dups.get(3).getTargets().iterator().next()).getParent().getParent().isHashed());
+
         verify(listener).updateOperationPhase(SweeperOperationPhase.FILESYSTEM_TRAVERSING);
         verify(listener, atLeastOnce()).updateTargetAction(any(SweeperTargetImpl.class), eq(SweeperTargetAction.EXPAND));
 

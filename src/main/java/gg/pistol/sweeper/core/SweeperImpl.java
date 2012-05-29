@@ -27,11 +27,15 @@ import com.google.common.base.Preconditions;
 
 public class SweeperImpl implements Sweeper {
 
-    private final SweeperAnalyzer analyzer = new SweeperAnalyzer();
+    private final SweeperAnalyzer analyzer;
 
     @Nullable private List<DuplicateTargetGroup> duplicates;
 
     @Nullable private SweeperCountImpl count;
+
+    public SweeperImpl() throws SweeperException {
+        analyzer = new SweeperAnalyzer();
+    }
 
     public void analyze(Set<Resource> targetResources, SweeperOperationListener listener) {
         Preconditions.checkNotNull(targetResources);

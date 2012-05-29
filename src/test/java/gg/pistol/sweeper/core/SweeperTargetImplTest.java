@@ -22,6 +22,7 @@ import static gg.pistol.sweeper.test.ObjectVerifier.*;
 
 import gg.pistol.sweeper.core.SweeperTarget.Mark;
 import gg.pistol.sweeper.core.SweeperTarget.Type;
+import gg.pistol.sweeper.core.hash.HashFunction;
 import gg.pistol.sweeper.core.resource.Resource;
 import gg.pistol.sweeper.core.resource.ResourceDirectory;
 import gg.pistol.sweeper.core.resource.ResourceFile;
@@ -53,6 +54,7 @@ public class SweeperTargetImplTest {
     private SweeperTargetImpl targetDir;
 
     private SweeperOperationListener listener;
+    private HashFunction hashFunction;
 
     @Before
     public void setUp() throws Exception {
@@ -68,6 +70,8 @@ public class SweeperTargetImplTest {
         target1Copy = new SweeperTargetImpl(resource1Copy, mockedParent);
         target2 = new SweeperTargetImpl(resource2, mockedParent);
         targetDir = new SweeperTargetImpl(resourceDir, mockedParent);
+
+        hashFunction = new HashFunction();
     }
 
     private ResourceFile mockResourceFile(String name) throws Exception {
@@ -292,7 +296,7 @@ public class SweeperTargetImplTest {
         assertFalse(target1.isHashed());
 
         for (int i = 1; i <= 2; i++) {
-            target1.computeHash(listener);
+            target1.computeHash(listener, hashFunction);
 
             assertTrue(target1.isPartiallyHashed());
             assertTrue(target1.isHashed());
@@ -328,7 +332,7 @@ public class SweeperTargetImplTest {
         assertFalse(target.isHashed());
 
         for (int i = 1; i <= 2; i++) {
-            target.computeHash(listener);
+            target.computeHash(listener, hashFunction);
 
             assertTrue(target.isPartiallyHashed());
             assertTrue(target.isHashed());
@@ -351,14 +355,21 @@ public class SweeperTargetImplTest {
     @Test
     public void testComputeHashException() throws Exception {
         try {
-            target1.computeHash(null);
+            target1.computeHash(null, hashFunction);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            target1.computeHash(listener);
+            target1.computeHash(listener, null);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            target1.computeHash(listener, hashFunction);
             fail();
         } catch (IllegalStateException e) {
             // expected
@@ -366,7 +377,7 @@ public class SweeperTargetImplTest {
 
         try {
             targetDir = prepareDirToHash(targetDir, 0L, target1);
-            targetDir.computeHash(listener);
+            targetDir.computeHash(listener, hashFunction);
             fail();
         } catch (IllegalStateException e) {
             // expected
@@ -377,7 +388,7 @@ public class SweeperTargetImplTest {
         target1 = prepareChildToHash(target1, 0L, 0L, "");
         when(target1.isHashed()).thenReturn(false);
         targetDir = prepareDirToHash(new SweeperTargetImpl(resourceDir, mockedParent), 0L, target1);
-        targetDir.computeHash(listener);
+        targetDir.computeHash(listener, hashFunction);
         verify(listener).updateTargetException(eq(targetDir), eq(SweeperTargetAction.COMPUTE_HASH), any(SweeperException.class));
     }
 

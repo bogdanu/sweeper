@@ -26,7 +26,7 @@ public class Sha1SumTest {
 
     @Test
     public void testCompute() throws Exception {
-        Sha1Sum sha1 = new Sha1Sum();
+        HashFunction sha1 = new HashFunction();
         ByteArrayInputStream stream = new ByteArrayInputStream("foo".getBytes("UTF-8"));
         assertEquals("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", sha1.compute(stream));
 

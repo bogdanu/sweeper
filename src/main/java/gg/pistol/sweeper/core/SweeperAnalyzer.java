@@ -17,8 +17,10 @@
 package gg.pistol.sweeper.core;
 
 import gg.pistol.sweeper.core.SweeperTarget.Type;
+import gg.pistol.sweeper.core.hash.HashFunction;
 import gg.pistol.sweeper.core.resource.Resource;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,11 +42,21 @@ class SweeperAnalyzer {
 
     private static final int INITIAL_EXPAND_LIMIT = 100;
 
+    private final HashFunction hashFunction;
+
     private volatile boolean abort;
 
     @Nullable private SweeperCountImpl count;
 
     private int totalTargets;
+
+    SweeperAnalyzer() throws SweeperException {
+        try {
+            hashFunction = new HashFunction();
+        } catch (NoSuchAlgorithmException e) {
+            throw new SweeperException(e);
+        }
+    }
 
     List<DuplicateTargetGroup> compute(Set<Resource> targetResources, SweeperOperationListener listener)
             throws SweeperAbortException {
@@ -257,7 +269,7 @@ class SweeperAnalyzer {
             long currentSize = 0;
 
             public void visit(SweeperTargetImpl target, int idx) {
-                target.computeHash(listener);
+                target.computeHash(listener, hashFunction);
                 if (target.getType() == Type.FILE) {
                     currentSize += target.getSize();
                     listener.incrementPhase(SweeperOperationPhase.HASH_COMPUTATION, currentSize, totalHashSize);

@@ -22,8 +22,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Preconditions;
 
 /**
@@ -31,34 +29,30 @@ import com.google.common.base.Preconditions;
  *
  * @author Bogdan Pistol
  */
-public class Sha1Sum {
+public class HashFunction {
 
     private static final int BUFFER_SIZE = 8 * (1 << 20);
 
-    @Nullable private static MessageDigest sha1Algorithm;
+    private final MessageDigest sha1Algorithm;
 
-    public String compute(InputStream stream) throws NoSuchAlgorithmException, IOException {
+    public HashFunction() throws NoSuchAlgorithmException {
+        sha1Algorithm = MessageDigest.getInstance("SHA-1");
+    }
+
+    public String compute(InputStream stream) throws IOException {
         Preconditions.checkNotNull(stream);
-        MessageDigest sha1 = getSha1Algorithm();
         byte[] buf = new byte[BUFFER_SIZE];
         int len;
         while ((len = stream.read(buf)) != -1) {
-            sha1.update(buf, 0, len);
+            sha1Algorithm.update(buf, 0, len);
         }
-        byte[] digest = sha1.digest();
-        sha1.reset();
+        byte[] digest = sha1Algorithm.digest();
+        sha1Algorithm.reset();
         Formatter formatter = new Formatter();
         for (byte b : digest) {
             formatter.format("%02x", b);
         }
         return formatter.toString();
-    }
-
-    protected MessageDigest getSha1Algorithm() throws NoSuchAlgorithmException {
-        if (sha1Algorithm == null) {
-            sha1Algorithm = MessageDigest.getInstance("SHA-1");
-        }
-        return sha1Algorithm;
     }
 
 }

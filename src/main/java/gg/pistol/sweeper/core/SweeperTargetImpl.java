@@ -16,7 +16,7 @@
  */
 package gg.pistol.sweeper.core;
 
-import gg.pistol.sweeper.core.hash.Sha1Sum;
+import gg.pistol.sweeper.core.hash.HashFunction;
 import gg.pistol.sweeper.core.resource.Resource;
 import gg.pistol.sweeper.core.resource.ResourceDirectory;
 import gg.pistol.sweeper.core.resource.ResourceFile;
@@ -24,7 +24,6 @@ import gg.pistol.sweeper.core.resource.ResourceFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,8 +48,6 @@ class SweeperTargetImpl implements SweeperTarget {
     @Nullable private final SweeperTargetImpl parent;
 
     private final Collection<SweeperTargetImpl> children;
-
-    private final Sha1Sum sha1Sum = new Sha1Sum();
 
     private long size;
     private int totalTargets;
@@ -185,8 +182,9 @@ class SweeperTargetImpl implements SweeperTarget {
      * <p>
      * The {@link #expand()} and {@link #computeSize()} methods must be called before this one.
      */
-    void computeHash(SweeperOperationListener listener) {
+    void computeHash(SweeperOperationListener listener, HashFunction hashFunction) {
         Preconditions.checkNotNull(listener);
+        Preconditions.checkNotNull(hashFunction);
         Preconditions.checkState(isPartiallySized(), "Size not computed");
         if (isPartiallyHashed()) {
             return;
@@ -201,9 +199,9 @@ class SweeperTargetImpl implements SweeperTarget {
         hashed = true;
         try {
             if (type == Type.FILE) {
-                computeFileHash();
+                computeFileHash(hashFunction);
             } else {
-                computeDirectoryHash();
+                computeDirectoryHash(hashFunction);
             }
         } catch (IllegalStateException e) {
             partiallyHashed = false;
@@ -215,19 +213,19 @@ class SweeperTargetImpl implements SweeperTarget {
         }
     }
 
-    private void computeFileHash() throws IOException, NoSuchAlgorithmException {
+    private void computeFileHash(HashFunction hashFunction) throws IOException {
         ResourceFile res = (ResourceFile) resource;
 
         modificationDate = res.getModificationDate();
         InputStream stream = res.getInputStream();
         try {
-            hash = getSize() + sha1Sum.compute(stream);
+            hash = getSize() + hashFunction.compute(stream);
         } finally {
             Closeables.closeQuietly(stream);
         }
     }
 
-    private void computeDirectoryHash() throws NoSuchAlgorithmException, IOException {
+    private void computeDirectoryHash(HashFunction hashFunction) throws IOException {
         modificationDate = null;
         List<String> hashes = new ArrayList<String>();
         for (SweeperTargetImpl child : getChildren()) {
@@ -248,7 +246,7 @@ class SweeperTargetImpl implements SweeperTarget {
         } else {
             Collections.sort(hashes);
             ByteArrayInputStream stream = new ByteArrayInputStream(Joiner.on("-").join(hashes).getBytes());
-            hash = getSize() + sha1Sum.compute(stream);
+            hash = getSize() + hashFunction.compute(stream);
         }
     }
 

@@ -55,7 +55,6 @@
         <project.cobertura.minBranchCoverage>90</project.cobertura.minBranchCoverage>
         <project.cobertura.minLineCoverage>90</project.cobertura.minLineCoverage>
 
-
         <!-- Dependency versions -->
         <version.slf4j.api>1.6.4</version.slf4j.api>
         <version.logback.classic>1.0.2</version.logback.classic>
