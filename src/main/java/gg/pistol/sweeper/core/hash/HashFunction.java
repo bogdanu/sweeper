@@ -35,13 +35,15 @@ public class HashFunction {
 
     private final MessageDigest sha1Algorithm;
 
+    private final byte[] buf;
+
     public HashFunction() throws NoSuchAlgorithmException {
         sha1Algorithm = MessageDigest.getInstance("SHA-1");
+        buf = new byte[BUFFER_SIZE];
     }
 
     public String compute(InputStream stream) throws IOException {
         Preconditions.checkNotNull(stream);
-        byte[] buf = new byte[BUFFER_SIZE];
         int len;
         while ((len = stream.read(buf)) != -1) {
             sha1Algorithm.update(buf, 0, len);
