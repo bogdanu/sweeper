@@ -16,6 +16,8 @@
  */
 package gg.pistol.sweeper.core;
 
+import gg.pistol.lumberjack.JackLogger;
+import gg.pistol.lumberjack.JackLoggerFactory;
 import gg.pistol.sweeper.core.SweeperTarget.Type;
 import gg.pistol.sweeper.core.resource.Resource;
 
@@ -33,6 +35,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
 
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
@@ -42,12 +46,12 @@ class SweeperAnalyzer {
 
     private static final int INITIAL_EXPAND_LIMIT = 100;
 
-    private final HashFunction hashFunction;
+    private final JackLogger log;
 
+    private final HashFunction hashFunction;
     private final AtomicBoolean abort;
 
     @Nullable private SweeperCountImpl count;
-
     private int totalTargets;
 
     SweeperAnalyzer() throws SweeperException {
@@ -57,6 +61,7 @@ class SweeperAnalyzer {
             throw new SweeperException(e);
         }
         abort = new AtomicBoolean();
+        log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(SweeperAnalyzer.class));
     }
 
     List<DuplicateTargetGroup> compute(Set<Resource> targetResources, SweeperOperationListener listener)
@@ -64,6 +69,8 @@ class SweeperAnalyzer {
         Preconditions.checkNotNull(targetResources);
         Preconditions.checkNotNull(listener);
         Preconditions.checkArgument(!targetResources.isEmpty());
+
+        log.trace("Computing the analysis for the resources {}", targetResources);
         abort.set(false);
         OperationTrackingListener trackingListener = new OperationTrackingListener(listener);
 
@@ -81,6 +88,7 @@ class SweeperAnalyzer {
 
     private SweeperTargetImpl traverseFilesystem(Set<Resource> targetResources, OperationTrackingListener listener)
             throws SweeperAbortException {
+        log.trace("Traversing the filesystem");
         listener.updateOperationPhase(SweeperOperationPhase.FILESYSTEM_TRAVERSING);
         SweeperTargetImpl root = new SweeperTargetImpl(targetResources);
 
@@ -100,6 +108,7 @@ class SweeperAnalyzer {
 
     private int expand(SweeperTargetImpl root, int limit, @Nullable Collection<SweeperTargetImpl> nextTargets,
             OperationTrackingListener listener) throws SweeperAbortException {
+        log.trace("Expanding {} with limit <{}>", root, limit);
         LinkedList<SweeperTargetImpl> next = new LinkedList<SweeperTargetImpl>();
         next.add(root);
         int targets = -1;
@@ -127,12 +136,14 @@ class SweeperAnalyzer {
 
     private void checkAbortFlag() throws SweeperAbortException {
         if (abort.get()) {
+            log.info("Detected that the abort flag is set");
             throw new SweeperAbortException();
         }
     }
 
     private Collection<SweeperTargetImpl> computeSize(SweeperTargetImpl root, final int targets,
             final OperationTrackingListener listener) throws SweeperAbortException {
+        log.trace("Computing the size for {} that has <{}> sub-targets", root, targets);
         final Collection<SweeperTargetImpl> ret = new ArrayList<SweeperTargetImpl>();
         listener.updateOperationPhase(SweeperOperationPhase.SIZE_COMPUTATION);
 
@@ -173,6 +184,7 @@ class SweeperAnalyzer {
 
     private Multimap<Long, SweeperTargetImpl> filterDuplicateSize(Collection<SweeperTargetImpl> list,
             OperationTrackingListener listener) throws SweeperAbortException {
+        log.trace("Deduplicating the size");
         listener.updateOperationPhase(SweeperOperationPhase.SIZE_DEDUPLICATION);
 
         Multimap<Long, SweeperTargetImpl> sizeDups = filterDuplicates(list, new Function<SweeperTargetImpl, Long>() {
@@ -220,6 +232,7 @@ class SweeperAnalyzer {
 
     private void computeHash(Collection<SweeperTargetImpl> targets, final OperationTrackingListener listener)
             throws SweeperAbortException {
+        log.trace("Computing the hash for targets {}", targets);
         listener.updateOperationPhase(SweeperOperationPhase.HASH_COMPUTATION);
         targets = filterUpperTargets(targets);
 
@@ -281,6 +294,7 @@ class SweeperAnalyzer {
 
     private Multimap<String, SweeperTargetImpl> filterDuplicateHash(Collection<SweeperTargetImpl> targets,
             OperationTrackingListener listener) throws SweeperAbortException {
+        log.trace("Deduplicating the hash for targets {}", targets);
         listener.updateOperationPhase(SweeperOperationPhase.HASH_DEDUPLICATION);
 
         Multimap<String, SweeperTargetImpl> hashDups = filterDuplicates(targets,
@@ -296,6 +310,7 @@ class SweeperAnalyzer {
 
     private SweeperCountImpl computeCount(SweeperTargetImpl root, Multimap<String, SweeperTargetImpl> hashDups,
             OperationTrackingListener listener) throws SweeperAbortException {
+        log.trace("Counting the root {} and the hash duplicates {}", root, hashDups);
         listener.updateOperationPhase(SweeperOperationPhase.COUNTING);
 
         int totalTargets = root.getTotalTargets();
@@ -331,6 +346,7 @@ class SweeperAnalyzer {
 
     private List<DuplicateTargetGroup> createDuplicateGroups(Multimap<String, SweeperTargetImpl> hashDups,
             OperationTrackingListener listener) throws SweeperAbortException {
+        log.trace("Duplicate grouping");
         listener.updateOperationPhase(SweeperOperationPhase.DUPLICATE_GROUPING);
 
         List<DuplicateTargetGroup> ret = new ArrayList<DuplicateTargetGroup>();
@@ -348,6 +364,7 @@ class SweeperAnalyzer {
     }
 
     void abort() {
+        log.trace("Aborting the analysis");
         abort.set(true);
     }
 
