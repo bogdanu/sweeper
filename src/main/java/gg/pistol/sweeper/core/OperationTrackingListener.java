@@ -17,77 +17,115 @@
 package gg.pistol.sweeper.core;
 
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 
 /**
- * Extends SweeperOperationListener to track the operation and phase progress.
+ * Extends SweeperOperationListener to track operation progress.
  *
  * @author Bogdan Pistol
  */
+// package private
 class OperationTrackingListener implements SweeperOperationListener {
 
-    static final OperationTrackingListener IGNORE_OPERATION_LISTENER = new OperationTrackingListener(new SweeperOperationListener() {
-        public void updateOperationProgress(int percent) { }
-        public void updateOperationPhase(SweeperOperationPhase phase) { }
-        public void updateTargetAction(SweeperTarget target, SweeperTargetAction action) { }
-        public void updateTargetException(SweeperTarget target, SweeperTargetAction action, SweeperException e) { }
-        public void operationFinished() { }
-        public void operationAborted() { }
+    static final OperationTrackingListener NOOP_LISTENER = new OperationTrackingListener(new SweeperOperationListener() {
+        public void updateOperation(SweeperOperation operation) { }
+        public void updateOperationProgress(long operationProgress, long operationSize, int percentGlobalProgress) { }
+        public void updateTargetAction(Target target, TargetAction action) { }
+        public void updateTargetException(Target target, TargetAction action, SweeperException e) { }
         });
 
     private final SweeperOperationListener listener;
 
-    private int phaseProgress;
+    @Nullable
+    private SweeperOperation operation;
 
-    private int operationProgress;
+    private long operationProgress = -1;
+    private long operationMaxProgress = 0;
+    private int percentGlobalProgress;
 
     OperationTrackingListener(SweeperOperationListener listener) {
         Preconditions.checkNotNull(listener);
         this.listener = listener;
     }
 
-    public void updateOperationProgress(int percent) {
-        listener.updateOperationProgress(percent);
+    public void updateOperation(SweeperOperation operation) {
+        Preconditions.checkState(this.operation == null);
+
+        this.operation = operation;
+        listener.updateOperation(operation);
     }
 
-    public void updateOperationPhase(SweeperOperationPhase phase) {
-        listener.updateOperationPhase(phase);
+    public void updateOperationProgress(long operationProgress, long operationMaxProgress, int percentGlobalProgress) {
+        Preconditions.checkState(operation != null);
+        Preconditions.checkArgument(operationMaxProgress == this.operationMaxProgress);
+        Preconditions.checkArgument(operationProgress >= 0 && operationProgress <= operationMaxProgress);
+        Preconditions.checkArgument(percentGlobalProgress >= 0 && percentGlobalProgress <= 100);
+
+        listener.updateOperationProgress(operationProgress, operationMaxProgress, percentGlobalProgress);
     }
 
-    public void updateTargetAction(SweeperTarget target, SweeperTargetAction action) {
+    public void updateTargetAction(Target target, TargetAction action) {
+        Preconditions.checkState(operation != null);
+        Preconditions.checkNotNull(target);
+        Preconditions.checkNotNull(action);
+
         listener.updateTargetAction(target, action);
     }
 
-    public void updateTargetException(SweeperTarget target, SweeperTargetAction action, SweeperException e) {
+    public void updateTargetException(Target target, TargetAction action, SweeperException e) {
+        Preconditions.checkState(operation != null);
+        Preconditions.checkNotNull(target);
+        Preconditions.checkNotNull(action);
+        Preconditions.checkNotNull(e);
+
         listener.updateTargetException(target, action, e);
     }
 
-    public void operationFinished() {
-        listener.operationFinished();
+    void setOperationMaxProgress(long operationMaxProgress) {
+        Preconditions.checkState(operation != null);
+        Preconditions.checkArgument(operationMaxProgress >= 0);
+
+        this.operationMaxProgress = operationMaxProgress;
     }
 
-    public void operationAborted() {
-        listener.operationAborted();
-    }
+    void incrementProgress(long progress) {
+        Preconditions.checkState(operation != null);
+        Preconditions.checkState(operationMaxProgress >= 0);
+        Preconditions.checkArgument(progress >= 0 && progress <= operationMaxProgress);
 
-    void incrementPhase(SweeperOperationPhase phase, long progress, long maxProgress) {
-        int p = normalizeProgress(phase, progress, maxProgress);
-        if (p > phaseProgress) {
-            phaseProgress = p;
-            updateOperationProgress(operationProgress + phaseProgress);
+        if (progress > operationProgress) {
+            operationProgress = progress;
+            int percent = normalizeProgress(operation, operationProgress, operationMaxProgress);
+            updateOperationProgress(operationProgress, operationMaxProgress, percentGlobalProgress + percent);
         }
     }
 
-    void incrementOperation(SweeperOperationPhase phase) {
-        operationProgress += phase.getPercentQuota();
-        if (phaseProgress < phase.getPercentQuota()) {
-            updateOperationProgress(operationProgress);
-        }
-        phaseProgress = 0;
+    void incrementMicroProgress(long microProgress) {
+        Preconditions.checkState(operation != null);
+        Preconditions.checkState(operationMaxProgress >= 0);
+        microProgress += operationProgress;
+        Preconditions.checkArgument(microProgress >= 0 && microProgress <= operationMaxProgress);
+
+        incrementProgress(microProgress);
     }
 
-    private int normalizeProgress(SweeperOperationPhase phase, long progress, long maxProgress) {
-        return maxProgress == 0 ? 0 : (int) (phase.getPercentQuota() * progress / maxProgress);
+    void operationCompleted() {
+        Preconditions.checkState(operation != null);
+        Preconditions.checkState(operationMaxProgress >= 0);
+
+        percentGlobalProgress += operation.getPercentQuota();
+        if (operationProgress < operationMaxProgress) {
+            updateOperationProgress(operationMaxProgress, operationMaxProgress, percentGlobalProgress);
+        }
+        operationProgress = -1;
+        operationMaxProgress = 0;
+        operation = null;
+    }
+
+    private int normalizeProgress(SweeperOperation operation, long progress, long maxProgress) {
+        return maxProgress == 0 ? 0 : (int) (operation.getPercentQuota() * progress / maxProgress);
     }
 
 }

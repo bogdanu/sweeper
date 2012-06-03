@@ -20,8 +20,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static gg.pistol.sweeper.test.ObjectVerifier.*;
 
-import gg.pistol.sweeper.core.SweeperTarget.Mark;
-import gg.pistol.sweeper.core.SweeperTarget.Type;
+import gg.pistol.sweeper.core.Target.Mark;
+import gg.pistol.sweeper.core.Target.Type;
 import gg.pistol.sweeper.core.resource.Resource;
 import gg.pistol.sweeper.core.resource.ResourceDirectory;
 import gg.pistol.sweeper.core.resource.ResourceFile;
@@ -39,21 +39,21 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-public class SweeperTargetImplTest {
+public class TargetImplTest {
 
     private ResourceFile resource1;
     private ResourceFile resource1Copy;
     private ResourceFile resource2;
     private ResourceDirectory resourceDir;
 
-    private SweeperTargetImpl mockedParent;
+    private TargetImpl mockedParent;
 
-    private SweeperTargetImpl target1;
-    private SweeperTargetImpl target1Copy;
-    private SweeperTargetImpl target2;
-    private SweeperTargetImpl targetDir;
+    private TargetImpl target1;
+    private TargetImpl target1Copy;
+    private TargetImpl target2;
+    private TargetImpl targetDir;
 
-    private SweeperOperationListener listener;
+    private OperationTrackingListener listener;
     private HashFunction hashFunction;
 
     @Before
@@ -63,13 +63,13 @@ public class SweeperTargetImplTest {
         resource2 = mockResourceFile("foo");
         resourceDir = mockResourceDirectory("baz", resource1, resource2);
 
-        listener = mock(SweeperOperationListener.class);
-        mockedParent = mock(SweeperTargetImpl.class);
+        listener = mock(OperationTrackingListener.class);
+        mockedParent = mock(TargetImpl.class);
 
-        target1 = new SweeperTargetImpl(resource1, mockedParent);
-        target1Copy = new SweeperTargetImpl(resource1Copy, mockedParent);
-        target2 = new SweeperTargetImpl(resource2, mockedParent);
-        targetDir = new SweeperTargetImpl(resourceDir, mockedParent);
+        target1 = new TargetImpl(resource1, mockedParent);
+        target1Copy = new TargetImpl(resource1Copy, mockedParent);
+        target2 = new TargetImpl(resource2, mockedParent);
+        targetDir = new TargetImpl(resourceDir, mockedParent);
 
         hashFunction = new HashFunction();
     }
@@ -91,7 +91,7 @@ public class SweeperTargetImplTest {
 
     @Test
     public void testRootConstructor() throws Exception {
-        SweeperTargetImpl root = new SweeperTargetImpl(ImmutableSet.of((Resource) resource1, (Resource) resource2));
+        TargetImpl root = new TargetImpl(ImmutableSet.of((Resource) resource1, (Resource) resource2));
 
         assertEquals("", root.getName());
         assertEquals(Type.ROOT, root.getType());
@@ -100,19 +100,19 @@ public class SweeperTargetImplTest {
         assertTrue(root.isPartiallyExpanded());
         assertTrue(root.isExpanded());
 
-        Iterator<SweeperTargetImpl> children = root.getChildren().iterator();
+        Iterator<TargetImpl> children = root.getChildren().iterator();
         assertEquals(resource1, children.next().getResource());
         assertEquals(resource2, children.next().getResource());
 
         try {
-            new SweeperTargetImpl(null);
+            new TargetImpl(null);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            new SweeperTargetImpl(Collections.<Resource>emptySet());
+            new TargetImpl(Collections.<Resource>emptySet());
             fail();
         } catch (IllegalArgumentException e) {
             // expected
@@ -135,21 +135,21 @@ public class SweeperTargetImplTest {
         assertTrue(targetDir.getChildren().isEmpty());
 
         try {
-            new SweeperTargetImpl(null, mockedParent);
+            new TargetImpl(null, mockedParent);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            new SweeperTargetImpl(resource1, null);
+            new TargetImpl(resource1, null);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            new SweeperTargetImpl(mock(Resource.class), mockedParent);
+            new TargetImpl(mock(Resource.class), mockedParent);
             fail();
         } catch (IllegalArgumentException e) {
             // expected, resource is not a ResourceFile or a ResourceDirectory
@@ -163,11 +163,11 @@ public class SweeperTargetImplTest {
 
             assertTrue(targetDir.isPartiallyExpanded());
             assertTrue(targetDir.isExpanded());
-            Iterator<SweeperTargetImpl> children = targetDir.getChildren().iterator();
+            Iterator<TargetImpl> children = targetDir.getChildren().iterator();
             assertEquals(resource1, children.next().getResource());
             assertEquals(resource2, children.next().getResource());
         }
-        verify(listener).updateTargetAction(targetDir, SweeperTargetAction.EXPAND);
+        verify(listener).updateTargetAction(targetDir, TargetAction.EXPAND);
     }
 
     @Test
@@ -184,8 +184,8 @@ public class SweeperTargetImplTest {
 
         assertTrue(targetDir.isPartiallyExpanded());
         assertFalse(targetDir.isExpanded());
-        verify(listener).updateTargetAction(targetDir, SweeperTargetAction.EXPAND);
-        verify(listener).updateTargetException(eq(targetDir), eq(SweeperTargetAction.EXPAND), any(SweeperException.class));
+        verify(listener).updateTargetAction(targetDir, TargetAction.EXPAND);
+        verify(listener).updateTargetException(eq(targetDir), eq(TargetAction.EXPAND), any(SweeperException.class));
     }
 
     @Test
@@ -204,10 +204,10 @@ public class SweeperTargetImplTest {
             assertEquals(1, target1.getTotalTargets());
             assertEquals(1, target1.getTotalFiles());
         }
-        verify(listener).updateTargetAction(target1, SweeperTargetAction.COMPUTE_SIZE);
+        verify(listener).updateTargetAction(target1, TargetAction.COMPUTE_SIZE);
     }
 
-    private SweeperTargetImpl prepareChildToSize(SweeperTargetImpl target, long size, int totalTargets, int totalFiles) {
+    private TargetImpl prepareChildToSize(TargetImpl target, long size, int totalTargets, int totalFiles) {
         target = spy(target);
         when(target.isPartiallySized()).thenReturn(true);
         when(target.getSize()).thenReturn(size);
@@ -216,7 +216,7 @@ public class SweeperTargetImplTest {
         return target;
     }
 
-    private SweeperTargetImpl prepareDirToSize(SweeperTargetImpl target, boolean isFullExpanded, SweeperTargetImpl... children) {
+    private TargetImpl prepareDirToSize(TargetImpl target, boolean isFullExpanded, TargetImpl... children) {
         target = spy(target);
         when(target.isPartiallyExpanded()).thenReturn(true);
         when(target.isExpanded()).thenReturn(isFullExpanded);
@@ -225,9 +225,9 @@ public class SweeperTargetImplTest {
     }
 
     private void computeSizeDirectory(boolean isFullExpanded) throws Exception {
-        SweeperTargetImpl target1Spy = prepareChildToSize(target1, 5L, 1, 1);
-        SweeperTargetImpl target2Spy = prepareChildToSize(target2, 6L, 3, 2);
-        SweeperTargetImpl targetDirSpy = prepareDirToSize(targetDir, isFullExpanded, target1Spy, target2Spy);
+        TargetImpl target1Spy = prepareChildToSize(target1, 5L, 1, 1);
+        TargetImpl target2Spy = prepareChildToSize(target2, 6L, 3, 2);
+        TargetImpl targetDirSpy = prepareDirToSize(targetDir, isFullExpanded, target1Spy, target2Spy);
 
         assertFalse(targetDirSpy.isPartiallySized());
         assertFalse(targetDirSpy.isSized());
@@ -242,7 +242,7 @@ public class SweeperTargetImplTest {
             assertEquals(5, targetDirSpy.getTotalTargets());
             assertEquals(3, targetDirSpy.getTotalFiles());
         }
-        verify(listener).updateTargetAction(targetDirSpy, SweeperTargetAction.COMPUTE_SIZE);
+        verify(listener).updateTargetAction(targetDirSpy, TargetAction.COMPUTE_SIZE);
     }
 
     @Test
@@ -280,7 +280,7 @@ public class SweeperTargetImplTest {
         target1.computeSize(listener);
         assertTrue(target1.isPartiallySized());
         assertFalse(target1.isSized());
-        verify(listener).updateTargetException(eq(target1), eq(SweeperTargetAction.COMPUTE_SIZE), any(SweeperException.class));
+        verify(listener).updateTargetException(eq(target1), eq(TargetAction.COMPUTE_SIZE), any(SweeperException.class));
     }
 
     @Test
@@ -303,10 +303,10 @@ public class SweeperTargetImplTest {
             assertEquals(100L, target1.getModificationDate().getMillis());
             assertEquals(20L + "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", target1.getHash());
         }
-        verify(listener).updateTargetAction(target1, SweeperTargetAction.COMPUTE_HASH);
+        verify(listener).updateTargetAction(target1, TargetAction.COMPUTE_HASH);
     }
 
-    private SweeperTargetImpl prepareChildToHash(SweeperTargetImpl target, long lastModifiedMillis, long size, String hash) {
+    private TargetImpl prepareChildToHash(TargetImpl target, long lastModifiedMillis, long size, String hash) {
         target = spy(target);
         when(target.isPartiallyHashed()).thenReturn(true);
         when(target.isHashed()).thenReturn(true);
@@ -316,7 +316,7 @@ public class SweeperTargetImplTest {
         return target;
     }
 
-    private SweeperTargetImpl prepareDirToHash(SweeperTargetImpl target, long size, SweeperTargetImpl... children) {
+    private TargetImpl prepareDirToHash(TargetImpl target, long size, TargetImpl... children) {
         target = spy(target);
         when(target.isPartiallySized()).thenReturn(true);
         when(target.isSized()).thenReturn(true);
@@ -325,7 +325,7 @@ public class SweeperTargetImplTest {
         return target;
     }
 
-    private void verifyComputeHashDirectory(long expectedLastModified, String expectedHash, long dirSize, SweeperTargetImpl target, SweeperTargetImpl... children) throws Exception {
+    private void verifyComputeHashDirectory(long expectedLastModified, String expectedHash, long dirSize, TargetImpl target, TargetImpl... children) throws Exception {
         target = prepareDirToHash(target, dirSize, children);
 
         assertFalse(target.isPartiallyHashed());
@@ -339,7 +339,7 @@ public class SweeperTargetImplTest {
             assertEquals(expectedLastModified, target.getModificationDate().getMillis());
             assertEquals(expectedHash, target.getHash());
         }
-        verify(listener).updateTargetAction(target, SweeperTargetAction.COMPUTE_HASH);
+        verify(listener).updateTargetAction(target, TargetAction.COMPUTE_HASH);
     }
 
     @Test
@@ -349,7 +349,7 @@ public class SweeperTargetImplTest {
         verifyComputeHashDirectory(200L, 400L + "889ed5b4ac3cb37eb2a39531fb640e7d4d74c2c0", 400L, targetDir, target1, target2);
 
         when(target2.getSize()).thenReturn(0L);
-        verifyComputeHashDirectory(100L, "foo", 150L, new SweeperTargetImpl(resourceDir, mockedParent), target1, target2);
+        verifyComputeHashDirectory(100L, "foo", 150L, new TargetImpl(resourceDir, mockedParent), target1, target2);
     }
 
     @Test
@@ -394,9 +394,9 @@ public class SweeperTargetImplTest {
 
         target1 = prepareChildToHash(target1, 0L, 0L, "");
         when(target1.isHashed()).thenReturn(false);
-        targetDir = prepareDirToHash(new SweeperTargetImpl(resourceDir, mockedParent), 0L, target1);
+        targetDir = prepareDirToHash(new TargetImpl(resourceDir, mockedParent), 0L, target1);
         targetDir.computeHash(listener, hashFunction, new AtomicBoolean());
-        verify(listener).updateTargetException(eq(targetDir), eq(SweeperTargetAction.COMPUTE_HASH), any(SweeperException.class));
+        verify(listener).updateTargetException(eq(targetDir), eq(TargetAction.COMPUTE_HASH), any(SweeperException.class));
     }
 
     @Test
@@ -448,7 +448,7 @@ public class SweeperTargetImplTest {
     public void testSetMark() {
         assertEquals(Mark.DECIDE_LATER, target1.getMark());
         target1.setPoll(true);
-        DuplicateTargetGroup duplicateTargetGroup = mock(DuplicateTargetGroup.class);
+        DuplicateGroup duplicateTargetGroup = mock(DuplicateGroup.class);
         target1.setDuplicateTargetGroup(duplicateTargetGroup);
 
         target1.setMark(Mark.DELETE);

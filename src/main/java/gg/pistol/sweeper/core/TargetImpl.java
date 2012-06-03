@@ -23,6 +23,7 @@ import gg.pistol.sweeper.core.resource.ResourceFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,14 +41,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.io.Closeables;
 
-class SweeperTargetImpl implements SweeperTarget {
+// package private
+class TargetImpl implements Target {
 
     private final String name;
     private final Type type;
     @Nullable private final Resource resource;
-    @Nullable private final SweeperTargetImpl parent;
+    @Nullable private final TargetImpl parent;
 
-    private final Collection<SweeperTargetImpl> children;
+    private final Collection<TargetImpl> children;
 
     private long size;
     private int totalTargets;
@@ -56,7 +58,7 @@ class SweeperTargetImpl implements SweeperTarget {
     @Nullable private String hash;
     @Nullable private DateTime modificationDate;
 
-    @Nullable private DuplicateTargetGroup duplicateTargetGroup;
+    @Nullable private DuplicateGroup duplicateTargetGroup;
     private Mark mark = Mark.DECIDE_LATER;
     private boolean poll;
 
@@ -67,7 +69,7 @@ class SweeperTargetImpl implements SweeperTarget {
     private boolean partiallyHashed;
     private boolean hashed;
 
-    SweeperTargetImpl(Set<Resource> targetResources) {
+    TargetImpl(Set<Resource> targetResources) {
         Preconditions.checkNotNull(targetResources);
         Preconditions.checkArgument(!targetResources.isEmpty(), "targetResources is empty");
 
@@ -75,14 +77,14 @@ class SweeperTargetImpl implements SweeperTarget {
         type = Type.ROOT;
         resource = null;
         parent = null;
-        children = new ArrayList<SweeperTargetImpl>();
+        children = new ArrayList<TargetImpl>();
         partiallyExpanded = true;
         expanded = true;
 
         doExpand(targetResources);
     }
 
-    SweeperTargetImpl(Resource targetResource, SweeperTargetImpl parent) {
+    TargetImpl(Resource targetResource, TargetImpl parent) {
         Preconditions.checkNotNull(targetResource);
         Preconditions.checkNotNull(parent);
 
@@ -97,7 +99,7 @@ class SweeperTargetImpl implements SweeperTarget {
             children = Collections.emptyList();
         } else if (resource instanceof ResourceDirectory) {
             type = Type.DIRECTORY;
-            children = new ArrayList<SweeperTargetImpl>();
+            children = new ArrayList<TargetImpl>();
         } else {
             throw new IllegalArgumentException("targetResource class <" + resource.getClass().getSimpleName() + "> should be a ResourceFile or a ResourceDirectory");
         }
@@ -113,13 +115,13 @@ class SweeperTargetImpl implements SweeperTarget {
         }
         partiallyExpanded = true;
         expanded = true;
-        listener.updateTargetAction(this, SweeperTargetAction.EXPAND);
+        listener.updateTargetAction(this, TargetAction.EXPAND);
 
         ResourceDirectory.ResourceCollectionResponse response = ((ResourceDirectory) resource).getSubresources();
         if (!response.getExceptions().isEmpty()) {
             expanded = false;
             for (Exception e : response.getExceptions()) {
-                listener.updateTargetException(this, SweeperTargetAction.EXPAND, new SweeperException(e));
+                listener.updateTargetException(this, TargetAction.EXPAND, new SweeperException(e));
             }
         }
         doExpand(response.getResources());
@@ -127,15 +129,15 @@ class SweeperTargetImpl implements SweeperTarget {
 
     private void doExpand(Collection<Resource> targetResources) {
         for (Resource res : targetResources) {
-            SweeperTargetImpl child = new SweeperTargetImpl(res, this);
+            TargetImpl child = new TargetImpl(res, this);
             children.add(child);
         }
     }
 
     /**
-     * Computes the size.
+     * Compute the size.
      * <p>
-     * The expand method must be called before this one.
+     * The {@link #expand()} method must have been called.
      */
     void computeSize(SweeperOperationListener listener) {
         Preconditions.checkNotNull(listener);
@@ -144,7 +146,7 @@ class SweeperTargetImpl implements SweeperTarget {
             return;
         }
         partiallySized = true;
-        listener.updateTargetAction(this, SweeperTargetAction.COMPUTE_SIZE);
+        listener.updateTargetAction(this, TargetAction.COMPUTE_SIZE);
 
         sized = isExpanded();
         try {
@@ -153,7 +155,7 @@ class SweeperTargetImpl implements SweeperTarget {
                 totalTargetFiles = 1;
                 size = ((ResourceFile) resource).getSize();
             } else {
-                computeDirectorySize();
+                sized = sized && computeDirectorySize();
             }
         } catch (IllegalStateException e) {
             partiallySized = false;
@@ -161,28 +163,33 @@ class SweeperTargetImpl implements SweeperTarget {
             throw e;
         } catch (RuntimeException e) {
             sized = false;
-            listener.updateTargetException(this, SweeperTargetAction.COMPUTE_SIZE, new SweeperException(e));
+            listener.updateTargetException(this, TargetAction.COMPUTE_SIZE, new SweeperException(e));
         }
     }
 
-    private void computeDirectorySize() {
+    private boolean computeDirectorySize() {
         size = 0;
-        totalTargets = 1;
+        totalTargets = type == Type.ROOT ? 0 : 1;
         totalTargetFiles = 0;
-        for (SweeperTargetImpl child : getChildren()) {
+        boolean ret = true;
+        for (TargetImpl child : getChildren()) {
             Preconditions.checkState(child.isPartiallySized(), "All the children need to be size computed");
             size += child.getSize();
             totalTargets += child.getTotalTargets();
             totalTargetFiles += child.getTotalFiles();
+            if (!child.isSized()) {
+                ret = false;
+            }
         }
+        return ret;
     }
 
     /**
      * Computes the hash and the last modified date.
      * <p>
-     * The {@link #expand()} and {@link #computeSize()} methods must be called before this one.
+     * The {@link #computeSize()} method must have been called.
      */
-    void computeHash(SweeperOperationListener listener, HashFunction hashFunction, AtomicBoolean abort) throws SweeperAbortException {
+    void computeHash(OperationTrackingListener listener, HashFunction hashFunction, AtomicBoolean abort) throws SweeperAbortException {
         Preconditions.checkNotNull(listener);
         Preconditions.checkNotNull(hashFunction);
         Preconditions.checkNotNull(abort);
@@ -191,16 +198,16 @@ class SweeperTargetImpl implements SweeperTarget {
             return;
         }
         partiallyHashed = true;
-        listener.updateTargetAction(this, SweeperTargetAction.COMPUTE_HASH);
+        listener.updateTargetAction(this, TargetAction.COMPUTE_HASH);
         if (!isSized()) {
-            listener.updateTargetException(this, SweeperTargetAction.COMPUTE_HASH, new SweeperException("Cannot compute hash as the size operation failed"));
+            listener.updateTargetException(this, TargetAction.COMPUTE_HASH, new SweeperException("Cannot compute hash as the size operation failed"));
             return;
         }
 
         hashed = true;
         try {
             if (type == Type.FILE) {
-                computeFileHash(hashFunction, abort);
+                computeFileHash(listener, hashFunction, abort);
             } else {
                 computeDirectoryHash(hashFunction);
             }
@@ -214,17 +221,17 @@ class SweeperTargetImpl implements SweeperTarget {
             throw e;
         } catch (Exception e) {
             hashed = false;
-            listener.updateTargetException(this, SweeperTargetAction.COMPUTE_HASH, new SweeperException(e));
+            listener.updateTargetException(this, TargetAction.COMPUTE_HASH, new SweeperException(e));
         }
     }
 
-    private void computeFileHash(HashFunction hashFunction, AtomicBoolean abort) throws IOException, SweeperAbortException {
+    private void computeFileHash(OperationTrackingListener listener, HashFunction hashFunction, AtomicBoolean abort) throws IOException, SweeperAbortException {
         ResourceFile res = (ResourceFile) resource;
 
         modificationDate = res.getModificationDate();
         InputStream stream = res.getInputStream();
         try {
-            hash = getSize() + hashFunction.compute(stream, abort);
+            hash = getSize() + hashFunction.compute(stream, listener, abort);
         } finally {
             Closeables.closeQuietly(stream);
         }
@@ -233,7 +240,7 @@ class SweeperTargetImpl implements SweeperTarget {
     private void computeDirectoryHash(HashFunction hashFunction) throws IOException, SweeperAbortException {
         modificationDate = null;
         List<String> hashes = new ArrayList<String>();
-        for (SweeperTargetImpl child : getChildren()) {
+        for (TargetImpl child : getChildren()) {
             Preconditions.checkState(child.isPartiallyHashed(), "All the children need to be hash computed");
             if (!child.isHashed()) {
                 throw new IOException("Cannot compute hash as the children experienced errors while hashing");
@@ -265,7 +272,7 @@ class SweeperTargetImpl implements SweeperTarget {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        SweeperTargetImpl other = (SweeperTargetImpl) obj;
+        TargetImpl other = (TargetImpl) obj;
         return name.equals(other.name);
     }
 
@@ -274,7 +281,7 @@ class SweeperTargetImpl implements SweeperTarget {
         return Objects.toStringHelper(this).add("name", name).toString();
     }
 
-    public int compareTo(SweeperTarget other) {
+    public int compareTo(Target other) {
         Preconditions.checkNotNull(other);
         return ComparisonChain.start().compare(name, other.getName()).result();
     }
@@ -316,11 +323,11 @@ class SweeperTargetImpl implements SweeperTarget {
     }
 
     @Nullable
-    SweeperTargetImpl getParent() {
+    TargetImpl getParent() {
         return parent;
     }
 
-    Collection<SweeperTargetImpl> getChildren() {
+    Collection<TargetImpl> getChildren() {
         return children;
     }
 
@@ -370,7 +377,7 @@ class SweeperTargetImpl implements SweeperTarget {
         this.poll = poll;
     }
 
-    void setDuplicateTargetGroup(DuplicateTargetGroup duplicateTargetGroup) {
+    void setDuplicateTargetGroup(DuplicateGroup duplicateTargetGroup) {
         Preconditions.checkNotNull(duplicateTargetGroup);
         this.duplicateTargetGroup = duplicateTargetGroup;
     }

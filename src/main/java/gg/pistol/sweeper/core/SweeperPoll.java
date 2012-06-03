@@ -16,18 +16,18 @@
  */
 package gg.pistol.sweeper.core;
 
-import gg.pistol.sweeper.core.SweeperTarget.Mark;
+import gg.pistol.sweeper.core.Target.Mark;
 
 import java.util.Collection;
 
 /**
- * Resolution of duplicate content. The collection of duplicates can be retrieved with {@link #getTargets()} and then
- * every target can be marked with {@link Mark} values.
+ * A collection of duplicate targets that need resolution. The targets can be marked with {@link Mark} values to specify
+ * the removal the undesired duplicates.
  *
  * @author Bogdan Pistol
  */
 public interface SweeperPoll {
 
-    Collection<SweeperTarget> getTargets();
+    Collection<Target> getTargets();
 
 }

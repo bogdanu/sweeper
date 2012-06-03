@@ -24,27 +24,18 @@ package gg.pistol.sweeper.core;
 public interface SweeperCount {
 
     int getTotalTargets();
-
     int getTotalTargetFiles();
-
     int getTotalTargetDirectories();
-
     long getTotalSize();
 
     int getDuplicateTargets();
-
     int getDuplicateTargetFiles();
-
     int getDuplicateTargetDirectories();
-
     long getDuplicateSize();
 
     int getToDeleteTargets();
-
     int getToDeleteTargetFiles();
-
     int getToDeleteTargetDirectories();
-
     long getToDeleteSize();
 
 }

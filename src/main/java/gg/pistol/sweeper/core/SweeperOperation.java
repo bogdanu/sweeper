@@ -17,27 +17,25 @@
 package gg.pistol.sweeper.core;
 
 /**
- * An execution part of a {@link Sweeper} operation. Another way of saying it is that an operation is composed by
- * different phases.
+ * An operation executed by a {@link Sweeper} instance.
  * <p>
  * <ul>
- * <li>The analysis operation (calling the method {@link Sweeper#analyze()}) is composed by the
- * {@link #FILESYSTEM_TRAVERSING}, {@link #SIZE_COMPUTATION}, {@link #SIZE_DEDUPLICATION}, {@link #HASH_COMPUTATION},
- * {@link #HASH_DEDUPLICATION}, {@link #COUNTING} and {@link #DUPLICATE_GROUPING} phases.</li>
+ * <li>The {@link Sweeper#analyze()} method is doing the operations:
+ * {@link #RESOURCE_TRAVERSING}, {@link #SIZE_COMPUTATION}, {@link #SIZE_DEDUPLICATION}, {@link #HASH_COMPUTATION},
+ * {@link #HASH_DEDUPLICATION}, {@link #COUNTING} and {@link #DUPLICATE_GROUPING}.</li>
  *
- * <li>The deletion operation (calling the method {@link Sweeper#delete()}) is composed by the
- * {@link #FILESYSTEM_DELETION} phase.</li>
+ * <li>The {@link Sweeper#delete()} method is doing the {@link #FILESYSTEM_DELETION} operation.</li>
  * </ul>
  *
  * @author Bogdan Pistol
  */
-public enum SweeperOperationPhase {
-    FILESYSTEM_TRAVERSING(29), SIZE_COMPUTATION(20), SIZE_DEDUPLICATION(1), HASH_COMPUTATION(47), HASH_DEDUPLICATION(1), COUNTING(1),
+public enum SweeperOperation {
+    RESOURCE_TRAVERSING(29), SIZE_COMPUTATION(20), SIZE_DEDUPLICATION(1), HASH_COMPUTATION(47), HASH_DEDUPLICATION(1), COUNTING(1),
             DUPLICATE_GROUPING(1), FILESYSTEM_DELETION(100);
 
     private int percentProgress;
 
-    private SweeperOperationPhase(int percentQuota) {
+    private SweeperOperation(int percentQuota) {
         this.percentProgress = percentQuota;
     }
 

@@ -23,13 +23,13 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 /**
- * Duplicate file/directory cleaner
+ * Duplicate file/directory cleaner.
  *
  * @author Bogdan Pistol
  */
 public interface Sweeper {
 
-    void analyze(Set<Resource> resources, SweeperOperationListener listener);
+    void analyze(Set<Resource> resources, SweeperOperationListener listener) throws SweeperAbortException;
 
     void abortAnalysis();
 
@@ -41,9 +41,7 @@ public interface Sweeper {
     @Nullable
     SweeperPoll previousPoll();
 
-    boolean rewindUndecidedPolls();
-
-    void delete(SweeperOperationListener listener);
+    void delete(SweeperOperationListener listener) throws SweeperAbortException;
 
     void abortDeletion();
 

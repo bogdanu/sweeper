@@ -32,9 +32,10 @@ import com.google.common.collect.Ordering;
  *
  * @author Bogdan Pistol
  */
-class DuplicateTargetGroup implements Comparable<DuplicateTargetGroup>, SweeperPoll {
+// package private
+class DuplicateGroup implements Comparable<DuplicateGroup>, SweeperPoll {
 
-    private final Collection<SweeperTarget> targets;
+    private final Collection<Target> targets;
 
     private final long size;
 
@@ -44,14 +45,14 @@ class DuplicateTargetGroup implements Comparable<DuplicateTargetGroup>, SweeperP
 
     private boolean targetMarked;
 
-    DuplicateTargetGroup(Collection<SweeperTargetImpl> collection) {
+    DuplicateGroup(Collection<TargetImpl> collection) {
         Preconditions.checkNotNull(collection);
         Preconditions.checkArgument(!collection.isEmpty());
 
         String hashValue = null;
         long sizeValue = -1;
 
-        for (SweeperTargetImpl target : collection) {
+        for (TargetImpl target : collection) {
             Preconditions.checkArgument(target.isHashed());
             if (hashValue == null) {
                 hashValue = target.getHash();
@@ -61,16 +62,16 @@ class DuplicateTargetGroup implements Comparable<DuplicateTargetGroup>, SweeperP
             Preconditions.checkArgument(sizeValue == target.getSize());
         }
 
-        targets = new ArrayList<SweeperTarget>(collection);
+        targets = new ArrayList<Target>(collection);
         hash = hashValue;
         size = sizeValue;
 
-        for (SweeperTargetImpl target : collection) {
+        for (TargetImpl target : collection) {
             target.setDuplicateTargetGroup(this);
         }
     }
 
-    public Collection<SweeperTarget> getTargets() {
+    public Collection<Target> getTargets() {
         return targets;
     }
 
@@ -98,7 +99,7 @@ class DuplicateTargetGroup implements Comparable<DuplicateTargetGroup>, SweeperP
         return targetMarked;
     }
 
-    public int compareTo(DuplicateTargetGroup other) {
+    public int compareTo(DuplicateGroup other) {
         Preconditions.checkNotNull(other);
         return ComparisonChain.start().compare(size, other.getSize(), Ordering.natural().reverse())
                 .compare(hash, other.hash).result();
@@ -114,7 +115,7 @@ class DuplicateTargetGroup implements Comparable<DuplicateTargetGroup>, SweeperP
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        DuplicateTargetGroup other = (DuplicateTargetGroup) obj;
+        DuplicateGroup other = (DuplicateGroup) obj;
         return hash.equals(other.hash);
     }
 

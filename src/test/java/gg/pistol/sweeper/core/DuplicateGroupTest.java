@@ -29,11 +29,11 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-public class DuplicateTargetGroupTest {
+public class DuplicateGroupTest {
 
-    private DuplicateTargetGroup group1;
-    private DuplicateTargetGroup group1Copy;
-    private DuplicateTargetGroup group2;
+    private DuplicateGroup group1;
+    private DuplicateGroup group1Copy;
+    private DuplicateGroup group2;
 
     @Before
     public void setUp() throws Exception {
@@ -42,14 +42,14 @@ public class DuplicateTargetGroupTest {
         group2 = createGroup(10L, "hash2");
     }
 
-    private DuplicateTargetGroup createGroup(long size, String hash) {
-        SweeperTargetImpl target1 = mockTarget("target-" + Math.random(), size, true, hash);
-        SweeperTargetImpl target2 = mockTarget("target-" + Math.random(), size, true, hash);
-        return new DuplicateTargetGroup(ImmutableList.of(target1, target2));
+    private DuplicateGroup createGroup(long size, String hash) {
+        TargetImpl target1 = mockTarget("target-" + Math.random(), size, true, hash);
+        TargetImpl target2 = mockTarget("target-" + Math.random(), size, true, hash);
+        return new DuplicateGroup(ImmutableList.of(target1, target2));
     }
 
-    private SweeperTargetImpl mockTarget(String name, long size, boolean isHashed, String hash) {
-        SweeperTargetImpl target = mock(SweeperTargetImpl.class);
+    private TargetImpl mockTarget(String name, long size, boolean isHashed, String hash) {
+        TargetImpl target = mock(TargetImpl.class);
         when(target.getHash()).thenReturn(name);
         when(target.getSize()).thenReturn(size);
         when(target.isHashed()).thenReturn(isHashed);
@@ -59,11 +59,11 @@ public class DuplicateTargetGroupTest {
 
     @Test
     public void testConstructor() throws Exception {
-        SweeperTargetImpl target1 = mockTarget("target1", 1L, true, "hash");
-        SweeperTargetImpl target2 = mockTarget("target2", 1L, true, "hash");
-        DuplicateTargetGroup group = new DuplicateTargetGroup(ImmutableList.of(target1, target2));
+        TargetImpl target1 = mockTarget("target1", 1L, true, "hash");
+        TargetImpl target2 = mockTarget("target2", 1L, true, "hash");
+        DuplicateGroup group = new DuplicateGroup(ImmutableList.of(target1, target2));
 
-        Iterator<SweeperTarget> iterator = group.getTargets().iterator();
+        Iterator<Target> iterator = group.getTargets().iterator();
         assertEquals(target1, iterator.next());
         assertEquals(target2, iterator.next());
 
@@ -74,35 +74,35 @@ public class DuplicateTargetGroupTest {
         assertEquals(1L, group.getSize());
 
         try {
-            new DuplicateTargetGroup(null);
+            new DuplicateGroup(null);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            new DuplicateTargetGroup(Collections.<SweeperTargetImpl>emptyList());
+            new DuplicateGroup(Collections.<TargetImpl>emptyList());
             fail();
         } catch (IllegalArgumentException e) {
             // expected
         }
 
         try {
-            new DuplicateTargetGroup(Lists.newArrayList(mockTarget("target", 0L, false, null)));
+            new DuplicateGroup(Lists.newArrayList(mockTarget("target", 0L, false, null)));
             fail();
         } catch (IllegalArgumentException e) {
             // expected because not hashed
         }
 
         try {
-            new DuplicateTargetGroup(Lists.newArrayList(mockTarget("a", 0L, true, "foo"), mockTarget("b", 0L, true, "bar")));
+            new DuplicateGroup(Lists.newArrayList(mockTarget("a", 0L, true, "foo"), mockTarget("b", 0L, true, "bar")));
             fail();
         } catch (IllegalArgumentException e) {
             // expected because hashes are different
         }
 
         try {
-            new DuplicateTargetGroup(Lists.newArrayList(mockTarget("a", 1L, true, "hash"), mockTarget("b", 2L, true, "hash")));
+            new DuplicateGroup(Lists.newArrayList(mockTarget("a", 1L, true, "hash"), mockTarget("b", 2L, true, "hash")));
             fail();
         } catch (IllegalArgumentException e) {
             // expected because sizes are different

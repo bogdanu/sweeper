@@ -19,10 +19,10 @@ package gg.pistol.sweeper.core;
 /**
  * An individual action that applies to a target.
  * <p>
- * The target actions are executed in the scope of {@link SweeperOperationPhase}s.
+ * The target actions are executed in the scope of {@link SweeperOperation}s.
  *
  * @author Bogdan Pistol
  */
-public enum SweeperTargetAction {
+public enum TargetAction {
     EXPAND, COMPUTE_SIZE, COMPUTE_HASH, DELETE
 }

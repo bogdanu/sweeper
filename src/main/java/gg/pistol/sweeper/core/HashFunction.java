@@ -28,13 +28,16 @@ import javax.annotation.Nullable;
 import com.google.common.base.Preconditions;
 
 /**
- * SHA-1 hash
+ * A SHA-1 hash function.
  *
  * @author Bogdan Pistol
  */
+// package private
 class HashFunction {
 
-    private static final int BUFFER_SIZE = 8 * (1 << 20);
+    private static final int BUFFER_SIZE = 16 * (1 << 10); // 16 KB
+
+    private static final int TRACKING_THRESHOLD_SIZE = 5 * (1 << 20); // 5 MB
 
     private final MessageDigest sha1Algorithm;
 
@@ -45,11 +48,18 @@ class HashFunction {
         buf = new byte[BUFFER_SIZE];
     }
 
-    String compute(InputStream stream, @Nullable AtomicBoolean abort) throws IOException, SweeperAbortException {
+    String compute(InputStream stream, @Nullable OperationTrackingListener listener, @Nullable AtomicBoolean abort) throws IOException, SweeperAbortException {
         Preconditions.checkNotNull(stream);
         int len;
+        int trackingSize = 0;
         while ((len = stream.read(buf)) != -1) {
             sha1Algorithm.update(buf, 0, len);
+
+            trackingSize += len;
+            if (trackingSize >= TRACKING_THRESHOLD_SIZE) {
+                listener.incrementMicroProgress(trackingSize);
+                trackingSize = 0;
+            }
 
             if (abort != null && abort.get()) {
                 sha1Algorithm.reset();
@@ -66,7 +76,7 @@ class HashFunction {
     }
 
     String compute(InputStream stream) throws IOException, SweeperAbortException {
-        return compute(stream, null);
+        return compute(stream, null, null);
     }
 
 }

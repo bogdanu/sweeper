@@ -23,16 +23,12 @@ package gg.pistol.sweeper.core;
  */
 public interface SweeperOperationListener {
 
-    void updateOperationProgress(int percent);
+    void updateOperation(SweeperOperation operation);
 
-    void updateOperationPhase(SweeperOperationPhase phase);
+    void updateOperationProgress(long operationProgress, long operationMaxProgress, int percentGlobalProgress);
 
-    void updateTargetAction(SweeperTarget target, SweeperTargetAction action);
+    void updateTargetAction(Target target, TargetAction action);
 
-    void updateTargetException(SweeperTarget target, SweeperTargetAction action, SweeperException e);
-
-    void operationFinished();
-
-    void operationAborted();
+    void updateTargetException(Target target, TargetAction action, SweeperException e);
 
 }

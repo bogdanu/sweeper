@@ -25,7 +25,7 @@ import org.joda.time.DateTime;
  *
  * @author Bogdan Pistol
  */
-public interface SweeperTarget extends Comparable<SweeperTarget> {
+public interface Target extends Comparable<Target> {
 
     String getName();
 

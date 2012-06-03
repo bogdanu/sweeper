@@ -25,32 +25,32 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 
+/**
+ * Sweeper implementation.
+ *
+ * @author Bogdan Pistol
+ */
 public class SweeperImpl implements Sweeper {
 
-    private final SweeperAnalyzer analyzer;
+    private final Analyzer analyzer;
 
-    @Nullable private List<DuplicateTargetGroup> duplicates;
+    @Nullable private List<DuplicateGroup> duplicates;
 
     @Nullable private SweeperCountImpl count;
 
     public SweeperImpl() throws SweeperException {
-        analyzer = new SweeperAnalyzer();
+        analyzer = new Analyzer();
     }
 
-    public void analyze(Set<Resource> targetResources, SweeperOperationListener listener) {
+    public void analyze(Set<Resource> targetResources, SweeperOperationListener listener) throws SweeperAbortException {
         Preconditions.checkNotNull(targetResources);
         Preconditions.checkNotNull(listener);
         Preconditions.checkArgument(!targetResources.isEmpty(), "The targetResources is empty");
         duplicates = null;
         count = null;
 
-        try {
-            duplicates = analyzer.compute(targetResources, listener);
-            count = analyzer.getCount();
-            listener.operationFinished();
-        } catch (SweeperAbortException e) {
-            listener.operationAborted();
-        }
+        duplicates = analyzer.compute(targetResources, listener);
+        count = analyzer.getCount();
     }
 
     public void abortAnalysis() {
@@ -69,11 +69,6 @@ public class SweeperImpl implements Sweeper {
     public SweeperPoll previousPoll() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public boolean rewindUndecidedPolls() {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     public void delete(SweeperOperationListener listener) {

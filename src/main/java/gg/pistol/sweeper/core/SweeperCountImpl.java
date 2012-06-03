@@ -16,7 +16,7 @@
  */
 package gg.pistol.sweeper.core;
 
-
+// package private
 class SweeperCountImpl implements SweeperCount {
 
     private final int totalTargets;
@@ -36,6 +36,7 @@ class SweeperCountImpl implements SweeperCount {
         this.totalTargets = totalTargets;
         this.totalTargetFiles = totalTargetFiles;
         this.totalSize = totalSize;
+
         this.duplicateTargets = duplicateTargets;
         this.duplicateTargetFiles = duplicateTargetFiles;
         this.duplicateSize = duplicateSize;
