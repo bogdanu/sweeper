@@ -67,12 +67,12 @@ public class DuplicateGroupTest {
         assertEquals(target1, iterator.next());
         assertEquals(target2, iterator.next());
 
-        verify(target1).setDuplicateTargetGroup(group);
-        verify(target2).setDuplicateTargetGroup(group);
-
         assertEquals("hash", group.getHash());
         assertEquals(1L, group.getSize());
+    }
 
+    @Test
+    public void testConstructorException() {
         try {
             new DuplicateGroup(null);
             fail();
@@ -91,7 +91,7 @@ public class DuplicateGroupTest {
             new DuplicateGroup(Lists.newArrayList(mockTarget("target", 0L, false, null)));
             fail();
         } catch (IllegalArgumentException e) {
-            // expected because not hashed
+            // expected because it is not hashed
         }
 
         try {
@@ -107,20 +107,6 @@ public class DuplicateGroupTest {
         } catch (IllegalArgumentException e) {
             // expected because sizes are different
         }
-    }
-
-    @Test
-    public void testSetPolled() {
-        assertFalse(group1.isPolled());
-        group1.setPolled(true);
-        assertTrue(group1.isPolled());
-    }
-
-    @Test
-    public void testSetTargetMarked() {
-        assertFalse(group1.isTargetMarked());
-        group1.setTargetMarked(true);
-        assertTrue(group1.isTargetMarked());
     }
 
     @Test

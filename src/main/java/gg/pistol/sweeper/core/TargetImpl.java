@@ -364,9 +364,6 @@ class TargetImpl implements Target {
         Preconditions.checkNotNull(mark);
         Preconditions.checkState(isPoll(), "not in poll");
         this.mark = mark;
-        if (duplicateTargetGroup != null) {
-            duplicateTargetGroup.setTargetMarked(true);
-        }
     }
 
     public boolean isPoll() {

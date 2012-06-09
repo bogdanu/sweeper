@@ -454,7 +454,6 @@ public class TargetImplTest {
         target1.setMark(Mark.DELETE);
 
         assertEquals(Mark.DELETE, target1.getMark());
-        verify(duplicateTargetGroup).setTargetMarked(true);
 
         try {
             target1.setMark(null);

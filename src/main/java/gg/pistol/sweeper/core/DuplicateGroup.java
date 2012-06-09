@@ -41,9 +41,6 @@ class DuplicateGroup implements Comparable<DuplicateGroup>, SweeperPoll {
 
     private final String hash;
 
-    private boolean polled;
-
-    private boolean targetMarked;
 
     DuplicateGroup(Collection<TargetImpl> collection) {
         Preconditions.checkNotNull(collection);
@@ -65,10 +62,6 @@ class DuplicateGroup implements Comparable<DuplicateGroup>, SweeperPoll {
         targets = new ArrayList<Target>(collection);
         hash = hashValue;
         size = sizeValue;
-
-        for (TargetImpl target : collection) {
-            target.setDuplicateTargetGroup(this);
-        }
     }
 
     public Collection<Target> getTargets() {
@@ -83,22 +76,9 @@ class DuplicateGroup implements Comparable<DuplicateGroup>, SweeperPoll {
         return hash;
     }
 
-    boolean isPolled() {
-        return polled;
-    }
-
-    void setPolled(boolean polled) {
-        this.polled = polled;
-    }
-
-    void setTargetMarked(boolean value) {
-        targetMarked = value;
-    }
-
-    boolean isTargetMarked() {
-        return targetMarked;
-    }
-
+    /**
+     * Order descending by size.
+     */
     public int compareTo(DuplicateGroup other) {
         Preconditions.checkNotNull(other);
         return ComparisonChain.start().compare(size, other.getSize(), Ordering.natural().reverse())
