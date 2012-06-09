@@ -216,10 +216,10 @@ class Analyzer {
         listener.setOperationMaxProgress(totalTargets);
 
         traverseBottomUp(root, new TargetVisitorMethod() {
-            public void visit(TargetImpl target, int idx) {
+            public void visit(TargetImpl target, int targetIndex) {
                 target.computeSize(listener);
                 ret.add(target);
-                listener.incrementProgress(idx);
+                listener.incrementProgress(targetIndex);
             }
         });
 
@@ -244,7 +244,7 @@ class Analyzer {
         Deque<TargetImpl> stack = new LinkedList<TargetImpl>(); // DFS style stack
         Set<TargetImpl> childrenPushed = new HashSet<TargetImpl>(); // targets with the children pushed on the stack
         stack.push(root);
-        int idx = 1; // counter for the n-th visited target
+        int targetIndex = 1; // counter for the n-th visited target
 
         while (!stack.isEmpty()) {
             TargetImpl target = stack.peek();
@@ -255,8 +255,8 @@ class Analyzer {
                     stack.push(child);
                 }
             } else {
-                visitor.visit(target, idx);
-                idx++;
+                visitor.visit(target, targetIndex);
+                targetIndex++;
                 stack.pop();
             }
             checkAbortFlag();
@@ -400,7 +400,7 @@ class Analyzer {
         return new TargetVisitorMethod() {
             long currentSize = 0;
 
-            public void visit(TargetImpl target, int idx) throws SweeperAbortException {
+            public void visit(TargetImpl target, int targetIndex) throws SweeperAbortException {
                 target.computeHash(listener, hashFunction, abort);
 
                 // Keep track of file sizes only as directories only re-hash the hash of their children which should be
@@ -518,7 +518,7 @@ class Analyzer {
      * Visitor pattern interface for hierarchies of targets.
      */
     private static interface TargetVisitorMethod {
-        void visit(TargetImpl target, int idx) throws SweeperAbortException;
+        void visit(TargetImpl target, int targetIndex) throws SweeperAbortException;
     }
 
 }
