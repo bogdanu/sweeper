@@ -17,15 +17,13 @@
 package gg.pistol.sweeper.core;
 
 /**
- * Operation executed in the scope of {@link Sweeper#analyze()} or {@link Sweeper#delete()} method.
- * <p>
- * <ul>
- * <li>The {@link Sweeper#analyze()} method is doing the operations:
- * {@link #RESOURCE_TRAVERSING}, {@link #SIZE_COMPUTATION}, {@link #SIZE_DEDUPLICATION}, {@link #HASH_COMPUTATION},
- * {@link #HASH_DEDUPLICATION}, {@link #COUNTING} and {@link #DUPLICATE_GROUPING}.</li>
+ * Operation executed in the scope of {@link Sweeper#analyze} or {@link Sweeper#delete} method.
  *
- * <li>The {@link Sweeper#delete()} method is doing the {@link #RESOURCE_DELETION} operation.</li>
- * </ul>
+ * <p><ul><li>The {@link Sweeper#analyze} method is doing the operations: {@link #RESOURCE_TRAVERSING},
+ * {@link #SIZE_COMPUTATION}, {@link #SIZE_DEDUPLICATION}, {@link #HASH_COMPUTATION}, {@link #HASH_DEDUPLICATION},
+ * {@link #COUNTING} and {@link #DUPLICATE_GROUPING}.</li>
+ *
+ * <li>The {@link Sweeper#delete} method is executing the {@link #RESOURCE_DELETION} operation.</li></ul>
  *
  * @author Bogdan Pistol
  */
@@ -42,11 +40,10 @@ public enum SweeperOperation {
     /**
      * Getter for the percentage quota of this operation. The percentage quota is how much this operation contributes
      * to the global completion percentage. At completion the global percentage (the sum of all operation quotas) is 100%.
-     * <p>
-     * (package private)
      *
      * @return the percent quota
      */
+    // package private
     int getPercentQuota() {
         return percentQuota;
     }

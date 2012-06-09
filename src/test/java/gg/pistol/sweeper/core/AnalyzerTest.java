@@ -190,15 +190,17 @@ public class AnalyzerTest {
     /*
      * Test detecting empty file/directory duplicates in the following setup:
      *
-     *      --emtyDir
+     *      --emptyDir
      *     /
-     * root---emtyFile1
+     * root---emptyFile1
      *     \
-     *      --dir---emtyFile2
+     *      --dir---emptyFile2
      *           \
-     *            --emtyFile3
+     *            --emptyFile3
      *
-     * The following are duplicates: emtyFile1 = emtyFile2 = emtyFile3 = dir.
+     * The following are duplicates: emptyFile1 = emptyFile2 = emptyFile3 = dir. The root is not considered because it
+     * is not a real file or directory). Notice that files can be equal with directories, this is on purpose to have
+     * more flexibility when cleaning duplicate content.
      */
     @Test
     public void testWithEmpty() throws Exception {

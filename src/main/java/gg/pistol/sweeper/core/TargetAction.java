@@ -18,8 +18,8 @@ package gg.pistol.sweeper.core;
 
 /**
  * An individual action that applies to a target.
- * <p>
- * The target actions are executed in the scope of {@link SweeperOperation}s.
+ *
+ * <p>The target actions are executed in the scope of {@link SweeperOperation}s.
  *
  * @author Bogdan Pistol
  */

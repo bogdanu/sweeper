@@ -44,9 +44,9 @@ import com.google.common.collect.Multimap;
 
 /**
  * Analyzes a set of targets to find duplicates.
- * <p>
- * The {@link #compute(Set, SweeperOperationListener)} method is not thread safe and must be called from the same
- * thread or using synchronization techniques. The {@link #abort()} method is thread safe and can be called from any
+ *
+ * <p>The {@link #compute} method is not thread safe and must be called from the same
+ * thread or using synchronization techniques. The {@link #abort} method is thread safe and can be called from any
  * thread.
  *
  * @author Bogdan Pistol
@@ -67,7 +67,7 @@ class Analyzer {
     // It is atomic to be able to abort the analysis from another thread.
     private final AtomicBoolean abortFlag;
 
-    // Can be null when the compute() method is not called or aborted.
+    // Can be null if not computed.
     @Nullable private SweeperCountImpl count;
 
     // The number of total targets (including the ROOT target) calculated at the beginning (before sizing the targets)
@@ -114,15 +114,15 @@ class Analyzer {
 
     /**
      * Traverse the resources and expand them.
-     * <p>
-     * Because it is not known in advance how many resources need to be traversed, it is not possible to provide
+     *
+     * <p>Because it is not known in advance how many resources need to be traversed, it is not possible to provide
      * accurate progress on the traversed resources. In order to have some estimative progress, the tree of resources
      * is traversed up to a limit {@link #INITIAL_EXPAND_LIMIT} without any progress indication and a collection of not
      * yet expanded targets is filled (the leafs of the limited tree traversal).
      * Afterwards the collection of not yet expanded targets is traversed with progress indication relative to the size
-     * of collection.
+     * of the collection.
      *
-     * @return a root target that wraps the <code>targetResources</code>
+     * @return a root target that wraps the {@code targetResources}</code>
      */
     private TargetImpl traverseResources(Set<Resource> targetResources, OperationTrackingListener listener)
             throws SweeperAbortException {
@@ -149,9 +149,9 @@ class Analyzer {
     }
 
     /**
-     * Expand recursively a target up to the specified <code>limit</code> (the limit value -1 specifies no limit).
-     * <p>
-     * This method has a side effect: if you specify a non-null <code>nextTargets</code> collection parameter then
+     * Expand recursively a target up to the specified {@code limit} (the limit value -1 specifies no limit).
+     *
+     * <p>This method has a side effect: if you specify a non-null {@code nextTargets} collection parameter then
      * the collection will be filled with the remaining not yet expanded targets (that will possibly exist only if
      * an expansion limit is specified).
      *
@@ -205,9 +205,9 @@ class Analyzer {
 
     /**
      * Compute the size recursively with progress indication (the maximum progress is specified by
-     * the <code>totalTargets</code> parameter).
+     * the {@code totalTargets} parameter).
      *
-     * @return the collection of all the targets with computed size traversed from the <code>root</code>
+     * @return the collection of all the targets with computed size traversed from the {@code root}
      */
     private Collection<TargetImpl> computeSize(TargetImpl root, int totalTargets,
             final OperationTrackingListener listener) throws SweeperAbortException {
@@ -268,8 +268,8 @@ class Analyzer {
 
     /**
      * Select all the targets for which there is at least another target with the same size.
-     * <p>
-     * The {@link Target.Type#ROOT} target is excluded.
+     *
+     * <p>The {@link Target.Type#ROOT} target is excluded.
      *
      * @return a multimap with sizes as keys and the targets with that same size as values for the key
      */
@@ -504,8 +504,8 @@ class Analyzer {
 
     /**
      * Abort the analysis.
-     * <p>
-     * This method is thread safe.
+     *
+     * <p>This method is thread safe.
      */
     void abort() {
         log.trace("Aborting the analysis");

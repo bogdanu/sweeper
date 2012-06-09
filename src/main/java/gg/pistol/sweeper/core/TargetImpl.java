@@ -142,8 +142,8 @@ class TargetImpl implements Target {
     /**
      * Compute the size. In case this is a directory and there are errors computing the size of the children, then
      * the computed size will include only the available children for estimation purposes.
-     * <p>
-     * The {@link #expand()} method must have been called previously.
+     *
+     * <p>The {@link #expand} method must have been called previously.
      */
     void computeSize(OperationTrackingListener listener) {
         Preconditions.checkNotNull(listener);
@@ -197,8 +197,8 @@ class TargetImpl implements Target {
 
     /**
      * Compute the hash and the last modified date.
-     * <p>
-     * The {@link #computeSize()} method must have been called previously.
+     *
+     * <p>The {@link #computeSize} method must have been called previously.
      */
     void computeHash(HashFunction hashFunction, OperationTrackingListener listener, AtomicBoolean abortFlag)
             throws SweeperAbortException {

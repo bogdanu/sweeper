@@ -51,10 +51,10 @@ class HashFunction {
     }
 
     /**
-     * Computes the SHA-1 hash from the <code>inputStream</code> bytes with progress indication through the provided
-     * <code>listener</code>.
-     * <p>
-     * If the <code>abortFlag</code> flag changes while this method executes an {@link SweeperAbortException} will be
+     * Computes the SHA-1 hash from the {@code inputStream} bytes with progress indication through the provided
+     * {@code listener}.
+     *
+     * <p>If the {@code abortFlag} flag changes while this method executes an {@link SweeperAbortException} will be
      * thrown.
      *
      * @return the hexadecimal representation of the computed SHA-1 hash

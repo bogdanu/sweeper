@@ -78,29 +78,4 @@ public class SweeperCountImplTest {
         assertEquals(duplicateSize, count.getDuplicateSize());
     }
 
-    @Test
-    public void testSetToDeleteTargets() {
-        count.setToDeleteTargets(5);
-        assertEquals(5, count.getToDeleteTargets());
-    }
-
-    @Test
-    public void testSetToDeleteTargetFiles() {
-        count.setToDeleteTargetFiles(5);
-        assertEquals(5, count.getToDeleteTargetFiles());
-    }
-
-    @Test
-    public void testGetToDeleteTargetDirectories() {
-        count.setToDeleteTargets(5);
-        count.setToDeleteTargetFiles(3);
-        assertEquals(2, count.getToDeleteTargetDirectories());
-    }
-
-    @Test
-    public void testSetToDeleteSize() {
-        count.setToDeleteSize(5);
-        assertEquals(5, count.getToDeleteSize());
-    }
-
 }

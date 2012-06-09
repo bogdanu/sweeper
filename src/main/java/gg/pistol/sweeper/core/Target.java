@@ -44,25 +44,25 @@ public interface Target extends Comparable<Target> {
     Type getType();
 
     /**
-     * Getter for the target's size. If the target's type is ROOT or the target's resource is a directory then the size
-     * is the sum of all the children's sizes.
+     * Getter for the target's size. If the target's type is {@link Type#ROOT} or the target's resource is a directory
+     * then the size is the sum of all the children's sizes.
      *
      * @return the size in bytes
      */
     long getSize();
 
     /**
-     * Getter for the target's modification date. If the target's type is ROOT or the target's resource is a directory
-     * then the modification date is the modification date of the latest modified child.
+     * Getter for the target's modification date. If the target's type is {@link Type#ROOT} or the target's resource is
+     * a directory then the modification date is the modification date of the latest modified child.
      *
-     * @return the modification date or null in case the target is an empty directory
+     * @return the modification date or {@code null} in case the target is an empty directory
      */
     @Nullable DateTime getModificationDate();
 
     /**
      * Getter for the resource wrapped by this target.
      *
-     * @return the wrapped resource or null in case of a ROOT target
+     * @return the wrapped resource or {@code null} in case of a {@link Type#ROOT} target
      */
     @Nullable Resource getResource();
 

@@ -115,14 +115,13 @@ class OperationTrackingListener implements SweeperOperationListener {
 
     /**
      * Notification that the operation progressed further.
-     * <p>
-     * The progress of the operation is incremented in absolute values, for example (considering a max progress value
+     *
+     * <p>The progress of the operation is incremented in absolute values, for example (considering a max progress value
      * of 130):
-     * <ol>
-     * <li>incrementOperationProgress(40)</li>
+     *
+     * <ol><li>incrementOperationProgress(40)</li>
      * <li>incrementOperationProgress(110)</li>
-     * <li>incrementOperationProgress(130)</li>
-     * </ol>
+     * <li>incrementOperationProgress(130)</li></ol>
      *
      * @param progress
      *            an absolute value representing the progress
@@ -140,13 +139,13 @@ class OperationTrackingListener implements SweeperOperationListener {
 
     /**
      * Notification that a target action progressed further.
-     * <p>
-     * The progress of the action is incremented in relative values, for example (considering a maximum of 130):
-     * <ol>
-     * <li>incrementTargetActionProgress(40)</li>
+     *
+     * <p>The progress of the action is incremented in relative values, for example (considering a maximum of 130):
+     *
+     * <ol><li>incrementTargetActionProgress(40)</li>
      * <li>incrementTargetActionProgress(70)</li>
-     * <li>incrementTargetActionProgress(20)</li>
-     * </ol>
+     * <li>incrementTargetActionProgress(20)</li></ol>
+     *
      * At the end the progress will be 130 (the sum of all the relative action progress increments).
      *
      * @param actionProgress
