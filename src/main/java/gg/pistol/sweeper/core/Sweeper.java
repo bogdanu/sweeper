@@ -34,7 +34,8 @@ import javax.annotation.Nullable;
  * <ol><li>Find the duplicates by calling the {@link #analyze} method on the resources.</li>
  * <li>Retrieve and resolve the duplicate polls with {@link #nextDuplicatePoll}.</li>
  * <li>Optionally, to correct a previous choice it is possible to walk back with {@link #previousDuplicatePoll}.</li>
- * <li>Erase the targets marked for deletion with {@link #delete}.</li></ol>
+ * <li>Retrieve and review the targets marked for deletion with {@link #getToDeleteTargets}.</li>
+ * <li>Delete the undesired duplicate targets with {@link #delete}.</li></ol>
  *
  * @author Bogdan Pistol
  */
