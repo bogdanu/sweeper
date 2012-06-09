@@ -61,7 +61,6 @@ public class AnalyzerTest {
         when(res.getSize()).thenReturn(size);
         when(res.getModificationDate()).thenReturn(new DateTime(lastModifiedMillis));
         when(res.getInputStream()).thenReturn(new ByteArrayInputStream(content.getBytes("UTF-8")));
-        when(res.compareTo(any(Resource.class))).thenReturn(1); // to not be equal with anything
         return res;
     }
 
@@ -75,7 +74,6 @@ public class AnalyzerTest {
         }
         doReturn(ImmutableList.copyOf(children)).when(subresResponse).getResources();
         doReturn(Collections.<Exception>emptyList()).when(subresResponse).getExceptions();
-        when(res.compareTo(any(Resource.class))).thenReturn(1); // to not be equal with anything
         return res;
     }
 

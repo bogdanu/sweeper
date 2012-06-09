@@ -28,10 +28,10 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
@@ -129,7 +129,7 @@ class Analyzer {
             OperationTrackingListener listener) throws SweeperAbortException {
         log.trace("Traversing the resources");
         listener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
-        TargetImpl root = new TargetImpl(new TreeSet<Resource>(targetResources));
+        TargetImpl root = new TargetImpl(new LinkedHashSet<Resource>(targetResources));
         totalTargets = 1;
 
         Collection<TargetImpl> nextTargets = new ArrayList<TargetImpl>();

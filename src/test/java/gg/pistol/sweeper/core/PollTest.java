@@ -7,8 +7,6 @@ import gg.pistol.sweeper.test.ObjectVerifier;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -29,16 +27,12 @@ public class PollTest {
 
     private TargetImpl mockTarget() {
         TargetImpl target = mock(TargetImpl.class);
-        when(target.compareTo(any(Target.class))).thenAnswer(new Answer<Integer>() { // for the mock to work in sets
-            public Integer answer(InvocationOnMock invocation) throws Throwable {
-                return invocation.getMock().toString().compareTo(invocation.getArguments()[0].toString());
-            }
-        });
         return target;
     }
 
     private Poll createPoll(TargetImpl... targets) {
-        return new Poll(ImmutableSet.copyOf(targets), 0);
+        DuplicateGroup duplicateGroup = mock(DuplicateGroup.class);
+        return new Poll(duplicateGroup, ImmutableSet.copyOf(targets));
     }
 
     @Test
@@ -46,7 +40,7 @@ public class PollTest {
         assertEquals(2, poll.getTargets().size());
 
         try {
-            new Poll(null, 0);
+            new Poll(poll.getDuplicateGroup(), null);
             fail();
         } catch (NullPointerException e) {
             // expected
