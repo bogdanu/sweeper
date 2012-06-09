@@ -18,8 +18,6 @@ package gg.pistol.sweeper.core;
 
 import javax.annotation.Nullable;
 
-import com.google.common.base.Preconditions;
-
 /**
  * A wrapper around the possible exceptions that could happen while executing the {@link Sweeper} operations.
  *
@@ -28,16 +26,16 @@ import com.google.common.base.Preconditions;
 public class SweeperException extends Exception {
     private static final long serialVersionUID = 1L;
 
-    public SweeperException(String msg) {
-        super(Preconditions.checkNotNull(msg));
+    public SweeperException(@Nullable String msg) {
+        super(msg);
     }
 
     public SweeperException(@Nullable Exception cause) {
         super(cause);
     }
 
-    public SweeperException(String msg, @Nullable Exception cause) {
-        super(Preconditions.checkNotNull(msg), cause);
+    public SweeperException(@Nullable String msg, @Nullable Exception cause) {
+        super(msg, cause);
     }
 
 }
