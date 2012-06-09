@@ -23,6 +23,11 @@ package gg.pistol.sweeper.core.resource;
  */
 public interface Resource extends Comparable<Resource> {
 
+    /**
+     * Getter for the name of the resource.
+     *
+     * @return the resource name
+     */
     String getName();
 
 }

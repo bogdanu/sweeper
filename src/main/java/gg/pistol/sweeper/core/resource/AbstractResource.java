@@ -22,8 +22,8 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ComparisonChain;
 
-
-public abstract class AbstractResource implements Resource {
+// package private
+abstract class AbstractResource implements Resource {
 
     public int compareTo(Resource other) {
         Preconditions.checkNotNull(other);

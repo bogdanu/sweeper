@@ -28,19 +28,19 @@ import org.joda.time.DateTime;
 import com.google.common.base.Preconditions;
 
 /**
- * File-system file
+ * File-system resource file implementation.
  *
  * @author Bogdan Pistol
  */
 public class ResourceFileFs extends AbstractResource implements ResourceFile {
 
     private final File resource;
-
     private final String name;
 
     public ResourceFileFs(File file) throws IOException {
         Preconditions.checkNotNull(file);
-        Preconditions.checkArgument(file.isFile(), "The provided File <" + file.getPath() + "> is not representing a normal file");
+        Preconditions.checkArgument(file.isFile(),
+                "The provided File <" + file.getPath() + "> is not representing a normal file");
         resource = file.getCanonicalFile();
         name = resource.getPath();
     }

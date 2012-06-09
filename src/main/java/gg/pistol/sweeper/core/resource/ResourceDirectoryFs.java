@@ -16,28 +16,28 @@
  */
 package gg.pistol.sweeper.core.resource;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import com.google.common.base.Preconditions;
 
 /**
- * File-system directory
+ * File-system resource directory implementation.
  *
  * @author Bogdan Pistol
  */
 public class ResourceDirectoryFs extends AbstractResource implements ResourceDirectory {
 
     private final File resource;
-
     private final String name;
 
     public ResourceDirectoryFs(File file) throws IOException {
         Preconditions.checkNotNull(file);
-        Preconditions.checkArgument(file.isDirectory(), "The provided File <" + file.getPath() + "> is not representing a directory");
+        Preconditions.checkArgument(file.isDirectory(),
+                "The provided File <" + file.getPath() + "> is not representing a directory");
         resource = file.getCanonicalFile();
         name = resource.getPath();
     }
@@ -47,24 +47,30 @@ public class ResourceDirectoryFs extends AbstractResource implements ResourceDir
     }
 
     public ResourceDirectory.ResourceCollectionResponse getSubresources() {
-        Collection<Resource> resources = new ArrayList<Resource>();
-        Collection<Exception> exceptions = new ArrayList<Exception>();
-
         File[] files = null;
         try {
             files = getFiles(resource);
         } catch (Exception e) {
-            exceptions.add(e);
-            return createResponse(resources, exceptions);
+            return createResponse(Collections.<Resource>emptyList(), Collections.singleton(e));
         }
+
+        Collection<Resource> resources = new ArrayList<Resource>();
+        Collection<Exception> exceptions = null;
 
         for (File f : files) {
             try {
                 Resource r = createResource(f);
                 resources.add(r);
             } catch (Exception e) {
+                if (exceptions == null) {
+                    exceptions = new ArrayList<Exception>();
+                }
                 exceptions.add(e);
             }
+        }
+
+        if (exceptions == null) {
+            exceptions = Collections.<Exception>emptyList();
         }
 
         return createResponse(resources, exceptions);

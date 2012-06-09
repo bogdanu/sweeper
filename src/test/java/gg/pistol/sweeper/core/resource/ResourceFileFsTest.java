@@ -56,10 +56,11 @@ public class ResourceFileFsTest {
     @Test
     public void testGetSize() throws Exception {
         File file = mockFile("foo");
-        when(file.length()).thenReturn(10L);
+        long size = 10L;
+        when(file.length()).thenReturn(size);
         ResourceFileFs res = new ResourceFileFs(file);
 
-        assertEquals(10L, res.getSize());
+        assertEquals(size, res.getSize());
     }
 
     @Test

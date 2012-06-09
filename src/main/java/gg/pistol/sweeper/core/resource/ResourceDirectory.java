@@ -25,12 +25,34 @@ import java.util.Collection;
  */
 public interface ResourceDirectory extends Resource {
 
+    /**
+     * Retrieve the sub-resources of this resource directory.
+     *
+     * <p>In case there are exceptions while resolving the sub-resources the response will contain a partial collection
+     * of sub-resources and all the exceptions occurred.
+     *
+     * @return a response containing the collection of retrieved sub-resources and possibly a collection of exceptions
+     *         encountered while retrieving the sub-resources
+     */
     ResourceCollectionResponse getSubresources();
 
+    /**
+     * A response that wraps a collection of resources and another collection of related exceptions.
+     */
     interface ResourceCollectionResponse {
 
+        /**
+         * Getter for the collection of resources.
+         *
+         * @return the resources
+         */
         Collection<Resource> getResources();
 
+        /**
+         * Getter for the collection of exceptions.
+         *
+         * @return the exceptions
+         */
         Collection<Exception> getExceptions();
 
     }

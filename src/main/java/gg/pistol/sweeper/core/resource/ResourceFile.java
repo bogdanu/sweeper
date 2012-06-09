@@ -22,16 +22,33 @@ import java.io.InputStream;
 import org.joda.time.DateTime;
 
 /**
- * A resource item which contains byte data.
+ * An individual resource which contains byte data.
  *
  * @author Bogdan Pistol
  */
 public interface ResourceFile extends Resource {
 
+    /**
+     * Open an {@link InputStream} that reads the resource content.
+     *
+     * @return the resource input stream
+     * @throws IOException
+     *             if the underlying implementation experiences I/O exceptions while opening the input stream
+     */
     InputStream getInputStream() throws IOException;
 
+    /**
+     * Retrieve the size of the resource content.
+     *
+     * @return the size of the content in bytes
+     */
     long getSize();
 
+    /**
+     * Retrieve the latest modification date of the resource.
+     *
+     * @return the latest modification date
+     */
     DateTime getModificationDate();
 
 }
