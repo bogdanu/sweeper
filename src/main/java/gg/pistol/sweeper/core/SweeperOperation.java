@@ -17,30 +17,38 @@
 package gg.pistol.sweeper.core;
 
 /**
- * An operation executed by a {@link Sweeper} instance.
+ * Operation executed in the scope of {@link Sweeper#analyze()} or {@link Sweeper#delete()} method.
  * <p>
  * <ul>
  * <li>The {@link Sweeper#analyze()} method is doing the operations:
  * {@link #RESOURCE_TRAVERSING}, {@link #SIZE_COMPUTATION}, {@link #SIZE_DEDUPLICATION}, {@link #HASH_COMPUTATION},
  * {@link #HASH_DEDUPLICATION}, {@link #COUNTING} and {@link #DUPLICATE_GROUPING}.</li>
  *
- * <li>The {@link Sweeper#delete()} method is doing the {@link #FILESYSTEM_DELETION} operation.</li>
+ * <li>The {@link Sweeper#delete()} method is doing the {@link #RESOURCE_DELETION} operation.</li>
  * </ul>
  *
  * @author Bogdan Pistol
  */
 public enum SweeperOperation {
-    RESOURCE_TRAVERSING(29), SIZE_COMPUTATION(20), SIZE_DEDUPLICATION(1), HASH_COMPUTATION(47), HASH_DEDUPLICATION(1), COUNTING(1),
-            DUPLICATE_GROUPING(1), FILESYSTEM_DELETION(100);
+    RESOURCE_TRAVERSING(29), SIZE_COMPUTATION(20), SIZE_DEDUPLICATION(1), HASH_COMPUTATION(47), HASH_DEDUPLICATION(1),
+            COUNTING(1), DUPLICATE_GROUPING(1), RESOURCE_DELETION(100);
 
-    private int percentProgress;
+    private int percentQuota;
 
     private SweeperOperation(int percentQuota) {
-        this.percentProgress = percentQuota;
+        this.percentQuota = percentQuota;
     }
 
-    public int getPercentQuota() {
-        return percentProgress;
+    /**
+     * Getter for the percentage quota of this operation. The percentage quota is how much this operation contributes
+     * to the global completion percentage. At completion the global percentage (the sum of all operation quotas) is 100%.
+     * <p>
+     * (package private)
+     *
+     * @return the percent quota
+     */
+    int getPercentQuota() {
+        return percentQuota;
     }
 
 }
