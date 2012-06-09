@@ -30,7 +30,7 @@ import java.util.Collection;
  * have priority over other targets, they will appear in future polls only contending with other targets also marked
  * for retention.</li>
  *
- * <li>Do not mark the target at all, decide later.</li></ul>
+ * <li>Mark the target to decide later.</li></ul>
  *
  * @author Bogdan Pistol
  */
@@ -44,19 +44,20 @@ public interface SweeperPoll {
     Collection<Target> getTargets();
 
     /**
-     * Mark the target for deletion and consider the hierarchy of descendants undesired duplicates.
+     * Mark the target.
      *
      * @param target
-     *            the target of the mark
+     *            the target
+     * @param mark
+     *            the target mark
      */
-    void markForDeletion(Target target);
+    void mark(Target target, Mark mark);
 
     /**
-     * Mark the target for retention and consider the hierarchy of descendants desired originals.
-     *
-     * @param target
-     *            the target of the mark
+     * Target marks.
      */
-    void markForRetention(Target target);
+    enum Mark {
+        DELETE, RETAIN, DECIDE_LATER
+    }
 
 }
