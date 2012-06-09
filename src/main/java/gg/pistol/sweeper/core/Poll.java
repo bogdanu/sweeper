@@ -23,7 +23,7 @@ import java.util.TreeSet;
 import com.google.common.base.Preconditions;
 
 // package private
-class Poll implements SweeperPoll {
+class Poll implements SweeperPoll, Cloneable {
 
     private final Set<? extends Target> targets;
 
@@ -35,7 +35,7 @@ class Poll implements SweeperPoll {
     private boolean opened;
 
 
-    Poll(Collection<TargetImpl> targets, int duplicateIndex) {
+    Poll(Collection<? extends Target> targets, int duplicateIndex) {
         Preconditions.checkNotNull(targets);
         Preconditions.checkArgument(!targets.isEmpty());
         Preconditions.checkArgument(duplicateIndex >= 0);
@@ -101,6 +101,24 @@ class Poll implements SweeperPoll {
 
     int getDuplicateIndex() {
         return duplicateIndex;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Poll other = (Poll) obj;
+        return targets.equals(other.targets) && toDeleteTargets.equals(other.toDeleteTargets)
+                && retainedTargets.equals(other.retainedTargets) && duplicateIndex == other.duplicateIndex;
+    }
+
+    @Override
+    public Poll clone() {
+        Poll clone = new Poll(targets, duplicateIndex);
+        clone.toDeleteTargets.addAll(toDeleteTargets);
+        clone.retainedTargets.addAll(retainedTargets);
+        return clone;
     }
 
 }

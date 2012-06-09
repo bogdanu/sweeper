@@ -3,6 +3,7 @@ package gg.pistol.sweeper.core;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import gg.pistol.sweeper.core.SweeperPoll.Mark;
+import gg.pistol.sweeper.test.ObjectVerifier;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -112,6 +113,16 @@ public class PollTest {
         } catch (IllegalStateException e) {
             // expected because the poll is closed
         }
+    }
+
+    @Test
+    public void testEquals() {
+        Poll pollCopy = poll.clone();
+        Poll otherPoll = poll.clone();
+        otherPoll.open();
+        otherPoll.mark(target1, Mark.DELETE);
+
+        ObjectVerifier.verifyEquals(poll, pollCopy, otherPoll);
     }
 
 }
