@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
@@ -67,8 +68,8 @@ class Analyzer {
     // It is atomic to be able to abort the analysis from another thread.
     private final AtomicBoolean abortFlag;
 
-    // Can be null if not computed.
     @Nullable private SweeperCountImpl count;
+    @Nullable private TargetImpl rootTarget;
 
     // The number of total targets (including the ROOT target) calculated at the beginning (before sizing the targets)
     // by traverseResources().
@@ -90,7 +91,7 @@ class Analyzer {
      *
      * @return the list of all {@link DuplicateGroup}s sorted decreasingly by size.
      */
-    List<DuplicateGroup> compute(Set<Resource> targetResources, SweeperOperationListener listener)
+    List<DuplicateGroup> compute(Collection<Resource> targetResources, SweeperOperationListener listener)
             throws SweeperAbortException {
         Preconditions.checkNotNull(targetResources);
         Preconditions.checkNotNull(listener);
@@ -100,14 +101,14 @@ class Analyzer {
         abortFlag.set(false);
         OperationTrackingListener trackingListener = new OperationTrackingListener(listener);
 
-        TargetImpl root = traverseResources(targetResources, trackingListener);
-        Collection<TargetImpl> sized = computeSize(root, totalTargets, trackingListener);
+        rootTarget = traverseResources(targetResources, trackingListener);
+        Collection<TargetImpl> sized = computeSize(rootTarget, totalTargets, trackingListener);
         Multimap<Long, TargetImpl> sizeDups = filterDuplicateSize(sized, trackingListener);
 
         computeHash(sizeDups.values(), trackingListener);
         Multimap<String, TargetImpl> hashDups = filterDuplicateHash(sizeDups.values(), trackingListener);
 
-        count = computeCount(root, hashDups, trackingListener);
+        count = computeCount(rootTarget, hashDups, trackingListener);
         List<DuplicateGroup> duplicates = createDuplicateGroups(hashDups, trackingListener);
         return duplicates;
     }
@@ -124,15 +125,15 @@ class Analyzer {
      *
      * @return a root target that wraps the {@code targetResources}</code>
      */
-    private TargetImpl traverseResources(Set<Resource> targetResources, OperationTrackingListener listener)
+    private TargetImpl traverseResources(Collection<Resource> targetResources, OperationTrackingListener listener)
             throws SweeperAbortException {
         log.trace("Traversing the resources");
         listener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
-        TargetImpl root = new TargetImpl(targetResources);
+        TargetImpl root = new TargetImpl(new TreeSet<Resource>(targetResources));
         totalTargets = 1;
 
         Collection<TargetImpl> nextTargets = new ArrayList<TargetImpl>();
-        totalTargets += expand(root, INITIAL_EXPAND_LIMIT, nextTargets, listener);
+        totalTargets += expand(root.getChildren(), root.getChildren(), INITIAL_EXPAND_LIMIT, nextTargets, listener);
 
         Iterator<TargetImpl> iterator = nextTargets.iterator();
         listener.setOperationMaxProgress(nextTargets.size());
@@ -140,7 +141,7 @@ class Analyzer {
         // expand with progress indication
         for (int i = 1; iterator.hasNext(); i++) {
             TargetImpl target = iterator.next();
-            totalTargets += expand(target, -1, null, listener);
+            totalTargets += expand(Collections.singletonList(target), root.getChildren(), -1, null, listener);
             listener.incrementOperationProgress(i);
         }
 
@@ -151,19 +152,37 @@ class Analyzer {
     /**
      * Expand recursively a target up to the specified {@code limit} (the limit value -1 specifies no limit).
      *
-     * <p>This method has a side effect: if you specify a non-null {@code nextTargets} collection parameter then
+     * <p>This method has side effects: if you specify a non-null {@code nextTargets} collection parameter then
      * the collection will be filled with the remaining not yet expanded targets (that will possibly exist only if
      * an expansion limit is specified).
      *
+     * <p>Another side effect: if there is an expanded target equal to any of the {@code rootChildren} then that root
+     * child will be removed from the {@code rootChildren} collection. This is done to prevent a target from having
+     * multiple parents.
+     *
+     * <p>Example of multiple parent situation: supposing that {@link #compute} is called with the resource arguments
+     * "res1" and "res2", it could be the case that res2 is a descendant of res1:
+     *
+     * <pre><code>
+     * root---res1---dir---res2
+     *     \
+     *      --res2
+     * </code></pre>
+     *
+     * In this case res2 has two parents: root and dir, to prevent this from happening the "root---res2" child is
+     * removed.
+     *
      * @return the number of traversed children targets
      */
-    private int expand(TargetImpl target, int limit, @Nullable Collection<TargetImpl> nextTargets,
-            OperationTrackingListener listener) throws SweeperAbortException {
-        log.trace("Expanding {} with limit <{}>", target, limit);
-        LinkedList<TargetImpl> next = new LinkedList<TargetImpl>();
-        next.add(target);
+    private int expand(Collection<TargetImpl> targets, Collection<TargetImpl> rootChildren, int limit,
+            @Nullable Collection<TargetImpl> nextTargets, OperationTrackingListener listener) throws SweeperAbortException {
+        log.trace("Expanding {} with limit <{}>", targets, limit);
 
-        int targets = -1;  // exclude the first target from counting (only count the children)
+        Set<TargetImpl> rootChildrenSet = new HashSet<TargetImpl>(rootChildren);
+        LinkedList<TargetImpl> next = new LinkedList<TargetImpl>();
+        next.addAll(targets);
+
+        int targetCount = 0;
 
         int levelSize = 1; // the number of targets on the current BFS level
 
@@ -181,8 +200,16 @@ class Analyzer {
             currentTarget.expand(listener);
             next.addAll(currentTarget.getChildren());
 
+            // resolve the multiple parent situations
+            for (TargetImpl t : currentTarget.getChildren()) {
+                if (rootChildrenSet.contains(t)) {
+                    rootChildrenSet.remove(t);
+                    rootChildren.remove(t);
+                }
+            }
+
             levelSize--;
-            targets++;
+            targetCount++;
             checkAbortFlag();
         }
 
@@ -190,10 +217,7 @@ class Analyzer {
             nextTargets.addAll(next);
         }
 
-        // Count also all the not yet expanded targets, because every one of these will be expanded and not be
-        // counted as the first target of the expansion.
-        targets += next.size();
-        return targets;
+        return targetCount;
     }
 
     private void checkAbortFlag() throws SweeperAbortException {
@@ -515,6 +539,11 @@ class Analyzer {
     @Nullable
     SweeperCountImpl getCount() {
         return count;
+    }
+
+    @Nullable
+    TargetImpl getRootTarget() {
+        return rootTarget;
     }
 
     /**

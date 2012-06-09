@@ -61,6 +61,7 @@ public class AnalyzerTest {
         when(res.getSize()).thenReturn(size);
         when(res.getModificationDate()).thenReturn(new DateTime(lastModifiedMillis));
         when(res.getInputStream()).thenReturn(new ByteArrayInputStream(content.getBytes("UTF-8")));
+        when(res.compareTo(any(Resource.class))).thenReturn(1); // to not be equal with anything
         return res;
     }
 
@@ -74,6 +75,7 @@ public class AnalyzerTest {
         }
         when(subresResponse.getResources()).thenReturn(ImmutableList.copyOf(children));
         when(subresResponse.getExceptions()).thenReturn(Collections.<Exception>emptyList());
+        when(res.compareTo(any(Resource.class))).thenReturn(1); // to not be equal with anything
         return res;
     }
 
@@ -151,6 +153,8 @@ public class AnalyzerTest {
 
         TargetImpl dirCopyTarget = getTargetFromResource(dups.get(0).getTargets(), dirCopy);
         TargetImpl root = dirCopyTarget.getParent();
+
+        assertEquals(root, analyzer.getRootTarget());
         assertTrue(dirCopyTarget.isHashed());
         assertTrue(root.isSized());
         assertFalse(root.isHashed());
@@ -350,7 +354,7 @@ public class AnalyzerTest {
 
         assertTrue(areTargetsFromResources(dups.get(0).getTargets(), file1, file1Copy));
 
-        TargetImpl root = getTargetFromResource(dups.get(0).getTargets(), file1).getParent();
+        TargetImpl root = analyzer.getRootTarget();
         assertFalse(root.isSized());
         assertFalse(root.isHashed());
         TargetImpl dirTarget = getTargetFromResource(dups.get(0).getTargets(), file1Copy).getParent();
@@ -369,6 +373,27 @@ public class AnalyzerTest {
         assertEquals(1, count.getDuplicateTargetFiles());
         assertEquals(0, count.getDuplicateTargetDirectories());
         assertEquals(file1Size, count.getDuplicateSize());
+    }
+
+    /*
+     * Test fixing the multiple target parent situations.
+     *
+     * root---res1---dir---res2
+     *     \
+     *      --res2
+     *
+     * In this case res2 has two parents: root and dir, to prevent this from happening the "root---res2" child should
+     * be removed.
+     */
+    @Test
+    public void testTargetMultipleParent() throws Exception {
+        ResourceFile res2 = mockFile("res2", 0L, 0L, "");
+        ResourceDirectory dir = mockDirectory("dir", res2);
+        ResourceDirectory res1 = mockDirectory("res1", dir);
+
+        analyzer.compute(ImmutableSet.of(res1, res2), listener);
+
+        assertEquals(1, analyzer.getRootTarget().getChildren().size());
     }
 
     @Test
