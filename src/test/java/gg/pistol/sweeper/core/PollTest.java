@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
 
 public class PollTest {
 
@@ -36,10 +36,8 @@ public class PollTest {
         return target;
     }
 
-    private Poll createPoll(Target... targets) {
-        DuplicateGroup dups = mock(DuplicateGroup.class);
-        doReturn(Lists.newArrayList(targets)).when(dups).getTargets();
-        return new Poll(dups);
+    private Poll createPoll(TargetImpl... targets) {
+        return new Poll(ImmutableSet.copyOf(targets), 0);
     }
 
     @Test
@@ -47,7 +45,7 @@ public class PollTest {
         assertEquals(2, poll.getTargets().size());
 
         try {
-            new Poll(null);
+            new Poll(null, 0);
             fail();
         } catch (NullPointerException e) {
             // expected
@@ -58,21 +56,28 @@ public class PollTest {
     public void testMark() {
         assertTrue(poll.getToDeleteTargets().isEmpty());
         assertTrue(poll.getRetainedTargets().isEmpty());
+        assertEquals(Mark.DECIDE_LATER, poll.getMark(target1));
+        assertEquals(Mark.DECIDE_LATER, poll.getMark(target2));
 
         poll.mark(target1, Mark.DELETE);
+        assertEquals(Mark.DELETE, poll.getMark(target1));
         assertFalse(poll.getToDeleteTargets().isEmpty());
         assertTrue(poll.getRetainedTargets().isEmpty());
 
         poll.mark(target1, Mark.RETAIN);
+        assertEquals(Mark.RETAIN, poll.getMark(target1));
         assertTrue(poll.getToDeleteTargets().isEmpty());
         assertFalse(poll.getRetainedTargets().isEmpty());
 
         poll.mark(target2, Mark.DELETE);
+        assertEquals(Mark.DELETE, poll.getMark(target2));
         assertFalse(poll.getToDeleteTargets().isEmpty());
         assertFalse(poll.getRetainedTargets().isEmpty());
 
         poll.mark(target1, Mark.DECIDE_LATER);
         poll.mark(target2, Mark.DECIDE_LATER);
+        assertEquals(Mark.DECIDE_LATER, poll.getMark(target1));
+        assertEquals(Mark.DECIDE_LATER, poll.getMark(target2));
         assertTrue(poll.getToDeleteTargets().isEmpty());
         assertTrue(poll.getRetainedTargets().isEmpty());
     }

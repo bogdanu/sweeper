@@ -26,16 +26,22 @@ import com.google.common.base.Preconditions;
 class Poll implements SweeperPoll {
 
     private final Set<? extends Target> targets;
+
     private final Set<TargetImpl> toDeleteTargets;
     private final Set<TargetImpl> retainedTargets;
+
+    private final int duplicateIndex;
 
     private boolean opened;
 
 
-    Poll(DuplicateGroup duplicates) {
-        Preconditions.checkNotNull(duplicates);
+    Poll(Collection<TargetImpl> targets, int duplicateIndex) {
+        Preconditions.checkNotNull(targets);
+        Preconditions.checkArgument(!targets.isEmpty());
+        Preconditions.checkArgument(duplicateIndex >= 0);
 
-        targets = new TreeSet<Target>(duplicates.getTargets());
+        this.targets = new TreeSet<Target>(targets);
+        this.duplicateIndex = duplicateIndex;
         toDeleteTargets = new TreeSet<TargetImpl>();
         retainedTargets = new TreeSet<TargetImpl>();
     }
@@ -66,6 +72,17 @@ class Poll implements SweeperPoll {
         }
     }
 
+    public Mark getMark(Target target) {
+        Preconditions.checkState(targets.contains(target), "The target is not from this poll");
+        if (toDeleteTargets.contains(target)) {
+            return Mark.DELETE;
+        } else if (retainedTargets.contains(target)) {
+            return Mark.RETAIN;
+        } else {
+            return Mark.DECIDE_LATER;
+        }
+    }
+
     void open() {
         opened = true;
     }
@@ -80,6 +97,10 @@ class Poll implements SweeperPoll {
 
     Collection<TargetImpl> getRetainedTargets() {
         return retainedTargets;
+    }
+
+    int getDuplicateIndex() {
+        return duplicateIndex;
     }
 
 }

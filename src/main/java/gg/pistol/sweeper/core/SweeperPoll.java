@@ -26,9 +26,9 @@ import java.util.Collection;
  * <ul><li>Mark the target for deletion, the entire hierarchy of descendants will be considered undesired duplicates
  * and will not appear in future polls.</li>
  *
- * <li>Mark the target for retention, the entire hierarchy of descendants will be considered desired originals and will
- * have priority over other targets, they will appear in future polls only contending with other targets also marked
- * for retention.</li>
+ * <li>Mark the target for retention, the entire hierarchy of descendants will be considered desired originals and in
+ * future polls they will have priority over other non-marked for retention targets (which will be marked by default
+ * for deletion, although the default mark value can be changed if desired).</li>
  *
  * <li>Mark the target to decide later.</li></ul>
  *
@@ -52,6 +52,18 @@ public interface SweeperPoll {
      *            the target mark
      */
     void mark(Target target, Mark mark);
+
+    /**
+     * Retrieve the mark for the target.
+     *
+     *<p>The default value is computed by taking into account the previous polls. See the class description for more
+     * details.
+     *
+     * @param target
+     *            the target to query
+     * @return the mark of the target
+     */
+    Mark getMark(Target target);
 
     /**
      * Target marks.
