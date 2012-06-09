@@ -22,12 +22,17 @@ import java.util.Collection;
 
 /**
  * A collection of duplicate targets that need resolution. The targets can be marked with {@link Mark} values to specify
- * the removal the undesired duplicates.
+ * the removal of undesired duplicates.
  *
  * @author Bogdan Pistol
  */
 public interface SweeperPoll {
 
+    /**
+     * Returns a collection of duplicate targets having the same hash.
+     *
+     * @return the duplicate targets
+     */
     Collection<Target> getTargets();
 
 }
