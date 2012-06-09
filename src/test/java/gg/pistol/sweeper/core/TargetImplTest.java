@@ -20,7 +20,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static gg.pistol.sweeper.test.ObjectVerifier.*;
 
-import gg.pistol.sweeper.core.Target.Mark;
 import gg.pistol.sweeper.core.Target.Type;
 import gg.pistol.sweeper.core.resource.Resource;
 import gg.pistol.sweeper.core.resource.ResourceDirectory;
@@ -63,7 +62,6 @@ public class TargetImplTest {
         resource2 = mockResourceFile("foo");
         resourceDir = mockResourceDirectory("baz", resource1, resource2);
 
-        listener = mock(OperationTrackingListener.class);
         mockedParent = mock(TargetImpl.class);
 
         target1 = new TargetImpl(resource1, mockedParent);
@@ -71,6 +69,7 @@ public class TargetImplTest {
         target2 = new TargetImpl(resource2, mockedParent);
         targetDir = new TargetImpl(resourceDir, mockedParent);
 
+        listener = mock(OperationTrackingListener.class);
         hashFunction = new HashFunction();
     }
 
@@ -91,7 +90,7 @@ public class TargetImplTest {
 
     @Test
     public void testRootConstructor() throws Exception {
-        TargetImpl root = new TargetImpl(ImmutableSet.of((Resource) resource1, (Resource) resource2));
+        TargetImpl root = new TargetImpl(ImmutableSet.of((Resource) resource1, resource2));
 
         assertEquals("", root.getName());
         assertEquals(Type.ROOT, root.getType());
@@ -117,7 +116,6 @@ public class TargetImplTest {
         } catch (IllegalArgumentException e) {
             // expected
         }
-
     }
 
     @Test
@@ -158,15 +156,15 @@ public class TargetImplTest {
 
     @Test
     public void testExpand() throws Exception {
-        for (int i = 1; i <= 2; i++) {
-            targetDir.expand(listener);
+        targetDir.expand(listener);
 
-            assertTrue(targetDir.isPartiallyExpanded());
-            assertTrue(targetDir.isExpanded());
-            Iterator<TargetImpl> children = targetDir.getChildren().iterator();
-            assertEquals(resource1, children.next().getResource());
-            assertEquals(resource2, children.next().getResource());
-        }
+        assertTrue(targetDir.isPartiallyExpanded());
+        assertTrue(targetDir.isExpanded());
+
+        Iterator<TargetImpl> children = targetDir.getChildren().iterator();
+        assertEquals(resource1, children.next().getResource());
+        assertEquals(resource2, children.next().getResource());
+
         verify(listener).updateTargetAction(targetDir, TargetAction.EXPAND);
     }
 
@@ -189,30 +187,65 @@ public class TargetImplTest {
     }
 
     @Test
-    public void testComputeSizeFile() throws Exception {
-        when(resource1.getSize()).thenReturn(5L);
+    public void testComputeFileSize() throws Exception {
+        long size = 5L;
+        when(resource1.getSize()).thenReturn(size);
 
         assertFalse(target1.isPartiallySized());
         assertFalse(target1.isSized());
 
-        for (int i = 1; i <= 2; i++) {
-            target1.computeSize(listener);
+        target1.computeSize(listener);
 
-            assertTrue(target1.isPartiallyExpanded());
-            assertTrue(target1.isSized());
-            assertEquals(5L, target1.getSize());
-            assertEquals(1, target1.getTotalTargets());
-            assertEquals(1, target1.getTotalFiles());
-        }
+        assertTrue(target1.isPartiallyExpanded());
+        assertTrue(target1.isSized());
+
+        assertEquals(size, target1.getSize());
+        assertEquals(1, target1.getTotalTargets());
+        assertEquals(1, target1.getTotalTargetFiles());
+
         verify(listener).updateTargetAction(target1, TargetAction.COMPUTE_SIZE);
+    }
+
+    @Test
+    public void testComputeDirectorySize() throws Exception {
+        computeDirectorySize(false);
+        computeDirectorySize(true);
+    }
+
+    private void computeDirectorySize(boolean isFullExpanded) throws Exception {
+        long target1Size = 5L;
+        int target1Subtargets = 1;
+        int target1Files = 1;
+        TargetImpl target1Spy = prepareChildToSize(target1, target1Size, target1Subtargets, target1Files);
+
+        long target2Size = 6L;
+        int target2Subtargets = 3;
+        int target2Files = 2;
+        TargetImpl target2Spy = prepareChildToSize(target2, target2Size, target2Subtargets, target2Files);
+        TargetImpl targetDirSpy = prepareDirToSize(targetDir, isFullExpanded, target1Spy, target2Spy);
+
+        assertFalse(targetDirSpy.isPartiallySized());
+        assertFalse(targetDirSpy.isSized());
+
+        targetDirSpy.computeSize(listener);
+
+        assertTrue(targetDirSpy.isPartiallySized());
+        assertEquals(isFullExpanded, targetDirSpy.isSized());
+
+        assertEquals(target1Size + target2Size, targetDirSpy.getSize());
+        assertEquals(1 + target1Subtargets + target2Subtargets, targetDirSpy.getTotalTargets());
+        assertEquals(target1Files + target2Files, targetDirSpy.getTotalTargetFiles());
+
+        verify(listener).updateTargetAction(targetDirSpy, TargetAction.COMPUTE_SIZE);
     }
 
     private TargetImpl prepareChildToSize(TargetImpl target, long size, int totalTargets, int totalFiles) {
         target = spy(target);
         when(target.isPartiallySized()).thenReturn(true);
+        when(target.isSized()).thenReturn(true);
         when(target.getSize()).thenReturn(size);
         when(target.getTotalTargets()).thenReturn(totalTargets);
-        when(target.getTotalFiles()).thenReturn(totalFiles);
+        when(target.getTotalTargetFiles()).thenReturn(totalFiles);
         return target;
     }
 
@@ -222,33 +255,6 @@ public class TargetImplTest {
         when(target.isExpanded()).thenReturn(isFullExpanded);
         when(target.getChildren()).thenReturn(ImmutableList.copyOf(children));
         return target;
-    }
-
-    private void computeSizeDirectory(boolean isFullExpanded) throws Exception {
-        TargetImpl target1Spy = prepareChildToSize(target1, 5L, 1, 1);
-        TargetImpl target2Spy = prepareChildToSize(target2, 6L, 3, 2);
-        TargetImpl targetDirSpy = prepareDirToSize(targetDir, isFullExpanded, target1Spy, target2Spy);
-
-        assertFalse(targetDirSpy.isPartiallySized());
-        assertFalse(targetDirSpy.isSized());
-
-        for (int i = 1; i <= 2; i++) {
-            targetDirSpy.computeSize(listener);
-
-            assertTrue(targetDirSpy.isPartiallyExpanded());
-            assertTrue(targetDirSpy.isPartiallySized());
-            assertEquals(isFullExpanded, targetDirSpy.isSized());
-            assertEquals(11L, targetDirSpy.getSize());
-            assertEquals(5, targetDirSpy.getTotalTargets());
-            assertEquals(3, targetDirSpy.getTotalFiles());
-        }
-        verify(listener).updateTargetAction(targetDirSpy, TargetAction.COMPUTE_SIZE);
-    }
-
-    @Test
-    public void testComputeSizeDirectory() throws Exception {
-        computeSizeDirectory(false);
-        computeSizeDirectory(true);
     }
 
     @Test
@@ -264,14 +270,15 @@ public class TargetImplTest {
             targetDir.computeSize(listener);
             fail();
         } catch (IllegalStateException e) {
-            // expected
+            // expected because not expanded
         }
 
+        TargetImpl targetDirSpy = prepareDirToSize(targetDir, true, target1);
         try {
-            prepareDirToSize(targetDir, false, target1).computeSize(listener);
+            targetDirSpy.computeSize(listener);
             fail();
         } catch (IllegalStateException e) {
-            // expected
+            // expected because target1 is not partially sized
             assertFalse(targetDir.isPartiallySized());
             assertFalse(targetDir.isSized());
         }
@@ -280,30 +287,52 @@ public class TargetImplTest {
         target1.computeSize(listener);
         assertTrue(target1.isPartiallySized());
         assertFalse(target1.isSized());
+
+        // exception because target1 is not sized
         verify(listener).updateTargetException(eq(target1), eq(TargetAction.COMPUTE_SIZE), any(SweeperException.class));
     }
 
     @Test
-    public void testComputeHashFile() throws Exception {
-        when(resource1.getModificationDate()).thenReturn(new DateTime(100L));
+    public void testComputeFileHash() throws Exception {
+        long modificationDate = 100L;
+        long size = 20L;
+        when(resource1.getModificationDate()).thenReturn(new DateTime(modificationDate));
         when(resource1.getInputStream()).thenReturn(new ByteArrayInputStream("foo".getBytes("UTF-8")));
         target1 = spy(target1);
         when(target1.isPartiallySized()).thenReturn(true);
         when(target1.isSized()).thenReturn(true);
-        when(target1.getSize()).thenReturn(20L);
+        when(target1.getSize()).thenReturn(size);
 
         assertFalse(target1.isPartiallyHashed());
         assertFalse(target1.isHashed());
 
-        for (int i = 1; i <= 2; i++) {
-            target1.computeHash(listener, hashFunction, new AtomicBoolean());
+        target1.computeHash(hashFunction, listener, new AtomicBoolean());
 
-            assertTrue(target1.isPartiallyHashed());
-            assertTrue(target1.isHashed());
-            assertEquals(100L, target1.getModificationDate().getMillis());
-            assertEquals(20L + "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", target1.getHash());
-        }
+        assertTrue(target1.isPartiallyHashed());
+        assertTrue(target1.isHashed());
+
+        assertEquals(modificationDate, target1.getModificationDate().getMillis());
+        assertEquals(size + "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", target1.getHash());
+
         verify(listener).updateTargetAction(target1, TargetAction.COMPUTE_HASH);
+    }
+
+    @Test
+    public void testComputeDirectoryHash() throws Exception {
+        long modificationDate1 = 100L;
+        long size1 = 150L;
+        target1 = prepareChildToHash(target1, modificationDate1, size1, "foo");
+
+        long modificationDate2 = 200L;
+        long size2 = 250L;
+        target2 = prepareChildToHash(target2, modificationDate2, size2, "bar");
+
+        verifyComputeHashDirectory(Math.max(modificationDate1, modificationDate2),
+                (size1 + size2) + "889ed5b4ac3cb37eb2a39531fb640e7d4d74c2c0", size1 + size2, targetDir, target1, target2);
+
+        when(target2.getSize()).thenReturn(0L);
+        verifyComputeHashDirectory(modificationDate1, "foo", size1, new TargetImpl(resourceDir, mockedParent),
+                target1, target2);
     }
 
     private TargetImpl prepareChildToHash(TargetImpl target, long lastModifiedMillis, long size, String hash) {
@@ -325,69 +354,59 @@ public class TargetImplTest {
         return target;
     }
 
-    private void verifyComputeHashDirectory(long expectedLastModified, String expectedHash, long dirSize, TargetImpl target, TargetImpl... children) throws Exception {
+    private void verifyComputeHashDirectory(long expectedLastModified, String expectedHash, long dirSize,
+            TargetImpl target, TargetImpl... children) throws Exception {
         target = prepareDirToHash(target, dirSize, children);
 
         assertFalse(target.isPartiallyHashed());
         assertFalse(target.isHashed());
 
-        for (int i = 1; i <= 2; i++) {
-            target.computeHash(listener, hashFunction, new AtomicBoolean());
+        target.computeHash(hashFunction, listener, new AtomicBoolean());
 
-            assertTrue(target.isPartiallyHashed());
-            assertTrue(target.isHashed());
-            assertEquals(expectedLastModified, target.getModificationDate().getMillis());
-            assertEquals(expectedHash, target.getHash());
-        }
+        assertTrue(target.isPartiallyHashed());
+        assertTrue(target.isHashed());
+        assertEquals(expectedLastModified, target.getModificationDate().getMillis());
+        assertEquals(expectedHash, target.getHash());
+
         verify(listener).updateTargetAction(target, TargetAction.COMPUTE_HASH);
-    }
-
-    @Test
-    public void testComputeHashDirectory() throws Exception {
-        target1 = prepareChildToHash(target1, 100L, 150L, "foo");
-        target2 = prepareChildToHash(target2, 200L, 250L, "bar");
-        verifyComputeHashDirectory(200L, 400L + "889ed5b4ac3cb37eb2a39531fb640e7d4d74c2c0", 400L, targetDir, target1, target2);
-
-        when(target2.getSize()).thenReturn(0L);
-        verifyComputeHashDirectory(100L, "foo", 150L, new TargetImpl(resourceDir, mockedParent), target1, target2);
     }
 
     @Test
     public void testComputeHashException() throws Exception {
         try {
-            target1.computeHash(null, hashFunction, new AtomicBoolean());
+            target1.computeHash(null, listener, new AtomicBoolean());
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            target1.computeHash(listener, null, new AtomicBoolean());
+            target1.computeHash(hashFunction, null, new AtomicBoolean());
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            target1.computeHash(listener, hashFunction, null);
+            target1.computeHash(hashFunction, listener, null);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            target1.computeHash(listener, hashFunction, new AtomicBoolean());
+            target1.computeHash(hashFunction, listener, new AtomicBoolean());
             fail();
         } catch (IllegalStateException e) {
-            // expected
+            // expected, not sized
         }
 
+        targetDir = prepareDirToHash(targetDir, 0L, target1);
         try {
-            targetDir = prepareDirToHash(targetDir, 0L, target1);
-            targetDir.computeHash(listener, hashFunction, new AtomicBoolean());
+            targetDir.computeHash(hashFunction, listener, new AtomicBoolean());
             fail();
         } catch (IllegalStateException e) {
-            // expected
+            // expected, target1 is not partially hashed
             assertFalse(targetDir.isPartiallyHashed());
             assertFalse(targetDir.isHashed());
         }
@@ -395,7 +414,11 @@ public class TargetImplTest {
         target1 = prepareChildToHash(target1, 0L, 0L, "");
         when(target1.isHashed()).thenReturn(false);
         targetDir = prepareDirToHash(new TargetImpl(resourceDir, mockedParent), 0L, target1);
-        targetDir.computeHash(listener, hashFunction, new AtomicBoolean());
+        targetDir.computeHash(hashFunction, listener, new AtomicBoolean());
+        assertTrue(target1.isPartiallyHashed());
+        assertFalse(target1.isHashed());
+
+        // exception because target1 is not hashed
         verify(listener).updateTargetException(eq(targetDir), eq(TargetAction.COMPUTE_HASH), any(SweeperException.class));
     }
 
@@ -430,8 +453,8 @@ public class TargetImplTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testGetTotalFilesException() {
-        target1.getTotalFiles();
+    public void testGetTotalTargetFilesException() {
+        target1.getTotalTargetFiles();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -442,37 +465,6 @@ public class TargetImplTest {
     @Test(expected = IllegalStateException.class)
     public void testGetModificationDateException() throws Exception {
         target1.getModificationDate();
-    }
-
-    @Test
-    public void testSetMark() {
-        assertEquals(Mark.DECIDE_LATER, target1.getMark());
-        target1.setPoll(true);
-        DuplicateGroup duplicateTargetGroup = mock(DuplicateGroup.class);
-        target1.setDuplicateTargetGroup(duplicateTargetGroup);
-
-        target1.setMark(Mark.DELETE);
-
-        assertEquals(Mark.DELETE, target1.getMark());
-
-        try {
-            target1.setMark(null);
-            fail();
-        } catch (NullPointerException e) {
-            // expected
-        }
-
-        try {
-            target2.setMark(Mark.DELETE);
-            fail();
-        } catch (IllegalStateException e) {
-            // expected
-        }
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testSetDuplicateTargetGroupException() {
-        target1.setDuplicateTargetGroup(null);
     }
 
 }

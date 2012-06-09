@@ -47,13 +47,12 @@ import com.google.common.collect.ImmutableSet;
 public class AnalyzerTest {
 
     private Analyzer analyzer;
-
     private SweeperOperationListener listener;
 
     @Before
     public void setUp() throws Exception {
         analyzer = new Analyzer();
-        listener = mock(OperationTrackingListener.class);
+        listener = mock(SweeperOperationListener.class);
     }
 
     private ResourceFile mockFile(String name, long size, long lastModifiedMillis, String content) throws Exception {
@@ -122,24 +121,29 @@ public class AnalyzerTest {
      */
     @Test
     public void testWithDuplicateDir() throws Exception {
-        ResourceFile file1 = mockFile("file1", 1L, 10L, "file1");
-        ResourceFile file2 = mockFile("file2", 2L, 11L, "file2");
+        long file1Size = 1L;
+        String file1Content = "file1Content";
+        ResourceFile file1 = mockFile("file1", file1Size, 10L, file1Content);
+
+        long file2Size = 2L;
+        String file2Content = "file2Content";
+        ResourceFile file2 = mockFile("file2", file2Size, 11L, file2Content);
         ResourceDirectory dir = mockDirectory("dir", file1, file2);
 
-        ResourceFile file1Copy = mockFile("file1Copy", 1L, 20L, "file1");
-        ResourceFile file2Copy = mockFile("file2Copy", 2L, 21L, "file2");
+        ResourceFile file1Copy = mockFile("file1Copy", file1Size, 20L, file1Content);
+        ResourceFile file2Copy = mockFile("file2Copy", file2Size, 21L, file2Content);
         ResourceDirectory dirCopy = mockDirectory("dirCopy", file1Copy, file2Copy);
 
-        ResourceFile someFile = mockFile("someFile", 5L, 30L, "someFile");
+        ResourceFile someFile = mockFile("someFile", 5L, 30L, "someFileContent");
         ResourceDirectory upperDir = mockDirectory("upperDir", dir, someFile);
 
         Set<Resource> set = ImmutableSet.of((Resource) upperDir, dirCopy);
         List<DuplicateGroup> dups = analyzer.compute(set, listener);
 
         assertEquals(3, dups.size());
-        assertEquals(3L + "24c6f5ec6943e59c19b08dd8f11c73ec8dd3b764", dups.get(0).getHash());
-        assertEquals(2L + "cb99b709a1978bd205ab9dfd4c5aaa1fc91c7523", dups.get(1).getHash());
-        assertEquals(1L + "60b27f004e454aca81b0480209cce5081ec52390", dups.get(2).getHash());
+        assertEquals((file1Size + file2Size) + "e20496eb93b914eeef887e311bcc6c56b739f4e0", dups.get(0).getHash());
+        assertEquals(file2Size + "6c46db5318dbb05719a85de973e4f1894149ce2d", dups.get(1).getHash());
+        assertEquals(file1Size + "5e24f8e3368074888321372b53d3e1b14b3f2858", dups.get(2).getHash());
 
         assertTrue(areTargetsFromResources(dups.get(0).getTargets(), dir, dirCopy));
         assertTrue(areTargetsFromResources(dups.get(1).getTargets(), file2, file2Copy));
@@ -162,7 +166,7 @@ public class AnalyzerTest {
         assertEquals(3, count.getDuplicateTargets());
         assertEquals(2, count.getDuplicateTargetFiles());
         assertEquals(1, count.getDuplicateTargetDirectories());
-        assertEquals(3L, count.getDuplicateSize());
+        assertEquals(file1Size + file2Size, count.getDuplicateSize());
     }
 
     private void verifyListener() {
@@ -239,15 +243,17 @@ public class AnalyzerTest {
      */
     @Test
     public void testWithSingleFile() throws Exception {
-        ResourceFile file = mockFile("file", 1L, 10L, "file");
-        ResourceFile fileCopy = mockFile("fileCopy", 1L, 11L, "file");
+        long fileSize = 1L;
+        String fileContent = "fileContent";
+        ResourceFile file = mockFile("file", fileSize, 10L, fileContent);
+        ResourceFile fileCopy = mockFile("fileCopy", fileSize, 11L, fileContent);
         ResourceDirectory dir = mockDirectory("dir", file);
 
         Set<Resource> set = ImmutableSet.of(fileCopy, dir);
         List<DuplicateGroup> dups = analyzer.compute(set, listener);
 
         assertEquals(1, dups.size());
-        assertEquals(1L + "971c419dd609331343dee105fffd0f4608dc0bf2", dups.get(0).getHash());
+        assertEquals(fileSize + "5d6829b05a40a708a8661a63359145c3f4376883", dups.get(0).getHash());
 
         assertTrue(areTargetsFromResources(dups.get(0).getTargets(), dir, fileCopy));
 
@@ -257,7 +263,7 @@ public class AnalyzerTest {
         assertEquals(3, count.getTotalTargets());
         assertEquals(2, count.getTotalTargetFiles());
         assertEquals(1, count.getTotalTargetDirectories());
-        assertEquals(2L, count.getTotalSize());
+        assertEquals(fileSize * 2, count.getTotalSize());
 
         // The duplicate count depends on the targets that need to be removed, if "dir" and "file" are considered to be
         // duplicates then there are 2 duplicate targets, otherwise if "fileCopy" is considered to be duplicate then
@@ -265,7 +271,7 @@ public class AnalyzerTest {
         assertTrue(ImmutableSet.of(1, 2).contains(count.getDuplicateTargets()));
         assertEquals(1, count.getDuplicateTargetFiles());
         assertTrue(ImmutableSet.of(0, 1).contains(count.getDuplicateTargetDirectories()));
-        assertEquals(1L, count.getDuplicateSize());
+        assertEquals(fileSize, count.getDuplicateSize());
     }
 
     /*
@@ -323,10 +329,12 @@ public class AnalyzerTest {
      */
     @Test
     public void testWithChildrenException() throws Exception {
-        ResourceFile file1 = mockFile("file1", 1L, 10L, "file1");
-        ResourceFile file1Copy = mockFile("file1Copy", 1L, 11L, "file1");
-        ResourceFile file2 = mockFile("file2", 2L, 20L, "file2");
-        ResourceFile file3 = mockFile("file3", 0L, 30L, "file3");
+        long file1Size = 1L;
+        String file1Content = "file1Content";
+        ResourceFile file1 = mockFile("file1", file1Size, 10L, file1Content);
+        ResourceFile file1Copy = mockFile("file1Copy", file1Size, 11L, file1Content);
+        ResourceFile file2 = mockFile("file2", 2L, 20L, "file2Content");
+        ResourceFile file3 = mockFile("file3", 0L, 30L, "file3Content");
 
         when(file2.getInputStream()).thenThrow(new IOException());
         when(file3.getSize()).thenThrow(new RuntimeException());
@@ -336,7 +344,7 @@ public class AnalyzerTest {
         List<DuplicateGroup> dups = analyzer.compute(ImmutableSet.of(file1, dir, file3), listener);
 
         assertEquals(1, dups.size());
-        assertEquals(1L + "60b27f004e454aca81b0480209cce5081ec52390", dups.get(0).getHash());
+        assertEquals(file1Size + "5e24f8e3368074888321372b53d3e1b14b3f2858", dups.get(0).getHash());
 
         assertTrue(areTargetsFromResources(dups.get(0).getTargets(), file1, file1Copy));
 
@@ -358,7 +366,7 @@ public class AnalyzerTest {
         assertEquals(1, count.getDuplicateTargets());
         assertEquals(1, count.getDuplicateTargetFiles());
         assertEquals(0, count.getDuplicateTargetDirectories());
-        assertEquals(1L, count.getDuplicateSize());
+        assertEquals(file1Size, count.getDuplicateSize());
     }
 
     @Test

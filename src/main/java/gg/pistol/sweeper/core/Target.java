@@ -16,39 +16,61 @@
  */
 package gg.pistol.sweeper.core;
 
+import javax.annotation.Nullable;
+
 import gg.pistol.sweeper.core.resource.Resource;
 
 import org.joda.time.DateTime;
 
 /**
- * A resource that is a possible sweep candidate.
+ * A sweep candidate.
  *
  * @author Bogdan Pistol
  */
 public interface Target extends Comparable<Target> {
 
+    /**
+     * Getter for the target's name.
+     *
+     * @return the name
+     */
     String getName();
 
+    /**
+     * Getter for the target's type.
+     *
+     * @return the type
+     */
     Type getType();
 
+    /**
+     * Getter for the target's size. If the target's type is ROOT or the target's resource is a directory then the size
+     * is the sum of all the children's sizes.
+     *
+     * @return the size in bytes
+     */
     long getSize();
 
-    DateTime getModificationDate();
+    /**
+     * Getter for the target's modification date. If the target's type is ROOT or the target's resource is a directory
+     * then the modification date is the modification date of the latest modified child.
+     *
+     * @return the modification date or null in case the target is an empty directory
+     */
+    @Nullable DateTime getModificationDate();
 
-    Resource getResource();
+    /**
+     * Getter for the resource wrapped by this target.
+     *
+     * @return the wrapped resource or null in case of a ROOT target
+     */
+    @Nullable Resource getResource();
 
-    Mark getMark();
-
-    void setMark(Mark mark);
-
-    boolean isPoll();
-
+    /**
+     * The target types.
+     */
     enum Type {
         FILE, DIRECTORY, ROOT
-    }
-
-    enum Mark {
-        RETAIN, DELETE, DECIDE_LATER
     }
 
 }

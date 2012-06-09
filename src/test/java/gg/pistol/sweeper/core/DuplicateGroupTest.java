@@ -37,8 +37,10 @@ public class DuplicateGroupTest {
 
     @Before
     public void setUp() throws Exception {
-        group1 = createGroup(20L, "hash1");
-        group1Copy = createGroup(20L, "hash1");
+        String hash1 = "hash1";
+        long size1 = 20L;
+        group1 = createGroup(size1, hash1);
+        group1Copy = createGroup(size1, hash1);
         group2 = createGroup(10L, "hash2");
     }
 
@@ -59,16 +61,18 @@ public class DuplicateGroupTest {
 
     @Test
     public void testConstructor() throws Exception {
-        TargetImpl target1 = mockTarget("target1", 1L, true, "hash");
-        TargetImpl target2 = mockTarget("target2", 1L, true, "hash");
+        String hash = "hash";
+        long size = 1L;
+        TargetImpl target1 = mockTarget("target1", size, true, hash);
+        TargetImpl target2 = mockTarget("target2", size, true, hash);
         DuplicateGroup group = new DuplicateGroup(ImmutableList.of(target1, target2));
 
         Iterator<Target> iterator = group.getTargets().iterator();
         assertEquals(target1, iterator.next());
         assertEquals(target2, iterator.next());
 
-        assertEquals("hash", group.getHash());
-        assertEquals(1L, group.getSize());
+        assertEquals(hash, group.getHash());
+        assertEquals(size, group.getSize());
     }
 
     @Test

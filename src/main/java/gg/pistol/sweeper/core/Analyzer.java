@@ -70,7 +70,8 @@ class Analyzer {
     // Can be null when the compute() method is not called or aborted.
     @Nullable private SweeperCountImpl count;
 
-    // the number of total targets calculated at the beginning (before sizing the targets) by traverseResources()
+    // The number of total targets (including the ROOT target) calculated at the beginning (before sizing the targets)
+    // by traverseResources().
     private int totalTargets;
 
 
@@ -218,7 +219,9 @@ class Analyzer {
         traverseBottomUp(root, new TargetVisitorMethod() {
             public void visit(TargetImpl target, int targetIndex) {
                 target.computeSize(listener);
-                ret.add(target);
+                if (target.isSized()) {
+                    ret.add(target);
+                }
                 listener.incrementOperationProgress(targetIndex);
             }
         });
@@ -278,7 +281,7 @@ class Analyzer {
         Multimap<Long, TargetImpl> sizeDups = filterDuplicates(list, new Function<TargetImpl, Long>() {
             @Nullable public Long apply(TargetImpl input) {
                 // all the null return values will be ignored
-                return input.isSized() && input.getType() != Target.Type.ROOT ? input.getSize() : null;
+                return input.getType() != Target.Type.ROOT ? input.getSize() : null;
             }
         });
 
@@ -401,7 +404,7 @@ class Analyzer {
             long currentSize = 0;
 
             public void visit(TargetImpl target, int targetIndex) throws SweeperAbortException {
-                target.computeHash(listener, hashFunction, abortFlag);
+                target.computeHash(hashFunction, listener, abortFlag);
 
                 // Keep track of file sizes only as directories only re-hash the hash of their children which should be
                 // fast compared to reading I/O operations and hashing of potentially very large files.
@@ -441,7 +444,7 @@ class Analyzer {
         listener.updateOperation(SweeperOperation.COUNTING);
 
         int totalTargets = root.getTotalTargets();
-        int totalTargetFiles = root.getTotalFiles();
+        int totalTargetFiles = root.getTotalTargetFiles();
         long totalSize = root.getSize();
 
         int duplicateTargets = 0;
@@ -465,7 +468,7 @@ class Analyzer {
             while (iterator.hasNext()) {
                 TargetImpl target = iterator.next();
                 duplicateTargets += target.getTotalTargets();
-                duplicateTargetFiles += target.getTotalFiles();
+                duplicateTargetFiles += target.getTotalTargetFiles();
                 duplicateSize += target.getSize();
 
                 checkAbortFlag();

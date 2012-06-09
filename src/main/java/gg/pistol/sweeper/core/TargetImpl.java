@@ -23,7 +23,6 @@ import gg.pistol.sweeper.core.resource.ResourceFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,23 +50,28 @@ class TargetImpl implements Target {
 
     private final Collection<TargetImpl> children;
 
+    /*
+     * The size, the total targets, the total targets that are files (totalTargetFiles), the hash and the modification
+     * date are counted recursively by taking into account all the children.
+     */
     private long size;
     private int totalTargets;
     private int totalTargetFiles;
-
     @Nullable private String hash;
     @Nullable private DateTime modificationDate;
 
-    @Nullable private DuplicateGroup duplicateTargetGroup;
-    private Mark mark = Mark.DECIDE_LATER;
-    private boolean poll;
-
+    /*
+     * Partially expanded, partially sized and partially hashed are representing states when the expand(), computeSize()
+     * or computeHash() operations have been called but exceptions prevented the full computation and the full states
+     * expanded, sized or hashed are false.
+     */
     private boolean partiallyExpanded;
     private boolean expanded;
     private boolean partiallySized;
     private boolean sized;
     private boolean partiallyHashed;
     private boolean hashed;
+
 
     TargetImpl(Set<Resource> targetResources) {
         Preconditions.checkNotNull(targetResources);
@@ -78,9 +82,9 @@ class TargetImpl implements Target {
         resource = null;
         parent = null;
         children = new ArrayList<TargetImpl>();
+
         partiallyExpanded = true;
         expanded = true;
-
         doExpand(targetResources);
     }
 
@@ -88,27 +92,28 @@ class TargetImpl implements Target {
         Preconditions.checkNotNull(targetResource);
         Preconditions.checkNotNull(parent);
 
+        name = targetResource.getName();
         resource = targetResource;
-        name = resource.getName();
         this.parent = parent;
 
         if (resource instanceof ResourceFile) {
             type = Type.FILE;
+            children = Collections.emptyList();
             partiallyExpanded = true;
             expanded = true;
-            children = Collections.emptyList();
         } else if (resource instanceof ResourceDirectory) {
             type = Type.DIRECTORY;
             children = new ArrayList<TargetImpl>();
         } else {
-            throw new IllegalArgumentException("targetResource class <" + resource.getClass().getSimpleName() + "> should be a ResourceFile or a ResourceDirectory");
+            throw new IllegalArgumentException("targetResource class <" + resource.getClass().getSimpleName() +
+                    "> should be a ResourceFile or a ResourceDirectory");
         }
     }
 
     /**
-     * Expands the immediate children
+     * Expand the immediate children.
      */
-    void expand(SweeperOperationListener listener) {
+    void expand(OperationTrackingListener listener) {
         Preconditions.checkNotNull(listener);
         if (isPartiallyExpanded()) {
             return;
@@ -135,13 +140,14 @@ class TargetImpl implements Target {
     }
 
     /**
-     * Compute the size.
+     * Compute the size. In case this is a directory and there are errors computing the size of the children, then
+     * the computed size will include only the available children for estimation purposes.
      * <p>
-     * The {@link #expand()} method must have been called.
+     * The {@link #expand()} method must have been called previously.
      */
-    void computeSize(SweeperOperationListener listener) {
+    void computeSize(OperationTrackingListener listener) {
         Preconditions.checkNotNull(listener);
-        Preconditions.checkState(isPartiallyExpanded(), "Should be expanded");
+        Preconditions.checkState(isPartiallyExpanded(), "Should be partially expanded");
         if (isPartiallySized()) {
             return;
         }
@@ -155,7 +161,8 @@ class TargetImpl implements Target {
                 totalTargetFiles = 1;
                 size = ((ResourceFile) resource).getSize();
             } else {
-                sized = sized && computeDirectorySize();
+                boolean dirSized = computeDirectorySize();
+                sized = sized && dirSized;
             }
         } catch (IllegalStateException e) {
             partiallySized = false;
@@ -167,16 +174,20 @@ class TargetImpl implements Target {
         }
     }
 
+    /**
+     * Compute the size of the directory and return whether all the children were sized.
+     */
     private boolean computeDirectorySize() {
         size = 0;
         totalTargets = type == Type.ROOT ? 0 : 1;
         totalTargetFiles = 0;
         boolean ret = true;
+
         for (TargetImpl child : getChildren()) {
-            Preconditions.checkState(child.isPartiallySized(), "All the children need to be size computed");
+            Preconditions.checkState(child.isPartiallySized(), "All the children need to be partially sized");
             size += child.getSize();
             totalTargets += child.getTotalTargets();
-            totalTargetFiles += child.getTotalFiles();
+            totalTargetFiles += child.getTotalTargetFiles();
             if (!child.isSized()) {
                 ret = false;
             }
@@ -185,31 +196,28 @@ class TargetImpl implements Target {
     }
 
     /**
-     * Computes the hash and the last modified date.
+     * Compute the hash and the last modified date.
      * <p>
-     * The {@link #computeSize()} method must have been called.
+     * The {@link #computeSize()} method must have been called previously.
      */
-    void computeHash(OperationTrackingListener listener, HashFunction hashFunction, AtomicBoolean abort) throws SweeperAbortException {
-        Preconditions.checkNotNull(listener);
+    void computeHash(HashFunction hashFunction, OperationTrackingListener listener, AtomicBoolean abortFlag)
+            throws SweeperAbortException {
         Preconditions.checkNotNull(hashFunction);
-        Preconditions.checkNotNull(abort);
-        Preconditions.checkState(isPartiallySized(), "Size not computed");
+        Preconditions.checkNotNull(listener);
+        Preconditions.checkNotNull(abortFlag);
+        Preconditions.checkState(isSized(), "Not sized");
         if (isPartiallyHashed()) {
             return;
         }
         partiallyHashed = true;
         listener.updateTargetAction(this, TargetAction.COMPUTE_HASH);
-        if (!isSized()) {
-            listener.updateTargetException(this, TargetAction.COMPUTE_HASH, new SweeperException("Cannot compute hash as the size operation failed"));
-            return;
-        }
 
         hashed = true;
         try {
             if (type == Type.FILE) {
-                computeFileHash(listener, hashFunction, abort);
+                computeFileHash(hashFunction, listener, abortFlag);
             } else {
-                computeDirectoryHash(hashFunction);
+                computeDirectoryHash(hashFunction, abortFlag);
             }
         } catch (SweeperAbortException e) {
             partiallyHashed = false;
@@ -225,7 +233,8 @@ class TargetImpl implements Target {
         }
     }
 
-    private void computeFileHash(OperationTrackingListener listener, HashFunction hashFunction, AtomicBoolean abort) throws IOException, SweeperAbortException {
+    private void computeFileHash(HashFunction hashFunction, OperationTrackingListener listener, AtomicBoolean abort)
+            throws IOException, SweeperAbortException {
         ResourceFile res = (ResourceFile) resource;
 
         modificationDate = res.getModificationDate();
@@ -237,13 +246,15 @@ class TargetImpl implements Target {
         }
     }
 
-    private void computeDirectoryHash(HashFunction hashFunction) throws IOException, SweeperAbortException {
+    private void computeDirectoryHash(HashFunction hashFunction, AtomicBoolean abortFlag)
+            throws IOException, SweeperAbortException, SweeperException {
         modificationDate = null;
         List<String> hashes = new ArrayList<String>();
+
         for (TargetImpl child : getChildren()) {
-            Preconditions.checkState(child.isPartiallyHashed(), "All the children need to be hash computed");
+            Preconditions.checkState(child.isPartiallyHashed(), "All the children need to be partially hashed");
             if (!child.isHashed()) {
-                throw new IOException("Cannot compute hash as the children experienced errors while hashing");
+                throw new SweeperException("Cannot compute hash because at least one child resource could not be hashed");
             }
             if (child.getSize() == 0) {
                 continue;
@@ -258,7 +269,7 @@ class TargetImpl implements Target {
         } else {
             Collections.sort(hashes);
             ByteArrayInputStream stream = new ByteArrayInputStream(Joiner.on("-").join(hashes).getBytes());
-            hash = getSize() + hashFunction.compute(stream, OperationTrackingListener.NOOP_LISTENER, new AtomicBoolean());
+            hash = getSize() + hashFunction.compute(stream, OperationTrackingListener.NOOP_LISTENER, abortFlag);
         }
     }
 
@@ -286,30 +297,6 @@ class TargetImpl implements Target {
         return ComparisonChain.start().compare(name, other.getName()).result();
     }
 
-    boolean isPartiallyExpanded() {
-        return partiallyExpanded;
-    }
-
-    boolean isExpanded() {
-        return expanded;
-    }
-
-    boolean isPartiallySized() {
-        return partiallySized;
-    }
-
-    boolean isSized() {
-        return sized;
-    }
-
-    boolean isPartiallyHashed() {
-        return partiallyHashed;
-    }
-
-    boolean isHashed() {
-        return hashed;
-    }
-
     public String getName() {
         return name;
     }
@@ -318,6 +305,7 @@ class TargetImpl implements Target {
         return type;
     }
 
+    @Nullable
     public Resource getResource() {
         return resource;
     }
@@ -341,7 +329,7 @@ class TargetImpl implements Target {
         return totalTargets;
     }
 
-    int getTotalFiles() {
+    int getTotalTargetFiles() {
         Preconditions.checkState(isPartiallySized(), "not computed");
         return totalTargetFiles;
     }
@@ -351,32 +339,34 @@ class TargetImpl implements Target {
         return hash;
     }
 
+    @Nullable
     public DateTime getModificationDate() {
         Preconditions.checkState(isHashed(), "not computed");
         return modificationDate;
     }
 
-    public Mark getMark() {
-        return mark;
+    boolean isPartiallyExpanded() {
+        return partiallyExpanded;
     }
 
-    public void setMark(Mark mark) {
-        Preconditions.checkNotNull(mark);
-        Preconditions.checkState(isPoll(), "not in poll");
-        this.mark = mark;
+    boolean isExpanded() {
+        return expanded;
     }
 
-    public boolean isPoll() {
-        return poll;
+    boolean isPartiallySized() {
+        return partiallySized;
     }
 
-    void setPoll(boolean poll) {
-        this.poll = poll;
+    boolean isSized() {
+        return sized;
     }
 
-    void setDuplicateTargetGroup(DuplicateGroup duplicateTargetGroup) {
-        Preconditions.checkNotNull(duplicateTargetGroup);
-        this.duplicateTargetGroup = duplicateTargetGroup;
+    boolean isPartiallyHashed() {
+        return partiallyHashed;
+    }
+
+    boolean isHashed() {
+        return hashed;
     }
 
 }

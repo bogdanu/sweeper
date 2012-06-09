@@ -16,8 +16,6 @@
  */
 package gg.pistol.sweeper.core;
 
-import gg.pistol.sweeper.core.Target.Mark;
-
 import java.util.Collection;
 
 /**

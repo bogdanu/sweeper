@@ -69,14 +69,6 @@ public class OperationTrackingListenerTest {
         }
 
         trackingListener.updateOperation(SweeperOperation.SIZE_COMPUTATION);
-
-        try {
-            trackingListener.updateOperationProgress(0, 0, 0);
-            fail();
-        } catch (IllegalStateException e) {
-            // expected because the max progress is not configured
-        }
-
         trackingListener.setOperationMaxProgress(1);
 
         try {
@@ -173,10 +165,10 @@ public class OperationTrackingListenerTest {
         trackingListener.updateOperation(SweeperOperation.COUNTING);
 
         try {
-            trackingListener.setOperationMaxProgress(0);
+            trackingListener.setOperationMaxProgress(-1);
             fail();
         } catch (IllegalArgumentException e) {
-            // expected because the condition maxProgress > 0 is not true
+            // expected because the condition maxProgress >= 0 is not true
         }
 
         trackingListener.setOperationMaxProgress(1);

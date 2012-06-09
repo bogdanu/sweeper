@@ -46,7 +46,7 @@ class OperationTrackingListener implements SweeperOperationListener {
     private SweeperOperation operation;
 
     private long progress;
-    private long maxProgress;
+    private long maxProgress = 1; // the smallest operation will be completed in one step
     private int percentGlobal;
 
 
@@ -66,8 +66,8 @@ class OperationTrackingListener implements SweeperOperationListener {
     }
 
     public void updateOperationProgress(long progress, long maxProgress, int percentGlobal) {
-        // Update only when an operation is started and the max progress for that operation is defined.
-        Preconditions.checkState(operation != null && this.maxProgress > 0);
+        // Update only when an operation is started.
+        Preconditions.checkState(operation != null);
 
         // Ensure that maxProgress remains the same during operation's progress.
         Preconditions.checkArgument(maxProgress == this.maxProgress);
@@ -81,7 +81,7 @@ class OperationTrackingListener implements SweeperOperationListener {
     public void updateTargetAction(Target target, TargetAction action) {
         Preconditions.checkNotNull(target);
         Preconditions.checkNotNull(action);
-        Preconditions.checkState(operation != null && maxProgress > 0);
+        Preconditions.checkState(operation != null);
 
         listener.updateTargetAction(target, action);
     }
@@ -90,7 +90,7 @@ class OperationTrackingListener implements SweeperOperationListener {
         Preconditions.checkNotNull(target);
         Preconditions.checkNotNull(action);
         Preconditions.checkNotNull(e);
-        Preconditions.checkState(operation != null && maxProgress > 0);
+        Preconditions.checkState(operation != null);
 
         listener.updateTargetException(target, action, e);
     }
@@ -101,7 +101,14 @@ class OperationTrackingListener implements SweeperOperationListener {
      */
     void setOperationMaxProgress(long maxProgress) {
         Preconditions.checkState(operation != null);
-        Preconditions.checkArgument(maxProgress > 0);
+        Preconditions.checkArgument(maxProgress >= 0);
+
+        if (maxProgress == 0) {
+            // The max progress value should be at least 1 (even when the real max progress is zero from
+            // the perspective of the caller of this method) because the smallest operation will be completed
+            // in one step.
+            maxProgress = 1;
+        }
 
         this.maxProgress = maxProgress;
     }
@@ -121,7 +128,7 @@ class OperationTrackingListener implements SweeperOperationListener {
      *            an absolute value representing the progress
      */
     void incrementOperationProgress(long progress) {
-        Preconditions.checkState(operation != null && maxProgress > 0);
+        Preconditions.checkState(operation != null);
         Preconditions.checkArgument(progress >= 0 && progress <= maxProgress);
 
         if (progress > this.progress) {
@@ -146,7 +153,7 @@ class OperationTrackingListener implements SweeperOperationListener {
      *            a relative value representing the action progress increment
      */
     void incrementTargetActionProgress(long actionProgress) {
-        Preconditions.checkState(operation != null && maxProgress > 0);
+        Preconditions.checkState(operation != null);
         long operationProgress = progress + actionProgress;
         Preconditions.checkArgument(operationProgress >= 0 && operationProgress <= maxProgress);
 
@@ -157,7 +164,7 @@ class OperationTrackingListener implements SweeperOperationListener {
      * Mark that the operation is done and update the listener with max progress if not already updated.
      */
     void operationCompleted() {
-        Preconditions.checkState(operation != null && maxProgress > 0);
+        Preconditions.checkState(operation != null);
 
         percentGlobal += operation.getPercentQuota();
         if (progress < maxProgress) {
@@ -165,11 +172,11 @@ class OperationTrackingListener implements SweeperOperationListener {
         }
         operation = null;
         progress = 0;
-        maxProgress = 0;
+        maxProgress = 1;
     }
 
     private int getPercentage(SweeperOperation operation, long progress, long maxProgress) {
-        return maxProgress == 0 ? 0 : (int) (operation.getPercentQuota() * progress / maxProgress);
+        return (int) (operation.getPercentQuota() * progress / maxProgress);
     }
 
 }
