@@ -25,12 +25,32 @@ import javax.annotation.Nullable;
 /**
  * Duplicate file/directory cleaner.
  *
+ * <p>This class is not thread safe and must be called from the same thread or using synchronization techniques,
+ * the only exception are the {@link #abortAnalysis} and {@link #abortDeletion} methods which are thread safe and can
+ * be called from any thread.
+ *
  * @author Bogdan Pistol
  */
 public interface Sweeper {
 
+    /**
+     * Perform an analysis to find duplicate targets.
+     *
+     * @param resources
+     *            perform the analysis on these resources and their descendants
+     * @param listener
+     *            the provided listener will be called back with progress notifications
+     * @throws SweeperAbortException
+     *             in case the analysis is aborted this exception will be thrown
+     */
     void analyze(Set<Resource> resources, SweeperOperationListener listener) throws SweeperAbortException;
 
+    /**
+     * Abort the analysis.
+     *
+     * <p>This method is thread safe, it can be called from another thread at the same time while performing
+     * the analysis.
+     */
     void abortAnalysis();
 
     boolean isAnalyzed();
