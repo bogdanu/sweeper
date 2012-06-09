@@ -17,7 +17,7 @@
 package gg.pistol.sweeper.core;
 
 /**
- * Counters for total target files/directories and duplicate target files/directories.
+ * Counters for total targets, duplicate targets and to delete targets.
  *
  * <p>The values returned by the methods {@link #getDuplicateTargets}, {@link #getDuplicateTargetFiles} and
  * {@link #getDuplicateTargetDirectories} should be considered estimates and not real correct values.
@@ -111,5 +111,33 @@ public interface SweeperCount {
      * @return the total duplicate size in bytes
      */
     long getDuplicateSize();
+
+    /**
+     * Getter for targets marked for deletion.
+     *
+     * @return the targets to delete
+     */
+    int getToDeleteTargets();
+
+    /**
+     * Getter for target files marked for deletion.
+     *
+     * @return target files to delete
+     */
+    int getToDeleteTargetFiles();
+
+    /**
+     * Getter for target directories marked for deletion.
+     *
+     * @return target directories to delete
+     */
+    int getToDeleteTargetDirectories();
+
+    /**
+     * Getter for the total size of the targets marked for deletion.
+     *
+     * @return total size to delete in bytes
+     */
+    long getToDeleteSize();
 
 }
