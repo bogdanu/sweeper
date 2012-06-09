@@ -25,7 +25,7 @@ import com.google.common.base.Preconditions;
 // package private
 class Poll implements SweeperPoll {
 
-    private final Set<Target> targets;
+    private final Set<? extends Target> targets;
     private final Set<TargetImpl> toDeleteTargets;
     private final Set<TargetImpl> retainedTargets;
 
@@ -40,7 +40,7 @@ class Poll implements SweeperPoll {
         retainedTargets = new TreeSet<TargetImpl>();
     }
 
-    public Collection<Target> getTargets() {
+    public Collection<? extends Target> getTargets() {
         return targets;
     }
 

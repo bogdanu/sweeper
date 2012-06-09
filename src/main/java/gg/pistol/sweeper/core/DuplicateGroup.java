@@ -16,8 +16,6 @@
  */
 package gg.pistol.sweeper.core;
 
-
-import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.annotation.Nullable;
@@ -35,7 +33,7 @@ import com.google.common.collect.Ordering;
 // package private
 class DuplicateGroup implements Comparable<DuplicateGroup> {
 
-    private final Collection<Target> targets;
+    private final Collection<? extends Target> targets;
 
     private final long size;
 
@@ -59,12 +57,12 @@ class DuplicateGroup implements Comparable<DuplicateGroup> {
             Preconditions.checkArgument(sizeValue == target.getSize());
         }
 
-        targets = new ArrayList<Target>(collection);
+        targets = collection;
         hash = hashValue;
         size = sizeValue;
     }
 
-    public Collection<Target> getTargets() {
+    public Collection<? extends Target> getTargets() {
         return targets;
     }
 

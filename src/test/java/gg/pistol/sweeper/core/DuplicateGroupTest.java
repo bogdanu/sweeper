@@ -67,7 +67,7 @@ public class DuplicateGroupTest {
         TargetImpl target2 = mockTarget("target2", size, true, hash);
         DuplicateGroup group = new DuplicateGroup(ImmutableList.of(target1, target2));
 
-        Iterator<Target> iterator = group.getTargets().iterator();
+        Iterator<? extends Target> iterator = group.getTargets().iterator();
         assertEquals(target1, iterator.next());
         assertEquals(target2, iterator.next());
 

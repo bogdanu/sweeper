@@ -51,7 +51,7 @@ public interface Sweeper {
      *             in case the analysis is aborted this exception will be thrown, afterwards the analysis can be
      *             restarted with a (possibly different) set of resources
      */
-    void analyze(Collection<Resource> resources, SweeperOperationListener listener) throws SweeperAbortException;
+    void analyze(Collection<? extends Resource> resources, SweeperOperationListener listener) throws SweeperAbortException;
 
     /**
      * Abort the analysis.
@@ -89,7 +89,7 @@ public interface Sweeper {
      *
      * @return the targets marked for deletion
      */
-    Collection<Target> getToDeleteTargets();
+    Collection<? extends Target> getToDeleteTargets();
 
     /**
      * Delete the provided {@code toDeleteTargets}.
@@ -104,7 +104,7 @@ public interface Sweeper {
      * @throws SweeperAbortException
      *             in case the deletion is aborted this exception will be thrown
      */
-    void delete(Collection<Target> toDeleteTargets, SweeperOperationListener listener) throws SweeperAbortException;
+    void delete(Collection<? extends Target> toDeleteTargets, SweeperOperationListener listener) throws SweeperAbortException;
 
     /**
      * Abort the deletion. This operation only stops the deletion in progress it does not reverse the already deleted

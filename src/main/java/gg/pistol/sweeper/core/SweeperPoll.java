@@ -41,7 +41,7 @@ public interface SweeperPoll {
      *
      * @return the duplicate targets
      */
-    Collection<Target> getTargets();
+    Collection<? extends Target> getTargets();
 
     /**
      * Mark the target.

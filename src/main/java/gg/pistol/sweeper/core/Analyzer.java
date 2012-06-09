@@ -91,7 +91,7 @@ class Analyzer {
      *
      * @return the list of all {@link DuplicateGroup}s sorted decreasingly by size.
      */
-    List<DuplicateGroup> compute(Collection<Resource> targetResources, SweeperOperationListener listener)
+    List<DuplicateGroup> compute(Collection<? extends Resource> targetResources, SweeperOperationListener listener)
             throws SweeperAbortException {
         Preconditions.checkNotNull(targetResources);
         Preconditions.checkNotNull(listener);
@@ -125,8 +125,8 @@ class Analyzer {
      *
      * @return a root target that wraps the {@code targetResources}</code>
      */
-    private TargetImpl traverseResources(Collection<Resource> targetResources, OperationTrackingListener listener)
-            throws SweeperAbortException {
+    private TargetImpl traverseResources(Collection<? extends Resource> targetResources,
+            OperationTrackingListener listener) throws SweeperAbortException {
         log.trace("Traversing the resources");
         listener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
         TargetImpl root = new TargetImpl(new TreeSet<Resource>(targetResources));

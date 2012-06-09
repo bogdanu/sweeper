@@ -73,13 +73,13 @@ public class AnalyzerTest {
         if (children == null) {
             children = new Resource[] {};
         }
-        when(subresResponse.getResources()).thenReturn(ImmutableList.copyOf(children));
-        when(subresResponse.getExceptions()).thenReturn(Collections.<Exception>emptyList());
+        doReturn(ImmutableList.copyOf(children)).when(subresResponse).getResources();
+        doReturn(Collections.<Exception>emptyList()).when(subresResponse).getExceptions();
         when(res.compareTo(any(Resource.class))).thenReturn(1); // to not be equal with anything
         return res;
     }
 
-    private boolean areTargetsFromResources(Collection<Target> targets, Resource... resources) {
+    private boolean areTargetsFromResources(Collection<? extends Target> targets, Resource... resources) {
         if (targets.size() != resources.length) {
             return false;
         }
@@ -98,7 +98,7 @@ public class AnalyzerTest {
         return true;
     }
 
-    private TargetImpl getTargetFromResource(Collection<Target> targets, Resource resource) {
+    private TargetImpl getTargetFromResource(Collection<? extends Target> targets, Resource resource) {
         for (Target target : targets) {
             if (target.getResource() == resource) {
                 return (TargetImpl) target;

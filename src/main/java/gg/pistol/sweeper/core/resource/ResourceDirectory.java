@@ -46,14 +46,14 @@ public interface ResourceDirectory extends Resource {
          *
          * @return the resources
          */
-        Collection<Resource> getResources();
+        Collection<? extends Resource> getResources();
 
         /**
          * Getter for the collection of exceptions.
          *
          * @return the exceptions
          */
-        Collection<Exception> getExceptions();
+        Collection<? extends Exception> getExceptions();
 
     }
 

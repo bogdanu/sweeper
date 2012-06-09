@@ -84,7 +84,7 @@ public class TargetImplTest {
         when(res.getName()).thenReturn(name);
         ResourceDirectory.ResourceCollectionResponse subresourceCollection = mock(ResourceDirectory.ResourceCollectionResponse.class);
         when(res.getSubresources()).thenReturn(subresourceCollection);
-        when(subresourceCollection.getResources()).thenReturn(ImmutableList.copyOf(subresources));
+        doReturn(ImmutableList.copyOf(subresources)).when(subresourceCollection).getResources();
         return res;
     }
 
@@ -177,7 +177,9 @@ public class TargetImplTest {
             // expected
         }
 
-        when(resourceDir.getSubresources().getExceptions()).thenReturn(ImmutableList.of(new Exception()));
+        ResourceDirectory.ResourceCollectionResponse response = mock(ResourceDirectory.ResourceCollectionResponse.class);
+        doReturn(ImmutableList.of(new Exception())).when(response).getExceptions();
+        when(resourceDir.getSubresources()).thenReturn(response);
         targetDir.expand(listener);
 
         assertTrue(targetDir.isPartiallyExpanded());

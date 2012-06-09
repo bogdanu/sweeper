@@ -73,7 +73,7 @@ class TargetImpl implements Target {
     private boolean hashed;
 
 
-    TargetImpl(Set<Resource> targetResources) {
+    TargetImpl(Set<? extends Resource> targetResources) {
         Preconditions.checkNotNull(targetResources);
         Preconditions.checkArgument(!targetResources.isEmpty(), "targetResources is empty");
 
@@ -132,7 +132,7 @@ class TargetImpl implements Target {
         doExpand(response.getResources());
     }
 
-    private void doExpand(Collection<Resource> targetResources) {
+    private void doExpand(Collection<? extends Resource> targetResources) {
         for (Resource res : targetResources) {
             TargetImpl child = new TargetImpl(res, this);
             children.add(child);

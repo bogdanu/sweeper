@@ -38,7 +38,7 @@ public class PollTest {
 
     private Poll createPoll(Target... targets) {
         DuplicateGroup dups = mock(DuplicateGroup.class);
-        when(dups.getTargets()).thenReturn(Lists.newArrayList(targets));
+        doReturn(Lists.newArrayList(targets)).when(dups).getTargets();
         return new Poll(dups);
     }
 
