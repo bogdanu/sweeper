@@ -17,33 +17,33 @@
 package gg.pistol.sweeper.core;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.google.common.base.Preconditions;
 
 // package private
 class Poll implements SweeperPoll, Cloneable {
 
+    private final DuplicateGroup duplicateGroup;
+
     private final Set<? extends Target> targets;
 
     private final Set<TargetImpl> toDeleteTargets;
     private final Set<TargetImpl> retainedTargets;
 
-    private final int duplicateIndex;
-
     private boolean opened;
 
 
-    Poll(Collection<? extends Target> targets, int duplicateIndex) {
+    Poll(DuplicateGroup duplicateGroup, Collection<? extends Target> targets) {
+        Preconditions.checkNotNull(duplicateGroup);
         Preconditions.checkNotNull(targets);
         Preconditions.checkArgument(!targets.isEmpty());
-        Preconditions.checkArgument(duplicateIndex >= 0);
 
-        this.targets = new TreeSet<Target>(targets);
-        this.duplicateIndex = duplicateIndex;
-        toDeleteTargets = new TreeSet<TargetImpl>();
-        retainedTargets = new TreeSet<TargetImpl>();
+        this.duplicateGroup = duplicateGroup;
+        this.targets = new LinkedHashSet<Target>(targets);
+        toDeleteTargets = new LinkedHashSet<TargetImpl>();
+        retainedTargets = new LinkedHashSet<TargetImpl>();
     }
 
     public Collection<? extends Target> getTargets() {
@@ -99,8 +99,8 @@ class Poll implements SweeperPoll, Cloneable {
         return retainedTargets;
     }
 
-    int getDuplicateIndex() {
-        return duplicateIndex;
+    DuplicateGroup getDuplicateGroup() {
+        return duplicateGroup;
     }
 
     @Override
@@ -109,13 +109,13 @@ class Poll implements SweeperPoll, Cloneable {
             return false;
         }
         Poll other = (Poll) obj;
-        return targets.equals(other.targets) && toDeleteTargets.equals(other.toDeleteTargets)
-                && retainedTargets.equals(other.retainedTargets) && duplicateIndex == other.duplicateIndex;
+        return duplicateGroup.equals(other.duplicateGroup) && targets.equals(other.targets)
+                && toDeleteTargets.equals(other.toDeleteTargets) && retainedTargets.equals(other.retainedTargets);
     }
 
     @Override
     public Poll clone() {
-        Poll clone = new Poll(targets, duplicateIndex);
+        Poll clone = new Poll(duplicateGroup, targets);
         clone.toDeleteTargets.addAll(toDeleteTargets);
         clone.retainedTargets.addAll(retainedTargets);
         return clone;
