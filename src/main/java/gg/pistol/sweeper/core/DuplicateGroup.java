@@ -33,7 +33,7 @@ import com.google.common.collect.Ordering;
  * @author Bogdan Pistol
  */
 // package private
-class DuplicateGroup implements Comparable<DuplicateGroup>, SweeperPoll {
+class DuplicateGroup implements Comparable<DuplicateGroup> {
 
     private final Collection<Target> targets;
 

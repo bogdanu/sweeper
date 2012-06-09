@@ -19,18 +19,44 @@ package gg.pistol.sweeper.core;
 import java.util.Collection;
 
 /**
- * A collection of duplicate targets that need resolution. The targets can be marked with {@link Mark} values to specify
- * the removal of undesired duplicates.
+ * A collection of duplicate targets that need resolution.
+ *
+ * <p>A target can be marked in the following ways:
+ *
+ * <ul><li>Mark the target for deletion, the entire hierarchy of descendants will be considered undesired duplicates
+ * and will not appear in future polls.</li>
+ *
+ * <li>Mark the target for retention, the entire hierarchy of descendants will be considered desired originals and will
+ * have priority over other targets, they will appear in future polls only contending with other targets also marked
+ * for retention.</li>
+ *
+ * <li>Do not mark the target at all, decide later.</li></ul>
  *
  * @author Bogdan Pistol
  */
 public interface SweeperPoll {
 
     /**
-     * Returns a collection of duplicate targets having the same hash.
+     * Retrieve the collection of duplicate targets.
      *
      * @return the duplicate targets
      */
     Collection<Target> getTargets();
+
+    /**
+     * Mark the target for deletion and consider the hierarchy of descendants undesired duplicates.
+     *
+     * @param target
+     *            the target of the mark
+     */
+    void markForDeletion(Target target);
+
+    /**
+     * Mark the target for retention and consider the hierarchy of descendants desired originals.
+     *
+     * @param target
+     *            the target of the mark
+     */
+    void markForRetention(Target target);
 
 }
