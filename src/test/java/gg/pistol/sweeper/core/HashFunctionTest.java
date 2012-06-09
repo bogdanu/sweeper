@@ -17,26 +17,73 @@
 package gg.pistol.sweeper.core;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import gg.pistol.sweeper.core.HashFunction;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class HashFunctionTest {
 
+    private HashFunction hash;
+    private InputStream inputStream;
+    private OperationTrackingListener listener;
+    private AtomicBoolean abortFlag;
+
+    @Before
+    public void setUp() throws Exception {
+        hash = new HashFunction();
+        inputStream = new ByteArrayInputStream("foo".getBytes("UTF-8"));
+        listener = mock(OperationTrackingListener.class);
+        abortFlag = new AtomicBoolean();
+    }
+
     @Test
     public void testCompute() throws Exception {
-        HashFunction sha1 = new HashFunction();
-        ByteArrayInputStream stream = new ByteArrayInputStream("foo".getBytes("UTF-8"));
-        assertEquals("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", sha1.compute(stream));
+        assertEquals("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", hash.compute(inputStream, listener, abortFlag));
 
-        stream = new ByteArrayInputStream("bar".getBytes("UTF-8"));
-        assertEquals("62cdb7020ff920e5aa642c3d4066950dd1f01f4d", sha1.compute(stream));
+        inputStream = new ByteArrayInputStream("".getBytes("UTF-8"));
+        assertEquals("da39a3ee5e6b4b0d3255bfef95601890afd80709", hash.compute(inputStream, listener, abortFlag));
 
-        stream = new ByteArrayInputStream("".getBytes("UTF-8"));
-        assertEquals("da39a3ee5e6b4b0d3255bfef95601890afd80709", sha1.compute(stream));
+        inputStream = new ByteArrayInputStream(new byte[6 * (1 << 20)]); // 6 MB
+        hash.compute(inputStream, listener, abortFlag);
+        verify(listener).incrementMicroProgress(anyLong());
+    }
+
+    @Test
+    public void testComputeException() throws Exception {
+        try {
+            hash.compute(null, listener, abortFlag);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            hash.compute(inputStream, null, abortFlag);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            hash.compute(inputStream, listener, null);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            hash.compute(inputStream, listener, new AtomicBoolean(true));
+            fail();
+        } catch (SweeperAbortException e) {
+            // expected
+        }
     }
 
 }

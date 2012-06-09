@@ -23,12 +23,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Preconditions;
 
 /**
- * A SHA-1 hash function.
+ * SHA-1 hash function implementation.
  *
  * @author Bogdan Pistol
  */
@@ -37,46 +35,74 @@ class HashFunction {
 
     private static final int BUFFER_SIZE = 16 * (1 << 10); // 16 KB
 
+    /*
+     * Track the progress in minimum chunks of TRACKING_THRESHOLD_SIZE.
+     */
     private static final int TRACKING_THRESHOLD_SIZE = 5 * (1 << 20); // 5 MB
 
     private final MessageDigest sha1Algorithm;
 
     private final byte[] buf;
 
+
     HashFunction() throws NoSuchAlgorithmException {
         sha1Algorithm = MessageDigest.getInstance("SHA-1");
         buf = new byte[BUFFER_SIZE];
     }
 
-    String compute(InputStream stream, @Nullable OperationTrackingListener listener, @Nullable AtomicBoolean abort) throws IOException, SweeperAbortException {
-        Preconditions.checkNotNull(stream);
+    /**
+     * Computes the SHA-1 hash from the <code>inputStream</code> bytes with progress indication through the provided
+     * <code>listener</code>.
+     * <p>
+     * If the <code>abortFlag</code> flag changes while this method executes an {@link SweeperAbortException} will be
+     * thrown.
+     *
+     * @return the hexadecimal representation of the computed SHA-1 hash
+     */
+    String compute(InputStream inputStream, OperationTrackingListener listener, AtomicBoolean abortFlag)
+            throws IOException,SweeperAbortException {
+
+        Preconditions.checkNotNull(inputStream);
+        Preconditions.checkNotNull(listener);
+        Preconditions.checkNotNull(abortFlag);
+
+        try {
+            return doCompute(inputStream, listener, abortFlag);
+        } finally {
+            // Reset the hash for further use.
+            sha1Algorithm.reset();
+        }
+    }
+
+    private String doCompute(InputStream inputStream, OperationTrackingListener listener, AtomicBoolean abortFlag)
+            throws IOException,SweeperAbortException {
         int len;
         int trackingSize = 0;
-        while ((len = stream.read(buf)) != -1) {
+
+        while ((len = inputStream.read(buf)) != -1) {
             sha1Algorithm.update(buf, 0, len);
 
             trackingSize += len;
             if (trackingSize >= TRACKING_THRESHOLD_SIZE) {
+                // The micro-progress is a subdivision of a target (from which the input stream is retrieved) action
+                // progress.
                 listener.incrementMicroProgress(trackingSize);
                 trackingSize = 0;
             }
 
-            if (abort != null && abort.get()) {
-                sha1Algorithm.reset();
+            if (abortFlag.get()) {
                 throw new SweeperAbortException();
             }
         }
+
         byte[] digest = sha1Algorithm.digest();
-        sha1Algorithm.reset();
+
+        // Transform the hash into a hexadecimal representation.
         Formatter formatter = new Formatter();
         for (byte b : digest) {
             formatter.format("%02x", b);
         }
         return formatter.toString();
-    }
-
-    String compute(InputStream stream) throws IOException, SweeperAbortException {
-        return compute(stream, null, null);
     }
 
 }

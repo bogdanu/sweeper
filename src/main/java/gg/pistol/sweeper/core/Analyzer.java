@@ -65,7 +65,7 @@ class Analyzer {
     private final HashFunction hashFunction;
 
     // It is atomic to be able to abort the analysis from another thread.
-    private final AtomicBoolean abort;
+    private final AtomicBoolean abortFlag;
 
     // Can be null when the compute() method is not called or aborted.
     @Nullable private SweeperCountImpl count;
@@ -80,7 +80,7 @@ class Analyzer {
         } catch (NoSuchAlgorithmException e) {
             throw new SweeperException(e);
         }
-        abort = new AtomicBoolean();
+        abortFlag = new AtomicBoolean();
         log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(Analyzer.class));
     }
 
@@ -96,7 +96,7 @@ class Analyzer {
         Preconditions.checkArgument(!targetResources.isEmpty());
 
         log.trace("Computing the analysis for the resources {}", targetResources);
-        abort.set(false);
+        abortFlag.set(false);
         OperationTrackingListener trackingListener = new OperationTrackingListener(listener);
 
         TargetImpl root = traverseResources(targetResources, trackingListener);
@@ -196,7 +196,7 @@ class Analyzer {
     }
 
     private void checkAbortFlag() throws SweeperAbortException {
-        if (abort.get()) {
+        if (abortFlag.get()) {
             log.info("Detected that the abort flag is set");
             throw new SweeperAbortException();
         }
@@ -401,7 +401,7 @@ class Analyzer {
             long currentSize = 0;
 
             public void visit(TargetImpl target, int targetIndex) throws SweeperAbortException {
-                target.computeHash(listener, hashFunction, abort);
+                target.computeHash(listener, hashFunction, abortFlag);
 
                 // Keep track of file sizes only as directories only re-hash the hash of their children which should be
                 // fast compared to reading I/O operations and hashing of potentially very large files.
@@ -506,7 +506,7 @@ class Analyzer {
      */
     void abort() {
         log.trace("Aborting the analysis");
-        abort.set(true);
+        abortFlag.set(true);
     }
 
     @Nullable

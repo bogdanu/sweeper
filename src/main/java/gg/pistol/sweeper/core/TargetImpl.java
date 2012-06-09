@@ -258,7 +258,7 @@ class TargetImpl implements Target {
         } else {
             Collections.sort(hashes);
             ByteArrayInputStream stream = new ByteArrayInputStream(Joiner.on("-").join(hashes).getBytes());
-            hash = getSize() + hashFunction.compute(stream);
+            hash = getSize() + hashFunction.compute(stream, OperationTrackingListener.NOOP_LISTENER, new AtomicBoolean());
         }
     }
 
