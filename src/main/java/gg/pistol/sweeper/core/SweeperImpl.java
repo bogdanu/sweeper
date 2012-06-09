@@ -18,6 +18,7 @@ package gg.pistol.sweeper.core;
 
 import gg.pistol.sweeper.core.resource.Resource;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -35,7 +36,6 @@ public class SweeperImpl implements Sweeper {
     private final Analyzer analyzer;
 
     @Nullable private List<DuplicateGroup> duplicates;
-
     @Nullable private SweeperCountImpl count;
 
     public SweeperImpl() throws SweeperException {
@@ -57,16 +57,22 @@ public class SweeperImpl implements Sweeper {
         analyzer.abort();
     }
 
-    public boolean isAnalyzed() {
-        return duplicates != null;
-    }
-
-    public SweeperPoll nextPoll() {
+    public SweeperPoll nextDuplicatePoll() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public SweeperPoll previousPoll() {
+    public SweeperPoll previousDuplicatePoll() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public SweeperCountImpl getCount() {
+        Preconditions.checkState(count != null, "not analyzed");
+        return count;
+    }
+
+    public Collection<Target> getToDeleteTargets() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -77,11 +83,6 @@ public class SweeperImpl implements Sweeper {
 
     public void abortDeletion() {
         // TODO Auto-generated method stub
-    }
-
-    public SweeperCountImpl getCount() {
-        Preconditions.checkState(count != null, "not analyzed");
-        return count;
     }
 
 }

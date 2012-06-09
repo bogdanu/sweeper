@@ -18,6 +18,7 @@ package gg.pistol.sweeper.core;
 
 import gg.pistol.sweeper.core.resource.Resource;
 
+import java.util.Collection;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -28,6 +29,13 @@ import javax.annotation.Nullable;
  * <p>This class is not thread safe and must be called from the same thread or using synchronization techniques,
  * the only exception are the {@link #abortAnalysis} and {@link #abortDeletion} methods which are thread safe and can
  * be called from any thread.
+ *
+ * <p>In order to clean a set of targets perform the following steps:
+ *
+ * <ol><li>Find the duplicates by calling the {@link #analyze} method on the resources.</li>
+ * <li>Retrieve and resolve the duplicate polls with {@link #nextDuplicatePoll}.</li>
+ * <li>Optionally, to correct a previous choice it is possible to walk back with {@link #previousDuplicatePoll}.</li>
+ * <li>Erase the targets marked for deletion with {@link #delete}.</li></ol>
  *
  * @author Bogdan Pistol
  */
@@ -41,7 +49,8 @@ public interface Sweeper {
      * @param listener
      *            the provided listener will be called back with progress notifications
      * @throws SweeperAbortException
-     *             in case the analysis is aborted this exception will be thrown
+     *             in case the analysis is aborted this exception will be thrown, afterwards the analysis can be
+     *             restarted with a (possibly different) set of resources
      */
     void analyze(Set<Resource> resources, SweeperOperationListener listener) throws SweeperAbortException;
 
@@ -53,18 +62,56 @@ public interface Sweeper {
      */
     void abortAnalysis();
 
-    boolean isAnalyzed();
-
+    /**
+     * Determine the next duplicate poll.
+     *
+     * @return the next duplicate poll or {@code null} if there are no more polls
+     */
     @Nullable
-    SweeperPoll nextPoll();
+    SweeperPoll nextDuplicatePoll();
 
+    /**
+     * Return to the previous poll.
+     *
+     * @return the previous duplicate poll or {@code null} if there are no more previous polls
+     */
     @Nullable
-    SweeperPoll previousPoll();
+    SweeperPoll previousDuplicatePoll();
 
+    /**
+     * Retrieve counters for total targets, duplicate targets and to delete targets.
+     *
+     * @return the counters
+     */
+    SweeperCount getCount();
+
+    /**
+     * Retrieve the collection of targets marked for deletion.
+     *
+     * @return the targets marked for deletion
+     */
+    Collection<Target> getToDeleteTargets();
+
+    /**
+     * Delete the targets marked for deletion.
+     *
+     * <p><b>Warning</b>: this operation is not reversible. Aborting the deletion stops the operation, but does not
+     * revert the already deleted targets.
+     *
+     * @param listener
+     *            the provided listener will be called back with progress notifications
+     * @throws SweeperAbortException
+     *             in case the deletion is aborted this exception will be thrown
+     */
     void delete(SweeperOperationListener listener) throws SweeperAbortException;
 
+    /**
+     * Abort the deletion. This operation only stops the deletion in progress it does not reverse the already deleted
+     * targets.
+     *
+     * <p>This method is thread safe, it can be called from another thread at the same time while performing
+     * the deletion.
+     */
     void abortDeletion();
-
-    SweeperCount getCount();
 
 }
