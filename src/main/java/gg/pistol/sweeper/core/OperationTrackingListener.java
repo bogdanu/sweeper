@@ -22,28 +22,33 @@ import javax.annotation.Nullable;
 import com.google.common.base.Preconditions;
 
 /**
- * Extends SweeperOperationListener to track operation progress.
+ * Wrapper for {@link SweeperOperationListener} that provides tracking of operation progress.
  *
  * @author Bogdan Pistol
  */
 // package private
 class OperationTrackingListener implements SweeperOperationListener {
 
+    /**
+     * No operation listener, useful for cases when listening the operation progress is not wanted.
+     */
     static final OperationTrackingListener NOOP_LISTENER = new OperationTrackingListener(new SweeperOperationListener() {
-        public void updateOperation(SweeperOperation operation) { }
-        public void updateOperationProgress(long operationProgress, long operationSize, int percentGlobalProgress) { }
-        public void updateTargetAction(Target target, TargetAction action) { }
-        public void updateTargetException(Target target, TargetAction action, SweeperException e) { }
+        public void updateOperation(SweeperOperation operation) { /* ignore */ }
+        public void updateOperationProgress(long progress, long maxProgress, int percentGlobal) { /* ignore */ }
+        public void updateTargetAction(Target target, TargetAction action) { /* ignore */ }
+        public void updateTargetException(Target target, TargetAction action, SweeperException e) { /* ignore */ }
         });
 
+    // The wrapped listener.
     private final SweeperOperationListener listener;
 
     @Nullable
     private SweeperOperation operation;
 
-    private long operationProgress = -1;
-    private long operationMaxProgress = 0;
-    private int percentGlobalProgress;
+    private long progress;
+    private long maxProgress;
+    private int percentGlobal;
+
 
     OperationTrackingListener(SweeperOperationListener listener) {
         Preconditions.checkNotNull(listener);
@@ -51,80 +56,119 @@ class OperationTrackingListener implements SweeperOperationListener {
     }
 
     public void updateOperation(SweeperOperation operation) {
+        Preconditions.checkNotNull(operation);
+
+        // Start a new operation only after the previous one completed.
         Preconditions.checkState(this.operation == null);
 
         this.operation = operation;
         listener.updateOperation(operation);
     }
 
-    public void updateOperationProgress(long operationProgress, long operationMaxProgress, int percentGlobalProgress) {
-        Preconditions.checkState(operation != null);
-        Preconditions.checkArgument(operationMaxProgress == this.operationMaxProgress);
-        Preconditions.checkArgument(operationProgress >= 0 && operationProgress <= operationMaxProgress);
-        Preconditions.checkArgument(percentGlobalProgress >= 0 && percentGlobalProgress <= 100);
+    public void updateOperationProgress(long progress, long maxProgress, int percentGlobal) {
+        // Update only when an operation is started and the max progress for that operation is defined.
+        Preconditions.checkState(operation != null && this.maxProgress > 0);
 
-        listener.updateOperationProgress(operationProgress, operationMaxProgress, percentGlobalProgress);
+        // Ensure that maxProgress remains the same during operation's progress.
+        Preconditions.checkArgument(maxProgress == this.maxProgress);
+
+        Preconditions.checkArgument(progress >= 0 && progress <= maxProgress);
+        Preconditions.checkArgument(percentGlobal >= 0 && percentGlobal <= 100);
+
+        listener.updateOperationProgress(progress, maxProgress, percentGlobal);
     }
 
     public void updateTargetAction(Target target, TargetAction action) {
-        Preconditions.checkState(operation != null);
         Preconditions.checkNotNull(target);
         Preconditions.checkNotNull(action);
+        Preconditions.checkState(operation != null && maxProgress > 0);
 
         listener.updateTargetAction(target, action);
     }
 
     public void updateTargetException(Target target, TargetAction action, SweeperException e) {
-        Preconditions.checkState(operation != null);
         Preconditions.checkNotNull(target);
         Preconditions.checkNotNull(action);
         Preconditions.checkNotNull(e);
+        Preconditions.checkState(operation != null && maxProgress > 0);
 
         listener.updateTargetException(target, action, e);
     }
 
-    void setOperationMaxProgress(long operationMaxProgress) {
+    /**
+     * Configure the maximum progress that the current operation will reach when completed. This is required before
+     * updating the progress for the operation.
+     */
+    void setOperationMaxProgress(long maxProgress) {
         Preconditions.checkState(operation != null);
-        Preconditions.checkArgument(operationMaxProgress >= 0);
+        Preconditions.checkArgument(maxProgress > 0);
 
-        this.operationMaxProgress = operationMaxProgress;
+        this.maxProgress = maxProgress;
     }
 
-    void incrementProgress(long progress) {
-        Preconditions.checkState(operation != null);
-        Preconditions.checkState(operationMaxProgress >= 0);
-        Preconditions.checkArgument(progress >= 0 && progress <= operationMaxProgress);
+    /**
+     * Notification that the operation progressed further.
+     * <p>
+     * The progress of the operation is incremented in absolute values, for example (considering a max progress value
+     * of 130):
+     * <ol>
+     * <li>incrementOperationProgress(40)</li>
+     * <li>incrementOperationProgress(110)</li>
+     * <li>incrementOperationProgress(130)</li>
+     * </ol>
+     *
+     * @param progress
+     *            an absolute value representing the progress
+     */
+    void incrementOperationProgress(long progress) {
+        Preconditions.checkState(operation != null && maxProgress > 0);
+        Preconditions.checkArgument(progress >= 0 && progress <= maxProgress);
 
-        if (progress > operationProgress) {
-            operationProgress = progress;
-            int percent = normalizeProgress(operation, operationProgress, operationMaxProgress);
-            updateOperationProgress(operationProgress, operationMaxProgress, percentGlobalProgress + percent);
+        if (progress > this.progress) {
+            this.progress = progress;
+            int percent = getPercentage(operation, this.progress, maxProgress);
+            updateOperationProgress(this.progress, maxProgress, percentGlobal + percent);
         }
     }
 
-    void incrementMicroProgress(long microProgress) {
-        Preconditions.checkState(operation != null);
-        Preconditions.checkState(operationMaxProgress >= 0);
-        microProgress += operationProgress;
-        Preconditions.checkArgument(microProgress >= 0 && microProgress <= operationMaxProgress);
+    /**
+     * Notification that a target action progressed further.
+     * <p>
+     * The progress of the action is incremented in relative values, for example (considering a maximum of 130):
+     * <ol>
+     * <li>incrementTargetActionProgress(40)</li>
+     * <li>incrementTargetActionProgress(70)</li>
+     * <li>incrementTargetActionProgress(20)</li>
+     * </ol>
+     * At the end the progress will be 130 (the sum of all the relative action progress increments).
+     *
+     * @param actionProgress
+     *            a relative value representing the action progress increment
+     */
+    void incrementTargetActionProgress(long actionProgress) {
+        Preconditions.checkState(operation != null && maxProgress > 0);
+        long operationProgress = progress + actionProgress;
+        Preconditions.checkArgument(operationProgress >= 0 && operationProgress <= maxProgress);
 
-        incrementProgress(microProgress);
+        incrementOperationProgress(operationProgress);
     }
 
+    /**
+     * Mark that the operation is done and update the listener with max progress if not already updated.
+     */
     void operationCompleted() {
-        Preconditions.checkState(operation != null);
-        Preconditions.checkState(operationMaxProgress >= 0);
+        Preconditions.checkState(operation != null && maxProgress > 0);
 
-        percentGlobalProgress += operation.getPercentQuota();
-        if (operationProgress < operationMaxProgress) {
-            updateOperationProgress(operationMaxProgress, operationMaxProgress, percentGlobalProgress);
+        percentGlobal += operation.getPercentQuota();
+        if (progress < maxProgress) {
+            updateOperationProgress(maxProgress, maxProgress, percentGlobal);
         }
-        operationProgress = -1;
-        operationMaxProgress = 0;
         operation = null;
+        progress = 0;
+        maxProgress = 0;
     }
 
-    private int normalizeProgress(SweeperOperation operation, long progress, long maxProgress) {
+    private int getPercentage(SweeperOperation operation, long progress, long maxProgress) {
         return maxProgress == 0 ? 0 : (int) (operation.getPercentQuota() * progress / maxProgress);
     }
 

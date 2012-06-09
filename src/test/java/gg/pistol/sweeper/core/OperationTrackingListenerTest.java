@@ -16,6 +16,7 @@
  */
 package gg.pistol.sweeper.core;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.Before;
@@ -23,14 +24,13 @@ import org.junit.Test;
 
 public class OperationTrackingListenerTest {
 
-    private SweeperOperationListener listener;
-
-    private OperationTrackingListener wrapper;
+    private SweeperOperationListener wrappedListener;
+    private OperationTrackingListener trackingListener;
 
     @Before
     public void setUp() throws Exception {
-        listener = mock(SweeperOperationListener.class);
-        wrapper = new OperationTrackingListener(listener);
+        wrappedListener = mock(SweeperOperationListener.class);
+        trackingListener = new OperationTrackingListener(wrappedListener);
     }
 
     @Test(expected = NullPointerException.class)
@@ -39,79 +39,191 @@ public class OperationTrackingListenerTest {
     }
 
     @Test
-    public void testUpdateOperationProgress() {
-//        wrapper.updateOperationProgress(10);
-//        verify(listener).updateOperationProgress(10);
+    public void testUpdateOperation() {
+        try {
+            trackingListener.updateOperation(null);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        trackingListener.updateOperation(SweeperOperation.SIZE_COMPUTATION);
+        verify(wrappedListener).updateOperation(SweeperOperation.SIZE_COMPUTATION);
+
+        try {
+            trackingListener.updateOperation(SweeperOperation.SIZE_COMPUTATION);
+            fail();
+        } catch (IllegalStateException e) {
+            // Expected because there is an operation in progress, the current operation needs to be completed before
+            // starting a new one.
+        }
     }
 
     @Test
-    public void testUpdateOperationPhase() {
-        wrapper.updateOperation(SweeperOperation.SIZE_COMPUTATION);
-        verify(listener).updateOperation(SweeperOperation.SIZE_COMPUTATION);
+    public void testUpdateOperationProgress() {
+        try {
+            trackingListener.updateOperationProgress(0, 0, 0);
+            fail();
+        } catch (IllegalStateException e) {
+            // expected because no operation is started
+        }
+
+        trackingListener.updateOperation(SweeperOperation.SIZE_COMPUTATION);
+
+        try {
+            trackingListener.updateOperationProgress(0, 0, 0);
+            fail();
+        } catch (IllegalStateException e) {
+            // expected because the max progress is not configured
+        }
+
+        trackingListener.setOperationMaxProgress(1);
+
+        try {
+            trackingListener.updateOperationProgress(0, 0, 0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Expected because the max progress is not consistent with the previously configured max progress.
+        }
+
+        try {
+            trackingListener.updateOperationProgress(2, 1, 0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected because progress > maxProgress
+        }
+
+        try {
+            trackingListener.updateOperationProgress(1, 1, 101);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected because percentGlobal > 100
+        }
+
+        trackingListener.updateOperationProgress(1, 1, 100);
+        verify(wrappedListener).updateOperationProgress(1, 1, 100);
     }
+
 
     @Test
     public void testUpdateTargetAction() {
         Target target = mock(Target.class);
-        wrapper.updateTargetAction(target, TargetAction.EXPAND);
-        verify(listener).updateTargetAction(target, TargetAction.EXPAND);
+
+        try {
+            trackingListener.updateTargetAction(null, TargetAction.EXPAND);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            trackingListener.updateTargetAction(target, null);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        trackingListener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
+        trackingListener.setOperationMaxProgress(1);
+        trackingListener.updateTargetAction(target, TargetAction.EXPAND);
+        verify(wrappedListener).updateTargetAction(target, TargetAction.EXPAND);
     }
 
     @Test
     public void testUpdateTargetException() {
         Target target = mock(Target.class);
-        SweeperException e = new SweeperException("");
-        wrapper.updateTargetException(target, TargetAction.EXPAND, e);
-        verify(listener).updateTargetException(target, TargetAction.EXPAND, e);
+        SweeperException exception = new SweeperException("");
+
+        try {
+            trackingListener.updateTargetException(null, TargetAction.EXPAND, exception);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            trackingListener.updateTargetException(target, null, exception);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            trackingListener.updateTargetException(target, TargetAction.EXPAND, null);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        trackingListener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
+        trackingListener.setOperationMaxProgress(1);
+        trackingListener.updateTargetException(target, TargetAction.EXPAND, exception);
+        verify(wrappedListener).updateTargetException(target, TargetAction.EXPAND, exception);
     }
 
     @Test
-    public void testUpdateHashProgress() {
-//        wrapper.updateHashProgress(1L, 2L);
-//        verify(listener).updateHashProgress(1L, 2L);
+    public void testSetOperationMaxProgress() {
+        try {
+            trackingListener.setOperationMaxProgress(0);
+            fail();
+        } catch (IllegalStateException e) {
+            // expected because no operation is started
+        }
+
+        trackingListener.updateOperation(SweeperOperation.COUNTING);
+
+        try {
+            trackingListener.setOperationMaxProgress(0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected because the condition maxProgress > 0 is not true
+        }
+
+        trackingListener.setOperationMaxProgress(1);
     }
 
     @Test
-    public void testOperationFinished() {
-//        wrapper.operationFinished();
-//        verify(listener).operationFinished();
+    public void testIncrementOperationProgress() {
+        trackingListener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
+        trackingListener.setOperationMaxProgress(100);
+
+        try {
+            trackingListener.incrementOperationProgress(110);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected because the progress is greater than maxProgress
+        }
+
+        trackingListener.incrementOperationProgress(50);
+        trackingListener.incrementOperationProgress(50);
+        verify(wrappedListener).updateOperationProgress(eq(50L), eq(100L), anyInt());
     }
 
     @Test
-    public void testOperationAborted() {
-//        wrapper.operationAborted();
-//        verify(listener).operationAborted();
+    public void testIncrementTargetActionProgress() {
+        trackingListener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
+        trackingListener.setOperationMaxProgress(100);
+        trackingListener.incrementOperationProgress(50);
+
+        try {
+            trackingListener.incrementTargetActionProgress(51);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected because the progress is greater than maxProgress
+        }
+
+        trackingListener.incrementTargetActionProgress(30);
+        trackingListener.incrementTargetActionProgress(20);
+        verify(wrappedListener).updateOperationProgress(eq(100L), eq(100L), anyInt());
     }
 
     @Test
-    public void testIncrementPhase() {
-//        wrapper.operationCompleted(SweeperOperation.SIZE_COMPUTATION);
-//
-//        long maxProgress = 50L;
-//
-//        wrapper.incrementPhase(SweeperOperation.SIZE_DEDUPLICATION, 10L, maxProgress);
-//        wrapper.incrementPhase(SweeperOperation.SIZE_DEDUPLICATION, 40L, maxProgress);
-//        wrapper.incrementPhase(SweeperOperation.SIZE_DEDUPLICATION, 40L, maxProgress);
-//        wrapper.incrementPhase(SweeperOperation.SIZE_DEDUPLICATION, 0, 0);
-//
-//        int expectedPercent1 = (int) (SweeperOperation.SIZE_COMPUTATION.getPercentQuota() + SweeperOperation.SIZE_DEDUPLICATION.getPercentQuota() * 10L / maxProgress);
-//        int expectedPercent2 = (int) (SweeperOperation.SIZE_COMPUTATION.getPercentQuota() + SweeperOperation.SIZE_DEDUPLICATION.getPercentQuota() * 40L / maxProgress);
-//
-//        verify(listener).updateOperationProgress(expectedPercent1);
-//        verify(listener).updateOperationProgress(expectedPercent2);
-    }
+    public void testOperationCompleted() {
+        trackingListener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
+        trackingListener.setOperationMaxProgress(100);
 
-    @Test
-    public void testIncrementOperation() {
-//        wrapper.operationCompleted(SweeperOperation.SIZE_COMPUTATION);
-//        verify(listener).updateOperationProgress(SweeperOperation.SIZE_COMPUTATION.getPercentQuota());
-//
-//        wrapper.operationCompleted(SweeperOperation.SIZE_DEDUPLICATION);
-//        verify(listener).updateOperationProgress(SweeperOperation.SIZE_COMPUTATION.getPercentQuota() + SweeperOperation.SIZE_DEDUPLICATION.getPercentQuota());
-//
-//        wrapper.incrementPhase(SweeperOperation.HASH_COMPUTATION, SweeperOperation.HASH_COMPUTATION.getPercentQuota(), SweeperOperation.HASH_COMPUTATION.getPercentQuota());
-//        wrapper.operationCompleted(SweeperOperation.HASH_COMPUTATION);
-//        verify(listener, times(1)).updateOperationProgress(SweeperOperation.SIZE_COMPUTATION.getPercentQuota() + SweeperOperation.SIZE_DEDUPLICATION.getPercentQuota() + SweeperOperation.HASH_COMPUTATION.getPercentQuota());
+        trackingListener.operationCompleted();
+        verify(wrappedListener).updateOperationProgress(eq(100L), eq(100L), anyInt());
     }
 
 }

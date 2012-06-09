@@ -23,12 +23,47 @@ package gg.pistol.sweeper.core;
  */
 public interface SweeperOperationListener {
 
+    /**
+     * Notification that a new operation is started.
+     *
+     * @param operation
+     *            the newly started operation
+     */
     void updateOperation(SweeperOperation operation);
 
-    void updateOperationProgress(long operationProgress, long operationMaxProgress, int percentGlobalProgress);
+    /**
+     * Indication that the operation progressed further.
+     *
+     * @param progress
+     *            the current progress of the operation
+     * @param maxProgress
+     *            the maximum progress that the current operation will reach when completed
+     * @param percentGlobal
+     *            the global percentage of completion of all the operations
+     */
+    void updateOperationProgress(long progress, long maxProgress, int percentGlobal);
 
+    /**
+     * Notification that an action for a target is started. A {@link SweeperOperation} can be composed of
+     * {@link TargetAction}s.
+     *
+     * @param target
+     *            the subject of the action
+     * @param action
+     *            the newly started action
+     */
     void updateTargetAction(Target target, TargetAction action);
 
+    /**
+     * Notification that an exception occurred while executing an action for a target.
+     *
+     * @param target
+     *            the subject of the action
+     * @param action
+     *            the context of the exception
+     * @param e
+     *            the encountered exception
+     */
     void updateTargetException(Target target, TargetAction action, SweeperException e);
 
 }

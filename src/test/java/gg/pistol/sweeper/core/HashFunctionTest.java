@@ -52,7 +52,7 @@ public class HashFunctionTest {
 
         inputStream = new ByteArrayInputStream(new byte[6 * (1 << 20)]); // 6 MB
         hash.compute(inputStream, listener, abortFlag);
-        verify(listener).incrementMicroProgress(anyLong());
+        verify(listener).incrementTargetActionProgress(anyLong());
     }
 
     @Test

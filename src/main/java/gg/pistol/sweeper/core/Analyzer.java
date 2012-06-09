@@ -140,7 +140,7 @@ class Analyzer {
         for (int i = 1; iterator.hasNext(); i++) {
             TargetImpl target = iterator.next();
             totalTargets += expand(target, -1, null, listener);
-            listener.incrementProgress(i);
+            listener.incrementOperationProgress(i);
         }
 
         listener.operationCompleted();
@@ -219,7 +219,7 @@ class Analyzer {
             public void visit(TargetImpl target, int targetIndex) {
                 target.computeSize(listener);
                 ret.add(target);
-                listener.incrementProgress(targetIndex);
+                listener.incrementOperationProgress(targetIndex);
             }
         });
 
@@ -407,7 +407,7 @@ class Analyzer {
                 // fast compared to reading I/O operations and hashing of potentially very large files.
                 if (target.getType() == Type.FILE) {
                     currentSize += target.getSize();
-                    listener.incrementProgress(currentSize);
+                    listener.incrementOperationProgress(currentSize);
                 }
             }
         };
