@@ -30,8 +30,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.NavigableSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
@@ -89,9 +90,9 @@ class Analyzer {
     /**
      * Compute the analysis.
      *
-     * @return the list of all {@link DuplicateGroup}s sorted decreasingly by size.
+     * @return the set of all {@link DuplicateGroup}s sorted decreasingly by size.
      */
-    List<DuplicateGroup> compute(Collection<? extends Resource> targetResources, SweeperOperationListener listener)
+    NavigableSet<DuplicateGroup> compute(Collection<? extends Resource> targetResources, SweeperOperationListener listener)
             throws SweeperAbortException {
         Preconditions.checkNotNull(targetResources);
         Preconditions.checkNotNull(listener);
@@ -109,7 +110,7 @@ class Analyzer {
         Multimap<String, TargetImpl> hashDups = filterDuplicateHash(sizeDups.values(), trackingListener);
 
         count = computeCount(rootTarget, hashDups, trackingListener);
-        List<DuplicateGroup> duplicates = createDuplicateGroups(hashDups, trackingListener);
+        NavigableSet<DuplicateGroup> duplicates = createDuplicateGroups(hashDups, trackingListener);
         return duplicates;
     }
 
@@ -506,21 +507,17 @@ class Analyzer {
         return count;
     }
 
-    private List<DuplicateGroup> createDuplicateGroups(Multimap<String, TargetImpl> hashDups,
+    private NavigableSet<DuplicateGroup> createDuplicateGroups(Multimap<String, TargetImpl> hashDups,
             OperationTrackingListener listener) throws SweeperAbortException {
         log.trace("Duplicate grouping");
         listener.updateOperation(SweeperOperation.DUPLICATE_GROUPING);
 
-        List<DuplicateGroup> ret = new ArrayList<DuplicateGroup>();
+        NavigableSet<DuplicateGroup> ret = new TreeSet<DuplicateGroup>();
         for (String key : hashDups.keySet()) {
             Collection<TargetImpl> values = hashDups.get(key);
             DuplicateGroup dup = new DuplicateGroup(values);
             ret.add(dup);
         }
-
-        // Sort the groups of duplicates decreasingly based on the size (the sorting criteria and order is provided by
-        // the Comparable interface implemented by DuplicateGroup).
-        Collections.sort(ret);
 
         listener.operationCompleted();
         return ret;

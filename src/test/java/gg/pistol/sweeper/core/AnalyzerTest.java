@@ -28,7 +28,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
+import java.util.NavigableSet;
 import java.util.Set;
 
 import org.joda.time.DateTime;
@@ -138,18 +139,20 @@ public class AnalyzerTest {
         ResourceDirectory upperDir = mockDirectory("upperDir", dir, someFile);
 
         Set<Resource> set = ImmutableSet.of((Resource) upperDir, dirCopy);
-        List<DuplicateGroup> dups = analyzer.compute(set, listener);
+        NavigableSet<DuplicateGroup> dups = analyzer.compute(set, listener);
 
         assertEquals(3, dups.size());
-        assertEquals((file1Size + file2Size) + "e20496eb93b914eeef887e311bcc6c56b739f4e0", dups.get(0).getHash());
-        assertEquals(file2Size + "6c46db5318dbb05719a85de973e4f1894149ce2d", dups.get(1).getHash());
-        assertEquals(file1Size + "5e24f8e3368074888321372b53d3e1b14b3f2858", dups.get(2).getHash());
+        Iterator<DuplicateGroup> iterator = dups.iterator();
+        assertEquals((file1Size + file2Size) + "e20496eb93b914eeef887e311bcc6c56b739f4e0", iterator.next().getHash());
+        assertEquals(file2Size + "6c46db5318dbb05719a85de973e4f1894149ce2d", iterator.next().getHash());
+        assertEquals(file1Size + "5e24f8e3368074888321372b53d3e1b14b3f2858", iterator.next().getHash());
 
-        assertTrue(areTargetsFromResources(dups.get(0).getTargets(), dir, dirCopy));
-        assertTrue(areTargetsFromResources(dups.get(1).getTargets(), file2, file2Copy));
-        assertTrue(areTargetsFromResources(dups.get(2).getTargets(), file1, file1Copy));
+        iterator = dups.iterator();
+        assertTrue(areTargetsFromResources(iterator.next().getTargets(), dir, dirCopy));
+        assertTrue(areTargetsFromResources(iterator.next().getTargets(), file2, file2Copy));
+        assertTrue(areTargetsFromResources(iterator.next().getTargets(), file1, file1Copy));
 
-        TargetImpl dirCopyTarget = getTargetFromResource(dups.get(0).getTargets(), dirCopy);
+        TargetImpl dirCopyTarget = getTargetFromResource(dups.first().getTargets(), dirCopy);
         TargetImpl root = dirCopyTarget.getParent();
 
         assertEquals(root, analyzer.getRootTarget());
@@ -213,12 +216,12 @@ public class AnalyzerTest {
         ResourceDirectory dir = mockDirectory("dir", emptyFile2, emptyFile3);
 
         Set<Resource> set = ImmutableSet.of(emptyDir, emptyFile1, dir);
-        List<DuplicateGroup> dups = analyzer.compute(set, listener);
+        NavigableSet<DuplicateGroup> dups = analyzer.compute(set, listener);
 
         assertEquals(1, dups.size());
-        assertEquals(0L + "da39a3ee5e6b4b0d3255bfef95601890afd80709", dups.get(0).getHash());
+        assertEquals(0L + "da39a3ee5e6b4b0d3255bfef95601890afd80709", dups.first().getHash());
 
-        assertTrue(areTargetsFromResources(dups.get(0).getTargets(), emptyDir, emptyFile1, emptyFile2, emptyFile3, dir));
+        assertTrue(areTargetsFromResources(dups.first().getTargets(), emptyDir, emptyFile1, emptyFile2, emptyFile3, dir));
 
         verifyListener();
 
@@ -254,12 +257,12 @@ public class AnalyzerTest {
         ResourceDirectory dir = mockDirectory("dir", file);
 
         Set<Resource> set = ImmutableSet.of(fileCopy, dir);
-        List<DuplicateGroup> dups = analyzer.compute(set, listener);
+        NavigableSet<DuplicateGroup> dups = analyzer.compute(set, listener);
 
         assertEquals(1, dups.size());
-        assertEquals(fileSize + "5d6829b05a40a708a8661a63359145c3f4376883", dups.get(0).getHash());
+        assertEquals(fileSize + "5d6829b05a40a708a8661a63359145c3f4376883", dups.first().getHash());
 
-        assertTrue(areTargetsFromResources(dups.get(0).getTargets(), dir, fileCopy));
+        assertTrue(areTargetsFromResources(dups.first().getTargets(), dir, fileCopy));
 
         verifyListener();
 
@@ -289,7 +292,7 @@ public class AnalyzerTest {
             set.add(mockFile("file" + i, i, i, "file" + i));
         }
 
-        List<DuplicateGroup> dups = analyzer.compute(set, listener);
+        NavigableSet<DuplicateGroup> dups = analyzer.compute(set, listener);
 
         assertTrue(dups.isEmpty());
 
@@ -345,17 +348,17 @@ public class AnalyzerTest {
 
         ResourceDirectory dir = mockDirectory("dir", file2, file1Copy);
 
-        List<DuplicateGroup> dups = analyzer.compute(ImmutableSet.of(file1, dir, file3), listener);
+        NavigableSet<DuplicateGroup> dups = analyzer.compute(ImmutableSet.of(file1, dir, file3), listener);
 
         assertEquals(1, dups.size());
-        assertEquals(file1Size + "5e24f8e3368074888321372b53d3e1b14b3f2858", dups.get(0).getHash());
+        assertEquals(file1Size + "5e24f8e3368074888321372b53d3e1b14b3f2858", dups.first().getHash());
 
-        assertTrue(areTargetsFromResources(dups.get(0).getTargets(), file1, file1Copy));
+        assertTrue(areTargetsFromResources(dups.first().getTargets(), file1, file1Copy));
 
         TargetImpl root = analyzer.getRootTarget();
         assertFalse(root.isSized());
         assertFalse(root.isHashed());
-        TargetImpl dirTarget = getTargetFromResource(dups.get(0).getTargets(), file1Copy).getParent();
+        TargetImpl dirTarget = getTargetFromResource(dups.first().getTargets(), file1Copy).getParent();
         assertTrue(dirTarget.isSized());
         assertFalse(dirTarget.isHashed());
 
