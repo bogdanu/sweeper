@@ -44,6 +44,7 @@ class Poll implements SweeperPoll, Cloneable {
         this.targets = new LinkedHashSet<Target>(targets);
         toDeleteTargets = new LinkedHashSet<TargetImpl>();
         retainedTargets = new LinkedHashSet<TargetImpl>();
+        opened = true;
     }
 
     public Collection<? extends Target> getTargets() {
@@ -81,10 +82,6 @@ class Poll implements SweeperPoll, Cloneable {
         } else {
             return Mark.DECIDE_LATER;
         }
-    }
-
-    void open() {
-        opened = true;
     }
 
     void close() {

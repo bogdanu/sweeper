@@ -32,8 +32,8 @@ import javax.annotation.Nullable;
  * <p>In order to clean a set of targets perform the following steps:
  *
  * <ol><li>Find the duplicates by calling the {@link #analyze} method on the resources.</li>
- * <li>Retrieve and resolve the duplicate polls with {@link #nextDuplicatePoll}.</li>
- * <li>Optionally, to correct a previous choice it is possible to walk back with {@link #previousDuplicatePoll}.</li>
+ * <li>Retrieve and resolve the duplicate polls with {@link #nextPoll}.</li>
+ * <li>Optionally, to correct a previous choice it is possible to walk back with {@link #previousPoll}.</li>
  * <li>Retrieve and review the targets marked for deletion with {@link #getToDeleteTargets}.</li>
  * <li>Delete the undesired duplicate targets with {@link #delete}.</li></ol>
  *
@@ -68,7 +68,7 @@ public interface Sweeper {
      * @return the next duplicate poll or {@code null} if there are no more polls
      */
     @Nullable
-    SweeperPoll nextDuplicatePoll();
+    SweeperPoll nextPoll();
 
     /**
      * Return to the previous poll.
@@ -76,7 +76,15 @@ public interface Sweeper {
      * @return the previous duplicate poll or {@code null} if there are no more previous polls
      */
     @Nullable
-    SweeperPoll previousDuplicatePoll();
+    SweeperPoll previousPoll();
+
+    /**
+     * Retrieve the current poll instance.
+     *
+     * @return the current poll or {@code null} if there is no current poll yet
+     */
+    @Nullable
+    SweeperPoll getCurrentPoll();
 
     /**
      * Retrieve counters for total targets, duplicate targets and to delete targets.
