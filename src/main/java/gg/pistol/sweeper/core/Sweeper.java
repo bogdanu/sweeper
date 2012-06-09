@@ -19,7 +19,6 @@ package gg.pistol.sweeper.core;
 import gg.pistol.sweeper.core.resource.Resource;
 
 import java.util.Collection;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -52,7 +51,7 @@ public interface Sweeper {
      *             in case the analysis is aborted this exception will be thrown, afterwards the analysis can be
      *             restarted with a (possibly different) set of resources
      */
-    void analyze(Set<Resource> resources, SweeperOperationListener listener) throws SweeperAbortException;
+    void analyze(Collection<Resource> resources, SweeperOperationListener listener) throws SweeperAbortException;
 
     /**
      * Abort the analysis.
@@ -93,17 +92,19 @@ public interface Sweeper {
     Collection<Target> getToDeleteTargets();
 
     /**
-     * Delete the targets marked for deletion.
+     * Delete the provided {@code toDeleteTargets}.
      *
-     * <p><b>Warning</b>: this operation is not reversible. Aborting the deletion stops the operation, but does not
-     * revert the already deleted targets.
+     * <p><b>Warning</b>: this operation is not reversible. Aborting the deletion stops the operation, but does not revert
+     * the already deleted targets.
      *
+     * @param toDeleteTargets
+     *            the targets of the delete operation
      * @param listener
      *            the provided listener will be called back with progress notifications
      * @throws SweeperAbortException
      *             in case the deletion is aborted this exception will be thrown
      */
-    void delete(SweeperOperationListener listener) throws SweeperAbortException;
+    void delete(Collection<Target> toDeleteTargets, SweeperOperationListener listener) throws SweeperAbortException;
 
     /**
      * Abort the deletion. This operation only stops the deletion in progress it does not reverse the already deleted
