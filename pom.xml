@@ -177,6 +177,7 @@
                         <packageBranchRate>${project.cobertura.minBranchCoverage}</packageBranchRate>
                         <totalBranchRate>${project.cobertura.minBranchCoverage}</totalBranchRate>
 
+                        <lineRate>${project.cobertura.minLineCoverage}</lineRate>
                         <packageLineRate>${project.cobertura.minLineCoverage}</packageLineRate>
                         <totalLineRate>${project.cobertura.minLineCoverage}</totalLineRate>
 
