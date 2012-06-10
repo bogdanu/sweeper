@@ -132,6 +132,7 @@ public class SweeperImplTest {
         sweeper.analyze(resources, listener);
 
         assertNull(sweeper.previousPoll());
+        assertNull(sweeper.getCurrentPoll());
 
         // forward
         SweeperPoll poll = sweeper.nextPoll();
@@ -191,6 +192,29 @@ public class SweeperImplTest {
 
         assertEquals(Mark.RETAIN, poll.getMark(file1Copy));
         assertEquals(Mark.DELETE, poll.getMark(file1));
+    }
+
+    @Test
+    public void testMarkException() throws Exception {
+        TargetImpl file = mockTarget(null, 0);
+        TargetImpl fileCopy = mockTarget(null, 0);
+        DuplicateGroup dup = mockDuplicate(2, file, fileCopy);
+
+        analyzerReturns(dup);
+        sweeper.analyze(resources, listener);
+
+        SweeperPoll poll = sweeper.nextPoll();
+        assertNull(sweeper.nextPoll());
+        try {
+            poll.mark(fileCopy, Mark.DELETE);
+            fail();
+        } catch (IllegalStateException e) {
+            // expected because the poll is closed
+        }
+
+        sweeper.getCurrentPoll().mark(fileCopy, Mark.DELETE);
+        sweeper.nextPoll();
+        assertEquals(fileCopy, sweeper.getToDeleteTargets().iterator().next());
     }
 
     @Test

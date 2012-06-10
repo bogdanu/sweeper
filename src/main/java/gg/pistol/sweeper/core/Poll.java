@@ -22,16 +22,26 @@ import java.util.Set;
 
 import com.google.common.base.Preconditions;
 
+/**
+ * The poll provides access and de-duplication resolution methods to a {@link DuplicateGroup}.
+ *
+ * @author Bogdan Pistol
+ */
 // package private
 class Poll implements SweeperPoll, Cloneable {
 
     private final DuplicateGroup duplicateGroup;
 
+    // A duplicate group target subset that does not have ancestors marked for deletion.
     private final Set<? extends Target> targets;
 
+    /*
+     * Targets marked in this poll.
+     */
     private final Set<TargetImpl> toDeleteTargets;
     private final Set<TargetImpl> retainedTargets;
 
+    // Controls whether this poll can be marked anymore, a closed poll cannot be marked.
     private boolean opened;
 
 
