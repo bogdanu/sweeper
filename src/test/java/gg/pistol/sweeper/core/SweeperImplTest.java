@@ -61,7 +61,7 @@ public class SweeperImplTest {
             dups = new DuplicateGroup[] {};
         }
         NavigableSet<DuplicateGroup> set = Sets.newTreeSet(ImmutableSet.copyOf(dups));
-        when(analyzer.compute(resources, listener)).thenReturn(set);
+        when(analyzer.analyze(resources, listener)).thenReturn(set);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class SweeperImplTest {
         analyzerReturns(mock(DuplicateGroup.class), mock(DuplicateGroup.class));
         sweeper.analyze(resources, listener);
 
-        verify(analyzer).compute(resources, listener);
+        verify(analyzer).analyze(resources, listener);
         assertEquals(count, sweeper.getCount());
         assertTrue(sweeper.getToDeleteTargets().isEmpty());
 

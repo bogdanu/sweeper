@@ -20,6 +20,7 @@ import gg.pistol.lumberjack.JackLogger;
 import gg.pistol.lumberjack.JackLoggerFactory;
 import gg.pistol.sweeper.core.Target.Type;
 import gg.pistol.sweeper.core.resource.Resource;
+import gg.pistol.sweeper.core.resource.ResourceDirectory;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -47,9 +48,9 @@ import com.google.common.collect.Multimap;
 /**
  * Analyzes a set of targets to find duplicates.
  *
- * <p>The {@link #compute} method is not thread safe and must be called from the same
- * thread or using synchronization techniques. The {@link #abort} method is thread safe and can be called from any
- * thread.
+ * <p>The {@link #analyze} and {@link #delete} methods are not thread safe and must be called from the same thread or
+ * using synchronization techniques. The {@link #abortAnalysis()} and {@link #abortDeletion()} methods are thread safe
+ * and can be called from any thread.
  *
  * @author Bogdan Pistol
  */
@@ -66,15 +67,14 @@ class Analyzer {
 
     private final HashFunction hashFunction;
 
-    // It is atomic to be able to abort the analysis from another thread.
-    private final AtomicBoolean abortFlag;
+    private boolean analyzing;
+    private boolean deleting;
+
+    private final AtomicBoolean abortAnalysis;
+    private final AtomicBoolean abortDeletion;
 
     @Nullable private SweeperCountImpl count;
     @Nullable private TargetImpl rootTarget;
-
-    // The number of total targets (including the ROOT target) calculated at the beginning (before sizing the targets)
-    // by traverseResources().
-    private int totalTargets;
 
 
     Analyzer() throws SweeperException {
@@ -83,7 +83,8 @@ class Analyzer {
         } catch (NoSuchAlgorithmException e) {
             throw new SweeperException(e);
         }
-        abortFlag = new AtomicBoolean();
+        abortAnalysis = new AtomicBoolean();
+        abortDeletion = new AtomicBoolean();
         log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(Analyzer.class));
     }
 
@@ -92,18 +93,24 @@ class Analyzer {
      *
      * @return the set of all {@link DuplicateGroup}s sorted decreasingly by size.
      */
-    NavigableSet<DuplicateGroup> compute(Collection<? extends Resource> targetResources, SweeperOperationListener listener)
+    NavigableSet<DuplicateGroup> analyze(Collection<? extends Resource> targetResources, SweeperOperationListener listener)
             throws SweeperAbortException {
         Preconditions.checkNotNull(targetResources);
         Preconditions.checkNotNull(listener);
         Preconditions.checkArgument(!targetResources.isEmpty());
 
         log.trace("Computing the analysis for the resources {}", targetResources);
-        abortFlag.set(false);
+        analyzing = true;
+        deleting = false;
+        abortAnalysis.set(false);
         OperationTrackingListener trackingListener = new OperationTrackingListener(listener);
 
-        rootTarget = traverseResources(targetResources, trackingListener);
-        Collection<TargetImpl> sized = computeSize(rootTarget, totalTargets, trackingListener);
+        // The number of total targets (including the ROOT target) calculated at the beginning (before sizing the targets)
+        // by traverseResources().
+        MutableInteger totalTargets = new MutableInteger(0);
+
+        rootTarget = traverseResources(targetResources, totalTargets, trackingListener);
+        Collection<TargetImpl> sized = computeSize(rootTarget, totalTargets.intValue(), trackingListener);
         Multimap<Long, TargetImpl> sizeDups = filterDuplicateSize(sized, trackingListener);
 
         computeHash(sizeDups.values(), trackingListener);
@@ -111,6 +118,7 @@ class Analyzer {
 
         count = computeCount(rootTarget, hashDups, trackingListener);
         NavigableSet<DuplicateGroup> duplicates = createDuplicateGroups(hashDups, trackingListener);
+        analyzing = false;
         return duplicates;
     }
 
@@ -126,15 +134,16 @@ class Analyzer {
      *
      * @return a root target that wraps the {@code targetResources}</code>
      */
-    private TargetImpl traverseResources(Collection<? extends Resource> targetResources,
+    private TargetImpl traverseResources(Collection<? extends Resource> targetResources, MutableInteger totalTargets,
             OperationTrackingListener listener) throws SweeperAbortException {
         log.trace("Traversing the resources");
         listener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
         TargetImpl root = new TargetImpl(new LinkedHashSet<Resource>(targetResources));
-        totalTargets = 1;
+        totalTargets.setValue(1);
 
         Collection<TargetImpl> nextTargets = new ArrayList<TargetImpl>();
-        totalTargets += expand(root.getChildren(), root.getChildren(), INITIAL_EXPAND_LIMIT, nextTargets, listener);
+        int initialTargets = expand(root.getChildren(), root.getChildren(), INITIAL_EXPAND_LIMIT, nextTargets, listener);
+        totalTargets.add(initialTargets);
 
         Iterator<TargetImpl> iterator = nextTargets.iterator();
         listener.setOperationMaxProgress(nextTargets.size());
@@ -142,7 +151,9 @@ class Analyzer {
         // expand with progress indication
         for (int i = 1; iterator.hasNext(); i++) {
             TargetImpl target = iterator.next();
-            totalTargets += expand(Collections.singletonList(target), root.getChildren(), -1, null, listener);
+
+            int expandedTargets = expand(Collections.singletonList(target), root.getChildren(), -1, null, listener);
+            totalTargets.add(expandedTargets);
             listener.incrementOperationProgress(i);
         }
 
@@ -222,8 +233,12 @@ class Analyzer {
     }
 
     private void checkAbortFlag() throws SweeperAbortException {
-        if (abortFlag.get()) {
-            log.info("Detected that the abort flag is set");
+        if (analyzing && abortAnalysis.get()) {
+            log.info("Aborting the analysis");
+            throw new SweeperAbortException();
+        }
+        if (deleting && abortDeletion.get()) {
+            log.info("Aborting the deletion");
             throw new SweeperAbortException();
         }
     }
@@ -241,7 +256,7 @@ class Analyzer {
         listener.updateOperation(SweeperOperation.SIZE_COMPUTATION);
         listener.setOperationMaxProgress(totalTargets);
 
-        traverseBottomUp(root, new TargetVisitorMethod() {
+        traverseBottomUp(Collections.singleton(root), new TargetVisitorMethod() {
             public void visit(TargetImpl target, int targetIndex) {
                 target.computeSize(listener);
                 if (target.isSized()) {
@@ -268,10 +283,10 @@ class Analyzer {
      *         \
      *          --A
      */
-    private void traverseBottomUp(TargetImpl root, TargetVisitorMethod visitor) throws SweeperAbortException {
+    private void traverseBottomUp(Collection<TargetImpl> roots, TargetVisitorMethod visitor) throws SweeperAbortException {
         Deque<TargetImpl> stack = new LinkedList<TargetImpl>(); // DFS style stack
         Set<TargetImpl> childrenPushed = new HashSet<TargetImpl>(); // targets with the children pushed on the stack
-        stack.push(root);
+        stack.addAll(roots);
         int targetIndex = 1; // counter for the n-th visited target
 
         while (!stack.isEmpty()) {
@@ -384,9 +399,7 @@ class Analyzer {
         }
         listener.setOperationMaxProgress(totalHashSize);
 
-        for (TargetImpl target : targets) {
-            traverseBottomUp(target, getHashVisitorMethod(listener));
-        }
+        traverseBottomUp(targets, getHashVisitorMethod(listener));
         listener.operationCompleted();
     }
 
@@ -429,7 +442,7 @@ class Analyzer {
             long currentSize = 0;
 
             public void visit(TargetImpl target, int targetIndex) throws SweeperAbortException {
-                target.computeHash(hashFunction, listener, abortFlag);
+                target.computeHash(hashFunction, listener, abortAnalysis);
 
                 // Keep track of file sizes only as directories only re-hash the hash of their children which should be
                 // fast compared to reading I/O operations and hashing of potentially very large files.
@@ -523,14 +536,93 @@ class Analyzer {
         return ret;
     }
 
+    void delete(Collection<? extends Target> targets, SweeperOperationListener listener) throws SweeperAbortException {
+        Preconditions.checkNotNull(targets);
+        Preconditions.checkNotNull(listener);
+        Preconditions.checkArgument(!targets.isEmpty());
+
+        log.trace("Deleting targets");
+        analyzing = false;
+        deleting = true;
+        abortDeletion.set(false);
+        OperationTrackingListener trackingListener = new OperationTrackingListener(listener);
+        trackingListener.updateOperation(SweeperOperation.RESOURCE_DELETION);
+
+        // Remove the possible multiple instances of the same target and get the children of any ROOT target (deleting
+        // a ROOT target means to delete its children).
+        Set<TargetImpl> targetSet = new LinkedHashSet<TargetImpl>();
+        for (Target target : targets) {
+            if (target.getType() == Type.ROOT) {
+                targetSet.addAll(((TargetImpl) target).getChildren());
+            } else {
+                targetSet.add((TargetImpl) target);
+            }
+            checkAbortFlag();
+        }
+
+        // Use only the upper targets (deleting an upper target will also delete all of its descendants).
+        Collection<TargetImpl> upperTargets = filterUpperTargets(targetSet);
+
+        int totalProgress = 0; // total individual targets to delete
+        for (TargetImpl target : upperTargets) {
+            // In case of recursive deletion then a more granular progress tracking is possible, otherwise if
+            // a directory (with all of its contents) can be deleted in one step then the progress will be more coarse.
+            if (target.getType() == Type.DIRECTORY && ((ResourceDirectory) target.getResource()).deleteOnlyEmpty()) {
+                totalProgress += target.getTotalTargets();
+            } else {
+                totalProgress++;
+            }
+            checkAbortFlag();
+        }
+        trackingListener.setOperationMaxProgress(totalProgress);
+        MutableInteger progress = new MutableInteger(0);
+
+        // The visitor pattern is used for recursive deletion (bottom-up).
+        TargetVisitorMethod deleteMethod = getDeleteVisitorMethod(progress, trackingListener);
+
+        for (TargetImpl target : upperTargets) {
+            if (target.getType() == Type.DIRECTORY && ((ResourceDirectory) target.getResource()).deleteOnlyEmpty()) {
+                traverseBottomUp(Collections.singleton(target), deleteMethod);
+            } else {
+                // Deletion of a file or a directory that can be deleted in one single step.
+                target.delete(trackingListener);
+                progress.increment();
+                trackingListener.incrementOperationProgress(progress.intValue());
+            }
+        }
+
+        trackingListener.operationCompleted();
+        deleting = false;
+    }
+
+    private TargetVisitorMethod getDeleteVisitorMethod(final MutableInteger progress, final OperationTrackingListener listener) {
+        return new TargetVisitorMethod() {
+            public void visit(TargetImpl target, int targetIndex) {
+                target.delete(listener);
+                progress.increment();
+                listener.incrementOperationProgress(progress.intValue());
+            }
+        };
+    }
+
     /**
-     * Abort the analysis.
+     * Abort the analyze operation.
      *
      * <p>This method is thread safe.
      */
-    void abort() {
-        log.trace("Aborting the analysis");
-        abortFlag.set(true);
+    void abortAnalysis() {
+        log.trace("Turning on the analysis abort flag");
+        abortAnalysis.set(true);
+    }
+
+    /**
+     * Abort the delete operation.
+     *
+     * <p>This method is thread safe.
+     */
+    void abortDeletion() {
+        log.trace("Turning on the deletion abort flag");
+        abortDeletion.set(true);
     }
 
     @Nullable

@@ -37,6 +37,15 @@ public interface ResourceDirectory extends Resource {
     ResourceCollectionResponse getSubresources();
 
     /**
+     * Determine if the implementation of this class supports deleting the directory with all of its contents or
+     * alternatively only the empty directory (which will require the deletion of its content in advance).
+     *
+     * @return {@code true} if the {@link #delete} method only deletes an empty directory or {@code false} in case
+     *         the method can delete the directory with all of its contents
+     */
+    boolean deleteOnlyEmpty();
+
+    /**
      * A response that wraps a collection of resources and another collection of related exceptions.
      */
     interface ResourceCollectionResponse {

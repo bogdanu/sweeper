@@ -27,6 +27,8 @@ import com.google.common.base.Preconditions;
 /**
  * File-system resource directory implementation.
  *
+ * <p>This implementation can only delete empty directories.
+ *
  * @author Bogdan Pistol
  */
 public class ResourceDirectoryFs extends AbstractResource implements ResourceDirectory {
@@ -106,6 +108,16 @@ public class ResourceDirectoryFs extends AbstractResource implements ResourceDir
         } else {
             throw new IOException("Cannot create a resource from <" + file.getPath()
                     + ">, it is not a file or directory");
+        }
+    }
+
+    public boolean deleteOnlyEmpty() {
+        return true;
+    }
+
+    public void delete() throws IOException {
+        if (!resource.delete()) {
+            throw new IOException("Could not delete the directory <" + name + ">");
         }
     }
 

@@ -139,7 +139,7 @@ public class AnalyzerTest {
         ResourceDirectory upperDir = mockDirectory("upperDir", dir, someFile);
 
         Set<Resource> set = ImmutableSet.of((Resource) upperDir, dirCopy);
-        NavigableSet<DuplicateGroup> dups = analyzer.compute(set, listener);
+        NavigableSet<DuplicateGroup> dups = analyzer.analyze(set, listener);
 
         assertEquals(3, dups.size());
         Iterator<DuplicateGroup> iterator = dups.iterator();
@@ -216,7 +216,7 @@ public class AnalyzerTest {
         ResourceDirectory dir = mockDirectory("dir", emptyFile2, emptyFile3);
 
         Set<Resource> set = ImmutableSet.of(emptyDir, emptyFile1, dir);
-        NavigableSet<DuplicateGroup> dups = analyzer.compute(set, listener);
+        NavigableSet<DuplicateGroup> dups = analyzer.analyze(set, listener);
 
         assertEquals(1, dups.size());
         assertEquals(0L + "da39a3ee5e6b4b0d3255bfef95601890afd80709", dups.first().getHash());
@@ -257,7 +257,7 @@ public class AnalyzerTest {
         ResourceDirectory dir = mockDirectory("dir", file);
 
         Set<Resource> set = ImmutableSet.of(fileCopy, dir);
-        NavigableSet<DuplicateGroup> dups = analyzer.compute(set, listener);
+        NavigableSet<DuplicateGroup> dups = analyzer.analyze(set, listener);
 
         assertEquals(1, dups.size());
         assertEquals(fileSize + "5d6829b05a40a708a8661a63359145c3f4376883", dups.first().getHash());
@@ -292,7 +292,7 @@ public class AnalyzerTest {
             set.add(mockFile("file" + i, i, i, "file" + i));
         }
 
-        NavigableSet<DuplicateGroup> dups = analyzer.compute(set, listener);
+        NavigableSet<DuplicateGroup> dups = analyzer.analyze(set, listener);
 
         assertTrue(dups.isEmpty());
 
@@ -348,7 +348,7 @@ public class AnalyzerTest {
 
         ResourceDirectory dir = mockDirectory("dir", file2, file1Copy);
 
-        NavigableSet<DuplicateGroup> dups = analyzer.compute(ImmutableSet.of(file1, dir, file3), listener);
+        NavigableSet<DuplicateGroup> dups = analyzer.analyze(ImmutableSet.of(file1, dir, file3), listener);
 
         assertEquals(1, dups.size());
         assertEquals(file1Size + "5e24f8e3368074888321372b53d3e1b14b3f2858", dups.first().getHash());
@@ -392,7 +392,7 @@ public class AnalyzerTest {
         ResourceDirectory dir = mockDirectory("dir", res2);
         ResourceDirectory res1 = mockDirectory("res1", dir);
 
-        analyzer.compute(ImmutableSet.of(res1, res2), listener);
+        analyzer.analyze(ImmutableSet.of(res1, res2), listener);
 
         assertEquals(1, analyzer.getRootTarget().getChildren().size());
     }
@@ -400,25 +400,88 @@ public class AnalyzerTest {
     @Test
     public void testComputeException() throws Exception {
         try {
-            analyzer.compute(null, listener);
+            analyzer.analyze(null, listener);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            analyzer.compute(Collections.<Resource>emptySet(), null);
+            analyzer.analyze(Collections.<Resource>emptySet(), null);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            analyzer.compute(Collections.<Resource>emptySet(), listener);
+            analyzer.analyze(Collections.<Resource>emptySet(), listener);
             fail();
         } catch (IllegalArgumentException e) {
             // expected
         }
+    }
+
+    /*
+     * Test deleting recursively the following hierarchy:
+     *
+     *             --file1
+     *            /
+     * root---dir1---file2
+     *     \
+     *      --dir2---file3
+     *            \
+     *             --file4
+     */
+    @Test
+    public void testRecursiveDelete() throws Exception {
+        ResourceFile file1 = mockFile("file1", 0, 0, "");
+        ResourceFile file2 = mockFile("file2", 0, 0, "");
+        ResourceFile file3 = mockFile("file3", 0, 0, "");
+        ResourceFile file4 = mockFile("file4", 0, 0, "");
+        ResourceDirectory dir1 = mockDirectory("dir1", file1, file2);
+        ResourceDirectory dir2 = mockDirectory("dir2", file3, file4);
+        when(dir1.deleteOnlyEmpty()).thenReturn(true);
+        when(dir2.deleteOnlyEmpty()).thenReturn(true);
+
+        analyzer.analyze(ImmutableSet.of(dir1, dir2), listener);
+        reset(listener);
+        analyzer.delete(ImmutableSet.of(analyzer.getRootTarget()), listener);
+
+        verify(listener).updateOperation(SweeperOperation.RESOURCE_DELETION);
+        verify(listener, times(6)).updateTargetAction(any(Target.class), eq(TargetAction.DELETE));
+        verify(listener).updateOperationProgress(anyLong(), anyLong(), eq(100));
+        verify(file1).delete();
+        verify(file2).delete();
+        verify(file3).delete();
+        verify(file4).delete();
+        verify(dir1).delete();
+        verify(dir2).delete();
+    }
+
+    /*
+     * Test deleting non-recursively the following hierarchy:
+     *
+     * root---dir---file1
+     *           \
+     *            --file2
+     */
+    @Test
+    public void testNonRecursiveDelete() throws Exception {
+        ResourceFile file1 = mockFile("file1", 0, 0, "");
+        ResourceFile file2 = mockFile("file2", 0, 0, "");
+        ResourceDirectory dir = mockDirectory("dir", file1, file2);
+        when(dir.deleteOnlyEmpty()).thenReturn(false);
+
+        analyzer.analyze(ImmutableSet.of(dir), listener);
+        reset(listener);
+        analyzer.delete(ImmutableSet.of(analyzer.getRootTarget()), listener);
+
+        verify(listener).updateOperation(SweeperOperation.RESOURCE_DELETION);
+        verify(listener, times(1)).updateTargetAction(any(Target.class), eq(TargetAction.DELETE));
+        verify(listener).updateOperationProgress(anyLong(), anyLong(), eq(100));
+        verify(file1, never()).delete();
+        verify(file2, never()).delete();
+        verify(dir).delete();
     }
 
     @Test
@@ -429,7 +492,7 @@ public class AnalyzerTest {
         PowerMockito.when(analyzer, "checkAbortFlag").thenThrow(new SweeperAbortException());
 
         try {
-            analyzer.compute(ImmutableSet.of(root), listener);
+            analyzer.analyze(ImmutableSet.of(root), listener);
             fail();
         } catch (SweeperAbortException e) {
             // expected

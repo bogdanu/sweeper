@@ -16,6 +16,8 @@
  */
 package gg.pistol.sweeper.core.resource;
 
+import java.io.IOException;
+
 /**
  * A named entity that represents an abstract resource.
  *
@@ -29,5 +31,13 @@ public interface Resource extends Comparable<Resource> {
      * @return the resource name
      */
     String getName();
+
+    /**
+     * Delete the resource.
+     *
+     * @throws IOException
+     *             if the underlying implementation experiences I/O exceptions while deleting the resource
+     */
+    void delete() throws IOException;
 
 }

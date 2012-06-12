@@ -41,14 +41,18 @@ public interface ResourceFile extends Resource {
      * Retrieve the size of the resource content.
      *
      * @return the size of the content in bytes
+     * @throws IOException
+     *             if the underlying implementation experiences I/O exceptions while getting the size
      */
-    long getSize();
+    long getSize() throws IOException;
 
     /**
      * Retrieve the latest modification date of the resource.
      *
      * @return the latest modification date
+     * @throws IOException
+     *             if the underlying implementation experiences I/O exceptions while getting the modification date
      */
-    DateTime getModificationDate();
+    DateTime getModificationDate() throws IOException;
 
 }

@@ -71,6 +71,7 @@ class TargetImpl implements Target {
     private boolean sized;
     private boolean partiallyHashed;
     private boolean hashed;
+    private boolean deleted;
 
 
     TargetImpl(Set<? extends Resource> targetResources) {
@@ -168,7 +169,7 @@ class TargetImpl implements Target {
             partiallySized = false;
             sized = false;
             throw e;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             sized = false;
             listener.updateTargetException(this, TargetAction.COMPUTE_SIZE, new SweeperException(e));
         }
@@ -273,6 +274,26 @@ class TargetImpl implements Target {
         }
     }
 
+    void delete(OperationTrackingListener listener) {
+        Preconditions.checkNotNull(listener);
+        Preconditions.checkState(getType() != Type.ROOT);
+
+        if (getType() == Type.DIRECTORY && ((ResourceDirectory) resource).deleteOnlyEmpty()) {
+            Preconditions.checkState(isExpanded());
+            for (TargetImpl t : getChildren()) {
+                Preconditions.checkState(t.isDeleted());
+            }
+        }
+
+        listener.updateTargetAction(this, TargetAction.DELETE);
+        try {
+            resource.delete();
+        } catch (Exception e) {
+            listener.updateTargetException(this, TargetAction.DELETE, new SweeperException(e));
+        }
+        deleted = true;
+    }
+
     @Override
     public int hashCode() {
         return name.hashCode();
@@ -367,6 +388,10 @@ class TargetImpl implements Target {
 
     boolean isHashed() {
         return hashed;
+    }
+
+    boolean isDeleted() {
+        return deleted;
     }
 
 }

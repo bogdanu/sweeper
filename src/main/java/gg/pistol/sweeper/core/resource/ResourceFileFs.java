@@ -61,4 +61,10 @@ public class ResourceFileFs extends AbstractResource implements ResourceFile {
         return new DateTime(resource.lastModified());
     }
 
+    public void delete() throws IOException {
+        if (!resource.delete()) {
+            throw new IOException("Could not delete the file <" + name + ">");
+        }
+    }
+
 }

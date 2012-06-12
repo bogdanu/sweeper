@@ -83,7 +83,7 @@ public class SweeperImpl implements Sweeper {
         Preconditions.checkArgument(!targetResources.isEmpty(), "The targetResources is empty");
 
         analyzed = false;
-        duplicates = analyzer.compute(targetResources, listener);
+        duplicates = analyzer.analyze(targetResources, listener);
 
         toDeleteTargets.clear();
         retainedTargets.clear();
@@ -97,7 +97,7 @@ public class SweeperImpl implements Sweeper {
     }
 
     public void abortAnalysis() {
-        analyzer.abort();
+        analyzer.abortAnalysis();
     }
 
     public SweeperPoll nextPoll() {
@@ -329,10 +329,16 @@ public class SweeperImpl implements Sweeper {
         return toDeleteTargets;
     }
 
-    public void delete(Collection<? extends Target> toDeleteTargets, SweeperOperationListener listener) {
+    public void delete(Collection<? extends Target> toDeleteTargets, SweeperOperationListener listener)
+            throws SweeperAbortException {
+        Preconditions.checkNotNull(toDeleteTargets);
+        Preconditions.checkNotNull(listener);
+        Preconditions.checkArgument(!toDeleteTargets.isEmpty());
+        analyzer.delete(toDeleteTargets, listener);
     }
 
     public void abortDeletion() {
+        analyzer.abortDeletion();
     }
 
 }
