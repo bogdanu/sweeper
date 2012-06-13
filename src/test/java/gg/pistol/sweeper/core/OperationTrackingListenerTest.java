@@ -86,16 +86,29 @@ public class OperationTrackingListenerTest {
         }
 
         try {
+            trackingListener.updateOperationProgress(-1, 1, 0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected because progress < 0
+        }
+
+        try {
             trackingListener.updateOperationProgress(1, 1, 101);
             fail();
         } catch (IllegalArgumentException e) {
             // expected because percentGlobal > 100
         }
 
+        try {
+            trackingListener.updateOperationProgress(1, 1, -1);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected because percentGlobal < 0
+        }
+
         trackingListener.updateOperationProgress(1, 1, 100);
         verify(wrappedListener).updateOperationProgress(1, 1, 100);
     }
-
 
     @Test
     public void testUpdateTargetAction() {

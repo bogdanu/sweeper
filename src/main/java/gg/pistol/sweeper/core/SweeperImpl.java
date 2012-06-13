@@ -154,7 +154,7 @@ public class SweeperImpl implements Sweeper {
 
         // Use all the targets not marked for deletion (including their ancestors).
         for (Target t : dup.getTargets()) {
-            Mark mark = getTargetAncestorMark((TargetImpl) t, true);
+            Mark mark = getTargetAncestorMark((TargetImpl) t);
             if (mark != Mark.DELETE) {
                 targets.add(t);
             }
@@ -189,10 +189,7 @@ public class SweeperImpl implements Sweeper {
         return poll;
     }
 
-    private Mark getTargetAncestorMark(TargetImpl target, boolean includeTarget) {
-        if (!includeTarget) {
-            target = target.getParent();
-        }
+    private Mark getTargetAncestorMark(TargetImpl target) {
         while (target != null) {
             if (toDeleteTargets.contains(target)) {
                 return Mark.DELETE;
@@ -241,18 +238,35 @@ public class SweeperImpl implements Sweeper {
     }
 
     /**
-     * Update the counters. Depending on the provided {@code countSign} (+1 or -1) the counters will be incremented or
-     * decremented.
+     * Update the delete counters. Depending on the provided {@code countSign} (+1 or -1) the counters will be
+     * incremented or decremented.
      */
     private void updateToDeleteCount(Poll poll, int countSign) {
-        for (TargetImpl t : poll.getToDeleteTargets()) {
-            // If there is an ancestor target marked for deletion then that target includes all its descendants
-            // in its counters and target "t" should not be counted.
-            if (getTargetAncestorMark(t, false) != Mark.DELETE) {
-                count.setToDeleteTargets(count.getToDeleteTargets() + countSign * t.getTotalTargets());
-                count.setToDeleteTargetFiles(count.getToDeleteTargetFiles() + countSign * t.getTotalTargetFiles());
-                count.setToDeleteSize(count.getToDeleteSize() + countSign * t.getSize());
+        /*
+         * In case a target from the poll has a descendant that is already deleted then counting that target will also
+         * include the descendant's counters. In this situation the counters of the already deleted descendants need to
+         * be removed from the global "count" object. It is not possible to have a situation where a target from
+         * the poll could have a deleted ancestor.
+         */
+        Set<TargetImpl> pollSet = new HashSet<TargetImpl>(poll.getToDeleteTargets());
+        for (TargetImpl target : toDeleteTargets) {
+            TargetImpl parent = target.getParent();
+            while (parent != null) {
+                if (pollSet.contains(parent)) {
+                    // found a deleted descendant, removing its counters
+                    count.setToDeleteTargets(count.getToDeleteTargets() - countSign * target.getTotalTargets());
+                    count.setToDeleteTargetFiles(count.getToDeleteTargetFiles() - countSign * target.getTotalTargetFiles());
+                    count.setToDeleteSize(count.getToDeleteSize() - countSign * target.getSize());
+                }
+                parent = parent.getParent();
             }
+        }
+
+        // counting the targets from the poll
+        for (TargetImpl target : poll.getToDeleteTargets()) {
+            count.setToDeleteTargets(count.getToDeleteTargets() + countSign * target.getTotalTargets());
+            count.setToDeleteTargetFiles(count.getToDeleteTargetFiles() + countSign * target.getTotalTargetFiles());
+            count.setToDeleteSize(count.getToDeleteSize() + countSign * target.getSize());
         }
     }
 
@@ -285,7 +299,7 @@ public class SweeperImpl implements Sweeper {
 
         if (polls.size() > 1 && (pollHistoryIdx == -1 || pollHistoryIdx - 1 >= 0)) {
             if (pollHistoryIdx == -1) {
-                // the first previous step in the history of polls
+                // the first step backwards in the history of polls
                 pollHistoryIdx = polls.size() - 1;
             }
             pollHistoryIdx--;

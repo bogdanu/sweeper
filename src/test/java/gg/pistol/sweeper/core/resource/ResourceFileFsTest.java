@@ -17,10 +17,10 @@
 package gg.pistol.sweeper.core.resource;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -71,6 +71,27 @@ public class ResourceFileFsTest {
         ResourceFileFs res = new ResourceFileFs(file);
 
         assertEquals(time, res.getModificationDate());
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        File file = mockFile("foo");
+        when(file.delete()).thenReturn(false);
+        ResourceFileFs res = new ResourceFileFs(file);
+
+        try {
+            res.delete();
+            fail();
+        } catch(IOException e) {
+            // expected
+            verify(file).delete();
+        }
+
+        reset(file);
+        when(file.delete()).thenReturn(true);
+        res.delete();
+
+        verify(file).delete();
     }
 
 }

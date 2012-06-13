@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.junit.Test;
@@ -34,6 +35,7 @@ public class ResourceDirectoryFsTest {
 
         ResourceDirectoryFs res = new ResourceDirectoryFs(dir);
         assertEquals("bar", res.getName());
+        assertTrue(res.deleteOnlyEmpty());
 
         when(dir.isDirectory()).thenReturn(false);
         try {
@@ -61,23 +63,47 @@ public class ResourceDirectoryFsTest {
         File dir = mockFile("foo", true);
 
         File child1 = mockFile("child1", true);
-        File child2 = mockFile("child2", false);
-        when(dir.listFiles()).thenReturn(new File[] {child1, child2});
+        File child2 = mockFile("child2", true);
+        File child3 = mockFile("child3", false);
+        when(dir.listFiles()).thenReturn(new File[] {child1, child2, child3});
 
         ResourceDirectoryFs res = new ResourceDirectoryFs(dir);
         Iterator<? extends Resource> iterator = res.getSubresources().getResources().iterator();
 
         assertEquals("child1", ((ResourceDirectoryFs) iterator.next()).getName());
-        assertEquals("child2", ((ResourceFileFs) iterator.next()).getName());
+        assertEquals("child2", ((ResourceDirectoryFs) iterator.next()).getName());
+        assertEquals("child3", ((ResourceFileFs) iterator.next()).getName());
         assertTrue(res.getSubresources().getExceptions().isEmpty());
 
         when(child1.isDirectory()).thenReturn(false);
+        when(child2.isDirectory()).thenReturn(false);
         assertEquals(1, res.getSubresources().getResources().size());
-        assertEquals(1, res.getSubresources().getExceptions().size());
+        assertEquals(2, res.getSubresources().getExceptions().size());
 
         when(dir.listFiles()).thenReturn(null);
         assertTrue(res.getSubresources().getResources().isEmpty());
         assertEquals(1, res.getSubresources().getExceptions().size());
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        File file = mockFile("foo", true);
+        when(file.delete()).thenReturn(false);
+        ResourceDirectoryFs res = new ResourceDirectoryFs(file);
+
+        try {
+            res.delete();
+            fail();
+        } catch(IOException e) {
+            // expected
+            verify(file).delete();
+        }
+
+        reset(file);
+        when(file.delete()).thenReturn(true);
+        res.delete();
+
+        verify(file).delete();
     }
 
 }

@@ -55,6 +55,15 @@ class OperationTrackingListener implements SweeperOperationListener {
         this.listener = listener;
     }
 
+    private void checkOperation() {
+        // Check that there is an operation in progress.
+        Preconditions.checkState(operation != null);
+    }
+
+    private void checkProgressArgument(long progress) {
+        Preconditions.checkArgument(progress >= 0 && progress <= maxProgress);
+    }
+
     public void updateOperation(SweeperOperation operation) {
         Preconditions.checkNotNull(operation);
 
@@ -67,12 +76,12 @@ class OperationTrackingListener implements SweeperOperationListener {
 
     public void updateOperationProgress(long progress, long maxProgress, int percentGlobal) {
         // Update only when an operation is started.
-        Preconditions.checkState(operation != null);
+        checkOperation();
 
         // Ensure that maxProgress remains the same during operation's progress.
         Preconditions.checkArgument(maxProgress == this.maxProgress);
 
-        Preconditions.checkArgument(progress >= 0 && progress <= maxProgress);
+        checkProgressArgument(progress);
         Preconditions.checkArgument(percentGlobal >= 0 && percentGlobal <= 100);
 
         listener.updateOperationProgress(progress, maxProgress, percentGlobal);
@@ -81,7 +90,7 @@ class OperationTrackingListener implements SweeperOperationListener {
     public void updateTargetAction(Target target, TargetAction action) {
         Preconditions.checkNotNull(target);
         Preconditions.checkNotNull(action);
-        Preconditions.checkState(operation != null);
+        checkOperation();
 
         listener.updateTargetAction(target, action);
     }
@@ -90,7 +99,7 @@ class OperationTrackingListener implements SweeperOperationListener {
         Preconditions.checkNotNull(target);
         Preconditions.checkNotNull(action);
         Preconditions.checkNotNull(e);
-        Preconditions.checkState(operation != null);
+        checkOperation();
 
         listener.updateTargetException(target, action, e);
     }
@@ -100,7 +109,7 @@ class OperationTrackingListener implements SweeperOperationListener {
      * updating the progress for the operation.
      */
     void setOperationMaxProgress(long maxProgress) {
-        Preconditions.checkState(operation != null);
+        checkOperation();
         Preconditions.checkArgument(maxProgress >= 0);
 
         if (maxProgress == 0) {
@@ -127,8 +136,8 @@ class OperationTrackingListener implements SweeperOperationListener {
      *            an absolute value representing the progress
      */
     void incrementOperationProgress(long progress) {
-        Preconditions.checkState(operation != null);
-        Preconditions.checkArgument(progress >= 0 && progress <= maxProgress);
+        checkOperation();
+        checkProgressArgument(progress);
 
         if (progress > this.progress) {
             this.progress = progress;
@@ -152,9 +161,9 @@ class OperationTrackingListener implements SweeperOperationListener {
      *            a relative value representing the action progress increment
      */
     void incrementTargetActionProgress(long actionProgress) {
-        Preconditions.checkState(operation != null);
+        checkOperation();
         long operationProgress = progress + actionProgress;
-        Preconditions.checkArgument(operationProgress >= 0 && operationProgress <= maxProgress);
+        checkProgressArgument(operationProgress);
 
         incrementOperationProgress(operationProgress);
     }
@@ -163,7 +172,7 @@ class OperationTrackingListener implements SweeperOperationListener {
      * Mark that the operation is done and update the listener with max progress if not already updated.
      */
     void operationCompleted() {
-        Preconditions.checkState(operation != null);
+        checkOperation();
 
         percentGlobal += operation.getPercentQuota();
         if (progress < maxProgress) {

@@ -196,15 +196,16 @@ public class TargetImplTest {
         assertFalse(target1.isPartiallySized());
         assertFalse(target1.isSized());
 
-        target1.computeSize(listener);
+        for (int i = 1; i <= 2; i++) {
+            target1.computeSize(listener);
 
-        assertTrue(target1.isPartiallyExpanded());
-        assertTrue(target1.isSized());
+            assertTrue(target1.isPartiallyExpanded());
+            assertTrue(target1.isSized());
 
-        assertEquals(size, target1.getSize());
-        assertEquals(1, target1.getTotalTargets());
-        assertEquals(1, target1.getTotalTargetFiles());
-
+            assertEquals(size, target1.getSize());
+            assertEquals(1, target1.getTotalTargets());
+            assertEquals(1, target1.getTotalTargetFiles());
+        }
         verify(listener).updateTargetAction(target1, TargetAction.COMPUTE_SIZE);
     }
 
@@ -229,15 +230,16 @@ public class TargetImplTest {
         assertFalse(targetDirSpy.isPartiallySized());
         assertFalse(targetDirSpy.isSized());
 
-        targetDirSpy.computeSize(listener);
+        for (int i = 1; i <= 2; i++) {
+            targetDirSpy.computeSize(listener);
 
-        assertTrue(targetDirSpy.isPartiallySized());
-        assertEquals(isFullExpanded, targetDirSpy.isSized());
+            assertTrue(targetDirSpy.isPartiallySized());
+            assertEquals(isFullExpanded, targetDirSpy.isSized());
 
-        assertEquals(target1Size + target2Size, targetDirSpy.getSize());
-        assertEquals(1 + target1Subtargets + target2Subtargets, targetDirSpy.getTotalTargets());
-        assertEquals(target1Files + target2Files, targetDirSpy.getTotalTargetFiles());
-
+            assertEquals(target1Size + target2Size, targetDirSpy.getSize());
+            assertEquals(1 + target1Subtargets + target2Subtargets, targetDirSpy.getTotalTargets());
+            assertEquals(target1Files + target2Files, targetDirSpy.getTotalTargetFiles());
+        }
         verify(listener).updateTargetAction(targetDirSpy, TargetAction.COMPUTE_SIZE);
     }
 
@@ -308,13 +310,15 @@ public class TargetImplTest {
         assertFalse(target1.isPartiallyHashed());
         assertFalse(target1.isHashed());
 
-        target1.computeHash(hashFunction, listener, new AtomicBoolean());
+        for (int i = 1; i <= 2; i++) {
+            target1.computeHash(hashFunction, listener, new AtomicBoolean());
 
-        assertTrue(target1.isPartiallyHashed());
-        assertTrue(target1.isHashed());
+            assertTrue(target1.isPartiallyHashed());
+            assertTrue(target1.isHashed());
 
-        assertEquals(modificationDate, target1.getModificationDate().getMillis());
-        assertEquals(size + "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", target1.getHash());
+            assertEquals(modificationDate, target1.getModificationDate().getMillis());
+            assertEquals(size + "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", target1.getHash());
+        }
 
         verify(listener).updateTargetAction(target1, TargetAction.COMPUTE_HASH);
     }
@@ -422,6 +426,47 @@ public class TargetImplTest {
 
         // exception because target1 is not hashed
         verify(listener).updateTargetException(eq(targetDir), eq(TargetAction.COMPUTE_HASH), any(SweeperException.class));
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        target1.delete(listener);
+        verify(listener).updateTargetAction(target1, TargetAction.DELETE);
+        verify(resource1).delete();
+
+        try {
+            target1.delete(null);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            new TargetImpl(ImmutableSet.of(resource1)).delete(listener);
+            fail();
+        } catch (IllegalStateException e) {
+            // expected because of trying to delete a ROOT target
+        }
+
+        when(resourceDir.deleteOnlyEmpty()).thenReturn(true);
+        try {
+            targetDir.delete(listener);
+            fail();
+        } catch (IllegalStateException e) {
+            // expected because "targetDir" is not expanded
+        }
+
+        when(targetDir.isExpanded()).thenReturn(true);
+        try {
+            targetDir.delete(listener);
+            fail();
+        } catch (IllegalStateException e) {
+            // expected because only empty directories can be deleted
+        }
+
+        doThrow(new IOException()).when(resource1).delete();
+        target1.delete(listener);
+        verify(listener).updateTargetException(eq(target1), eq(TargetAction.DELETE), any(SweeperException.class));
     }
 
     @Test

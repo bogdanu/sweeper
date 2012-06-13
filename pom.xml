@@ -183,6 +183,15 @@
 
                         <haltOnFailure>true</haltOnFailure>
                     </check>
+                    <instrumentation>
+                        <excludes>
+                            <!-- NOOP listener, does not implement any operations -->
+                            <exclude>gg/pistol/sweeper/core/OperationTrackingListener$1.class</exclude>
+
+                            <!-- Simple Exception extension -->
+                            <exclude>gg/pistol/sweeper/core/SweeperException.class</exclude>
+                        </excludes>
+                    </instrumentation>
                 </configuration>
                 <executions>
                     <execution>

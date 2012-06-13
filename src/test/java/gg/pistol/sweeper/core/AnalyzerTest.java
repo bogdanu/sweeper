@@ -25,6 +25,7 @@ import gg.pistol.sweeper.core.resource.ResourceFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -121,7 +122,7 @@ public class AnalyzerTest {
      * The following are duplicates: dir = dirCopy, file1 = file1Copy, file2 = file2Copy.
      */
     @Test
-    public void testWithDuplicateDir() throws Exception {
+    public void testAnalyzeDuplicateDir() throws Exception {
         long file1Size = 1L;
         String file1Content = "file1Content";
         ResourceFile file1 = mockFile("file1", file1Size, 10L, file1Content);
@@ -160,7 +161,7 @@ public class AnalyzerTest {
         assertTrue(root.isSized());
         assertFalse(root.isHashed());
 
-        verifyListener();
+        verifyAnalyzeListener();
 
         SweeperCountImpl count = analyzer.getCount();
         assertEquals(8, count.getTotalTargets());
@@ -174,7 +175,7 @@ public class AnalyzerTest {
         assertEquals(file1Size + file2Size, count.getDuplicateSize());
     }
 
-    private void verifyListener() {
+    private void verifyAnalyzeListener() {
         verify(listener).updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
         verify(listener, atLeastOnce()).updateTargetAction(any(TargetImpl.class), eq(TargetAction.EXPAND));
 
@@ -208,7 +209,7 @@ public class AnalyzerTest {
      * more flexibility when cleaning duplicate content.
      */
     @Test
-    public void testWithEmpty() throws Exception {
+    public void testAnalyzeEmpty() throws Exception {
         ResourceDirectory emptyDir = mockDirectory("emptyDir");
         ResourceFile emptyFile1 = mockFile("emptyFile1", 0L, 10L, "");
         ResourceFile emptyFile2 = mockFile("emptyFile2", 0L, 11L, "");
@@ -223,7 +224,7 @@ public class AnalyzerTest {
 
         assertTrue(areTargetsFromResources(dups.first().getTargets(), emptyDir, emptyFile1, emptyFile2, emptyFile3, dir));
 
-        verifyListener();
+        verifyAnalyzeListener();
 
         SweeperCountImpl count = analyzer.getCount();
         assertEquals(5, count.getTotalTargets());
@@ -249,7 +250,7 @@ public class AnalyzerTest {
      * is considered synonymous with the file it only contains).
      */
     @Test
-    public void testWithSingleFile() throws Exception {
+    public void testAnalyzeSingleFile() throws Exception {
         long fileSize = 1L;
         String fileContent = "fileContent";
         ResourceFile file = mockFile("file", fileSize, 10L, fileContent);
@@ -264,7 +265,7 @@ public class AnalyzerTest {
 
         assertTrue(areTargetsFromResources(dups.first().getTargets(), dir, fileCopy));
 
-        verifyListener();
+        verifyAnalyzeListener();
 
         SweeperCountImpl count = analyzer.getCount();
         assertEquals(3, count.getTotalTargets());
@@ -282,10 +283,10 @@ public class AnalyzerTest {
     }
 
     /*
-     * Test the compute() method on more than INITIAL_EXPAND_LIMIT targets.
+     * Test the analyze() method on more than INITIAL_EXPAND_LIMIT targets.
      */
     @Test
-    public void testWithExpandLimit() throws Exception {
+    public void testAnalyzeLimit() throws Exception {
         int targets = 103;
         Set<Resource> set = new HashSet<Resource>();
         for (int i = 0; i < targets; i++) {
@@ -329,18 +330,18 @@ public class AnalyzerTest {
      *
      *      --file1
      *     /
-     * root---dir---file2 (throwing hash exception)
+     * root---dir---file2 (file1 copy that throws hash exception)
      *     \     \
      *      \     --file1Copy
      *       --file3 (throwing size exception)
      */
     @Test
-    public void testWithChildrenException() throws Exception {
+    public void testAnalyzeChildrenException() throws Exception {
         long file1Size = 1L;
         String file1Content = "file1Content";
         ResourceFile file1 = mockFile("file1", file1Size, 10L, file1Content);
         ResourceFile file1Copy = mockFile("file1Copy", file1Size, 11L, file1Content);
-        ResourceFile file2 = mockFile("file2", 2L, 20L, "file2Content");
+        ResourceFile file2 = mockFile("file2", file1Size, 20L, "file2Content");
         ResourceFile file3 = mockFile("file3", 0L, 30L, "file3Content");
 
         when(file2.getInputStream()).thenThrow(new IOException());
@@ -362,13 +363,13 @@ public class AnalyzerTest {
         assertTrue(dirTarget.isSized());
         assertFalse(dirTarget.isHashed());
 
-        verifyListener();
+        verifyAnalyzeListener();
 
         SweeperCountImpl count = analyzer.getCount();
         assertEquals(5, count.getTotalTargets());
         assertEquals(4, count.getTotalTargetFiles());
         assertEquals(1, count.getTotalTargetDirectories());
-        assertEquals(4L, count.getTotalSize());
+        assertEquals(3L, count.getTotalSize());
 
         assertEquals(1, count.getDuplicateTargets());
         assertEquals(1, count.getDuplicateTargetFiles());
@@ -387,7 +388,7 @@ public class AnalyzerTest {
      * be removed.
      */
     @Test
-    public void testTargetMultipleParent() throws Exception {
+    public void testAnalyzeMultipleParent() throws Exception {
         ResourceFile res2 = mockFile("res2", 0L, 0L, "");
         ResourceDirectory dir = mockDirectory("dir", res2);
         ResourceDirectory res1 = mockDirectory("res1", dir);
@@ -398,7 +399,7 @@ public class AnalyzerTest {
     }
 
     @Test
-    public void testComputeException() throws Exception {
+    public void testAnalyzeException() throws Exception {
         try {
             analyzer.analyze(null, listener);
             fail();
@@ -474,7 +475,11 @@ public class AnalyzerTest {
 
         analyzer.analyze(ImmutableSet.of(dir), listener);
         reset(listener);
-        analyzer.delete(ImmutableSet.of(analyzer.getRootTarget()), listener);
+
+        Collection<Target> toDelete = new ArrayList<Target>();
+        toDelete.add(analyzer.getRootTarget());
+        toDelete.addAll(analyzer.getRootTarget().getChildren()); // test also multiple instance of the same target
+        analyzer.delete(toDelete, listener);
 
         verify(listener).updateOperation(SweeperOperation.RESOURCE_DELETION);
         verify(listener, times(1)).updateTargetAction(any(Target.class), eq(TargetAction.DELETE));
@@ -482,6 +487,30 @@ public class AnalyzerTest {
         verify(file1, never()).delete();
         verify(file2, never()).delete();
         verify(dir).delete();
+    }
+
+    @Test
+    public void testDeleteException() throws Exception {
+        try {
+            analyzer.delete(null, listener);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            analyzer.delete(Collections.<Target>emptySet(), null);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            analyzer.delete(Collections.<Target>emptySet(), listener);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected because of the empty collection
+        }
     }
 
     @Test

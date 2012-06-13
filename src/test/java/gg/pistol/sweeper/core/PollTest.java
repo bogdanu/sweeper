@@ -18,8 +18,11 @@ package gg.pistol.sweeper.core;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static gg.pistol.sweeper.test.ObjectVerifier.*;
+
+import java.util.Collections;
+
 import gg.pistol.sweeper.core.SweeperPoll.Mark;
-import gg.pistol.sweeper.test.ObjectVerifier;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,10 +58,24 @@ public class PollTest {
         assertEquals(2, poll.getTargets().size());
 
         try {
-            new Poll(poll.getDuplicateGroup(), null);
+            new Poll(null, Collections.<Target>emptySet());
             fail();
         } catch (NullPointerException e) {
             // expected
+        }
+
+        try {
+            new Poll(mock(DuplicateGroup.class), null);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            new Poll(mock(DuplicateGroup.class), Collections.<Target>emptySet());
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected because the targets collection is empty
         }
     }
 
@@ -128,9 +145,15 @@ public class PollTest {
     public void testEquals() {
         Poll pollCopy = poll.clone();
         Poll otherPoll = poll.clone();
-        otherPoll.mark(target1, Mark.DELETE);
 
-        ObjectVerifier.verifyEquals(poll, pollCopy, otherPoll);
+        otherPoll.mark(target1, Mark.DELETE);
+        verifyEquals(poll, pollCopy, otherPoll);
+
+        otherPoll.mark(target1, Mark.RETAIN);
+        verifyEquals(poll, pollCopy, otherPoll);
+
+        verifyEquals(poll, pollCopy, new Poll(poll.getDuplicateGroup(), ImmutableSet.of(target1)));
+        verifyEquals(poll, pollCopy, new Poll(mock(DuplicateGroup.class), ImmutableSet.of(target1)));
     }
 
 }

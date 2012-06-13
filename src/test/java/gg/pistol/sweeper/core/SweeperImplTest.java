@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 import gg.pistol.sweeper.core.SweeperPoll.Mark;
 import gg.pistol.sweeper.core.resource.Resource;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.NavigableSet;
 
@@ -47,7 +48,7 @@ public class SweeperImplTest {
     @Before
     public void setUp() throws Exception {
         analyzer = mock(Analyzer.class);
-        count = mock(SweeperCountImpl.class);
+        count = new SweeperCountImpl(0, 0, 0, 0, 0, 0);
         when(analyzer.getCount()).thenReturn(count);
 
         sweeper = new SweeperImpl(analyzer);
@@ -163,8 +164,19 @@ public class SweeperImplTest {
         }
     }
 
+    /*
+     * Test the default marking and the deleted targets counter in the following setup:
+     *
+     *            --file1
+     *           /
+     * null---dir---file2
+     *     \
+     *      --dirCopy---file1Copy
+     *               \
+     *                --file2Copy
+     */
     @Test
-    public void testNextDefaultMark() throws Exception {
+    public void testDefaultMark() throws Exception {
         TargetImpl dir = mockTarget(null, 3);
         TargetImpl file1 = mockTarget(dir, 1);
         TargetImpl file2 = mockTarget(dir, 1);
@@ -184,14 +196,27 @@ public class SweeperImplTest {
         poll.mark(dirCopy, Mark.DELETE);
 
         assertNull(sweeper.nextPoll());
-        verify(count).setToDeleteTargets(3);
+        assertEquals(3, count.getToDeleteTargets());
         assertEquals(1, sweeper.getToDeleteTargets().size());
 
         sweeper.getCurrentPoll().mark(dirCopy, Mark.RETAIN);
         poll = sweeper.nextPoll();
 
+        assertEquals(0, count.getToDeleteTargets());
         assertEquals(Mark.RETAIN, poll.getMark(file1Copy));
         assertEquals(Mark.DELETE, poll.getMark(file1));
+
+        poll = sweeper.nextPoll();
+        assertEquals(1, count.getToDeleteTargets());
+        assertEquals(Mark.DELETE, poll.getMark(file2));
+
+        poll = sweeper.nextPoll();
+        assertEquals(2, count.getToDeleteTargets());
+        assertEquals(Mark.DELETE, poll.getMark(dir));
+
+        sweeper.nextPoll();
+        assertEquals(3, count.getToDeleteTargets());
+        assertNull(sweeper.nextPoll());
     }
 
     @Test
@@ -218,7 +243,50 @@ public class SweeperImplTest {
     }
 
     @Test
-    public void testDelete() {
+    public void testNoDuplicates() throws Exception {
+        analyzerReturns();
+        sweeper.analyze(resources, listener);
+
+        assertNull(sweeper.nextPoll());
+        assertNull(sweeper.getCurrentPoll());
+        assertNull(sweeper.previousPoll());
+    }
+
+    @Test
+    public void testAbort() {
+        sweeper.abortAnalysis();
+        verify(analyzer).abortAnalysis();
+
+        sweeper.abortDeletion();
+        verify(analyzer).abortDeletion();
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+        Collection<Target> targets = ImmutableSet.of(mock(Target.class));
+        sweeper.delete(targets, listener);
+        verify(analyzer).delete(targets, listener);
+
+        try {
+            sweeper.delete(null, listener);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            sweeper.delete(targets, null);
+            fail();
+        } catch (NullPointerException e) {
+            // expected
+        }
+
+        try {
+            sweeper.delete(Collections.<Target>emptySet(), listener);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected because of the empty collection
+        }
     }
 
 }
