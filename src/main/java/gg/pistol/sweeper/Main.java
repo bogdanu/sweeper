@@ -16,14 +16,16 @@
  */
 package gg.pistol.sweeper;
 
+import gg.pistol.sweeper.gui.Wizard;
+
 /**
- * Entry point in the application
- * 
+ * Entry point in the application.
+ *
  * @author Bogdan Pistol
  */
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        Wizard.open();
     }
-
 }
