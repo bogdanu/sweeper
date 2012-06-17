@@ -59,8 +59,6 @@ class WebBrowserLauncher {
     }
 
     private class NobrowserDialog extends BorderedDialog {
-        private static final long serialVersionUID = 1L;
-
         private NobrowserDialog(Window owner, String title, String content, String url) {
             super(owner, i18n);
             setTitle(title);

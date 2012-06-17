@@ -22,7 +22,4 @@ package gg.pistol.sweeper.core;
  * @author Bogdan Pistol
  */
 public class SweeperAbortException extends Exception {
-
-    private static final long serialVersionUID = 1L;
-
 }

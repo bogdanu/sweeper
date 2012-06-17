@@ -38,7 +38,6 @@ import com.google.common.base.Preconditions;
 
 class BorderedDialog extends JDialog {
 
-    private static final long serialVersionUID = 1L;
     private static final int BORDER_SIZE = 5;
 
     private final JPanel contentPanel;

@@ -24,7 +24,6 @@ import javax.annotation.Nullable;
  * @author Bogdan Pistol
  */
 public class SweeperException extends Exception {
-    private static final long serialVersionUID = 1L;
 
     public SweeperException(@Nullable String msg) {
         super(msg);

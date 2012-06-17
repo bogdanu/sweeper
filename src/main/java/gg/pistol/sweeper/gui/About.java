@@ -142,8 +142,6 @@ class About {
     }
 
     private class LicenseDialog extends BorderedDialog {
-        private static final long serialVersionUID = 1L;
-
         private LicenseDialog() {
             super(window, i18n);
             setTitle(i18n.getString(I18n.ABOUT_BUTTON_LICENSE_ID));
