@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Sweeper
+    Copyright (C) 2012 Bogdan Pistol
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License version 3
+    as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="wizard.title">تكرار ملف / الدليل نظافة - {0}</entry>
+
+    <entry key="webbrowser.nobrowser">لا يمكن فتح متصفح الويب! لعرض محتوى يرجى زيارة الموقع:</entry>
+
+    <entry key="wizard.button.help">مساعدة</entry>
+    <entry key="wizard.button.about">حول</entry>
+    <entry key="wizard.button.cancel">إلغاء</entry>
+    <entry key="wizard.button.back">&lt; ظهر</entry>
+    <entry key="wizard.button.next">التالي &gt;</entry>
+    <entry key="wizard.button.finish">الانتهاء</entry>
+
+    <entry key="button.close">أغلق</entry>
+
+    <entry key="about.label.website">الموقع على الإنترنت</entry>
+    <entry key="about.button.license">ترخيص</entry>
+</properties>
+

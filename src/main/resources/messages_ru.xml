@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Sweeper
+    Copyright (C) 2012 Bogdan Pistol
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License version 3
+    as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="wizard.title">{0} - дубликат файла / каталога чистых</entry>
+
+    <entry key="webbrowser.nobrowser">Не удается открыть веб-браузер! Для просмотра содержимого пожалуйста, посетите:</entry>
+
+    <entry key="wizard.button.help">Помогите</entry>
+    <entry key="wizard.button.about">О программе</entry>
+    <entry key="wizard.button.cancel">Отмена</entry>
+    <entry key="wizard.button.back">&lt; Назад</entry>
+    <entry key="wizard.button.next">Далее &gt;</entry>
+    <entry key="wizard.button.finish">Готово</entry>
+
+    <entry key="button.close">Закрыть</entry>
+
+    <entry key="about.label.website">Сайт</entry>
+    <entry key="about.button.license">Лицензии</entry>
+</properties>
