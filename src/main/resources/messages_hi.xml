@@ -18,6 +18,8 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+    <entry key="language.name">हिंदी (Hindi)</entry>
+
     <entry key="wizard.title">{0} फ़ाइल / निर्देशिका क्लीनर डुप्लिकेट</entry>
 
     <entry key="webbrowser.nobrowser">वेब ब्राउज़र खुला नहीं कर सका!सामग्री को देखने के लिए कृपया पर जाएँ:</entry>

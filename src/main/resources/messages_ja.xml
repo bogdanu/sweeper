@@ -18,6 +18,8 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+    <entry key="language.name">日本の (Japanese)</entry>
+
     <entry key="wizard.title">{0} - ファイル/ディレクトリのクリーナーが重複しています</entry>
 
     <entry key="webbrowser.nobrowser">Webブラウザを開くことができませんでした！コンテンツを表示するには、アクセスしてください。</entry>

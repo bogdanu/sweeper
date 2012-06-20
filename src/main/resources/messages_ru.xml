@@ -18,6 +18,8 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+    <entry key="language.name">Русский (Russian)</entry>
+
     <entry key="wizard.title">{0} - дубликат файла / каталога чистых</entry>
 
     <entry key="webbrowser.nobrowser">Не удается открыть веб-браузер! Для просмотра содержимого пожалуйста, посетите:</entry>

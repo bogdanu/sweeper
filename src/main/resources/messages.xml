@@ -18,6 +18,8 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+    <entry key="language.name">English</entry>
+
     <entry key="wizard.title">{0} - Duplicate file/directory cleaner</entry>
 
     <entry key="webbrowser.nobrowser">Could not open the web browser! To view the content please visit:</entry>

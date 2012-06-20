@@ -17,28 +17,24 @@
  */
 package gg.pistol.sweeper.gui;
 
-import java.awt.BorderLayout;
+import gg.pistol.sweeper.gui.component.BasicDialog;
+import gg.pistol.sweeper.gui.component.DecoratedPanel;
+import gg.pistol.sweeper.gui.component.DynamicPanel;
+import gg.pistol.sweeper.gui.component.WebBrowserLauncher;
+import gg.pistol.sweeper.gui.i18n.I18n;
+
 import java.awt.Cursor;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.annotation.Nullable;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 
 import com.google.common.base.Preconditions;
 
@@ -46,74 +42,55 @@ class About {
 
     private static final String WEBSITE_URL = "https://github.com/bogdanu/sweeper";
 
-    private final Window owner;
-    private final BorderedDialog window;
-    private final LicenseDialog licenseDialog;
-
+    private final BasicDialog window;
     private final I18n i18n;
     private final WebBrowserLauncher webBrowserLauncher;
+
+    private final BasicDialog licenseDialog;
 
     About(@Nullable Window owner, I18n i18n, WebBrowserLauncher webBrowserLauncher) {
         Preconditions.checkNotNull(i18n);
         Preconditions.checkNotNull(webBrowserLauncher);
-        this.owner = owner;
         this.i18n = i18n;
         this.webBrowserLauncher = webBrowserLauncher;
-        licenseDialog = new LicenseDialog();
 
-        window = new BorderedDialog(owner, i18n);
-        window.setTitle(i18n.getString(I18n.WIZARD_BUTTON_ABOUT_ID));
-        window.setModal(true);
-        initComponents();
+        window = new BasicDialog(owner, createAboutPanel(), true);
+        licenseDialog = new BasicDialog(window, createLicensePanel(), true);
     }
 
-    private void initComponents() {
-        JPanel contentPanel = window.getContentPanel();
-        window.setBoxLayout(contentPanel, BoxLayout.PAGE_AXIS);
-
-        window.addAlignedComponent(contentPanel, new JLabel(I18n.APPLICATION_NAME));
-        contentPanel.add(Box.createVerticalStrut(3));
-
-        window.addAlignedComponent(contentPanel, new JLabel("Copyright (C) 2012 Bogdan Pistol"));
-        contentPanel.add(Box.createVerticalStrut(30));
-
-        JPanel site = new JPanel();
-        window.setBoxLayout(site, BoxLayout.LINE_AXIS);
-        site.add(new JLabel(i18n.getString(I18n.ABOUT_LABEL_WEBSITE_ID)));
-        site.add(new JLabel(": "));
-        JLabel url = new JLabel("<html><a href=''>" + WEBSITE_URL + "</a></html>");
-        url.addMouseListener(websiteAction());
-        url.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        url.setHorizontalAlignment(site.getComponentOrientation().isLeftToRight() ? SwingConstants.LEFT : SwingConstants.RIGHT);
-        site.add(url);
-
-        window.addAlignedComponent(contentPanel, site);
-        contentPanel.add(Box.createVerticalStrut(50));
-        contentPanel.add(Box.createVerticalGlue());
-
-        JPanel buttons = new JPanel();
-        window.setBoxLayout(buttons, BoxLayout.LINE_AXIS);
-        window.addAlignedComponent(contentPanel, buttons);
-        JButton license = new JButton(i18n.getString(I18n.ABOUT_BUTTON_LICENSE_ID));
-        JButton close = new JButton(i18n.getString(I18n.BUTTON_CLOSE_ID));
-        buttons.add(license);
-        buttons.add(Box.createHorizontalGlue());
-        buttons.add(close);
-        license.addActionListener(licenseAction());
-        close.addActionListener(closeAction());
-    }
-
-    private MouseListener websiteAction() {
-        return new MouseAdapter() {
+    private DynamicPanel createAboutPanel() {
+        return new DecoratedPanel(i18n, false, null) {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                try {
-                    webBrowserLauncher.openWebBrowser(new URI(WEBSITE_URL), window,
-                            i18n.getString(I18n.ABOUT_LABEL_WEBSITE_ID));
-                } catch (URISyntaxException ex) {
-                    // should never happen
-                    new RuntimeException(ex);
-                }
+            protected void addComponents(JPanel contentPanel) {
+                setTitle(i18n.getString(I18n.WIZARD_BUTTON_ABOUT_ID));
+                contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+
+                contentPanel.add(alignVertically(new JLabel(I18n.APPLICATION_NAME)));
+                contentPanel.add(Box.createVerticalStrut(3));
+                contentPanel.add(alignVertically(new JLabel(I18n.COPYRIGHT)));
+                contentPanel.add(Box.createVerticalStrut(30));
+
+                JPanel linkPanel = createHorizontalPanel();
+                linkPanel.add(new JLabel(i18n.getString(I18n.ABOUT_LABEL_WEBSITE_ID) + ": "));
+                linkPanel.add(createLink(WEBSITE_URL, websiteAction()));
+                contentPanel.add(alignVertically(linkPanel));
+
+                contentPanel.add(Box.createVerticalStrut(50));
+                contentPanel.add(Box.createVerticalGlue());
+
+                JPanel buttons = createHorizontalPanel();
+                buttons.add(createButton(i18n.getString(I18n.ABOUT_BUTTON_LICENSE_ID), licenseAction(), "buttons"));
+                buttons.add(Box.createHorizontalGlue());
+                buttons.add(createButton(i18n.getString(I18n.BUTTON_CLOSE_ID), closeAction(), "buttons"));
+                contentPanel.add(alignVertically(buttons));
+            }
+        };
+    }
+
+    private Runnable websiteAction() {
+        return new Runnable() {
+            public void run() {
+                webBrowserLauncher.openWebBrowser(WEBSITE_URL, window, i18n.getString(I18n.ABOUT_LABEL_WEBSITE_ID));
             }
         };
     }
@@ -121,8 +98,6 @@ class About {
     private ActionListener licenseAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                licenseDialog.pack();
-                licenseDialog.setLocationRelativeTo(window);
                 licenseDialog.setVisible(true);
             }
         };
@@ -136,36 +111,27 @@ class About {
         };
     }
 
-    void show() {
-        window.pack();
-        window.setLocationRelativeTo(owner);
-        window.setVisible(true);
+    private DynamicPanel createLicensePanel() {
+        return new DecoratedPanel(i18n, true, null) {
+            @Override
+            protected void addComponents(JPanel contentPanel) {
+                setTitle(i18n.getString(I18n.ABOUT_BUTTON_LICENSE_ID));
+
+                JTextArea license = new JTextArea(I18n.LICENSE);
+                license.setEditable(false);
+                license.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+                license.setOpaque(false);
+
+                JScrollPane scroll = new JScrollPane(license);
+                scroll.setBorder(null);
+
+                contentPanel.add(scroll);
+            }
+        };
     }
 
-    private class LicenseDialog extends BorderedDialog {
-        private LicenseDialog() {
-            super(window, i18n);
-            setTitle(i18n.getString(I18n.ABOUT_BUTTON_LICENSE_ID));
-            setModal(true);
-
-            addCloseButton();
-
-            Icon warningIcon = UIManager.getIcon("OptionPane.informationIcon");
-            if (warningIcon != null) {
-                addSideImage(warningIcon);
-            }
-
-            JTextArea text = new JTextArea(I18n.LICENSE);
-            text.setEditable(false);
-            text.setCursor(new Cursor(Cursor.TEXT_CURSOR));
-            text.setOpaque(false);
-
-            JScrollPane scroll = new JScrollPane(text);
-            scroll.setBorder(null);
-
-            getContentPanel().setLayout(new BorderLayout());
-            getContentPanel().add(scroll, BorderLayout.CENTER);
-        }
+    void show() {
+        window.setVisible(true);
     }
 
 }

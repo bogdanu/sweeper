@@ -18,6 +18,8 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+    <entry key="language.name">Français (French)</entry>
+
     <entry key="wizard.title">{0} - Dupliquer fichier / répertoire propre</entry>
 
     <entry key="webbrowser.nobrowser">Impossible d'ouvrir le navigateur web! Pour afficher le contenu s'il vous plaît visitez:</entry>

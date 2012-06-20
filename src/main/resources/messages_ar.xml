@@ -18,6 +18,8 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+    <entry key="language.name">العربية (Arabic)</entry>
+
     <entry key="wizard.title">تكرار ملف / الدليل نظافة - {0}</entry>
 
     <entry key="webbrowser.nobrowser">لا يمكن فتح متصفح الويب! لعرض محتوى يرجى زيارة الموقع:</entry>

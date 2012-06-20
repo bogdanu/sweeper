@@ -18,6 +18,8 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+    <entry key="language.name">Română (Romanian)</entry>
+
     <entry key="wizard.title">{0} - Curăţă fişierele/directoarele duplicate</entry>
 
     <entry key="webbrowser.nobrowser">Nu s-a putut deschide navigatorul web! Pentru a accesa conţinutul vă rugăm să vizitaţi:</entry>

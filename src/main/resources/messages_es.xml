@@ -18,6 +18,8 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+    <entry key="language.name">Español (Spanish)</entry>
+
     <entry key="wizard.title">{0} - Duplicar archivo / directorio limpio</entry>
 
     <entry key="webbrowser.nobrowser">No se pudo abrir el navegador web! Para ver el contenido por favor visite:</entry>

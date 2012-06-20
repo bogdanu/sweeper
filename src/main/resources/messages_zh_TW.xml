@@ -18,6 +18,8 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+    <entry key="language.name">中國傳統文化 (Chinese Traditional)</entry>
+
     <entry key="wizard.title">{0} - 重複的文件/目錄的清潔劑</entry>
 
     <entry key="webbrowser.nobrowser">無法打開網頁瀏覽器！要查看的內容，請訪問：</entry>

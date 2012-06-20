@@ -15,34 +15,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gg.pistol.sweeper.gui;
+package gg.pistol.sweeper.gui.component;
 
-import java.awt.Cursor;
+import gg.pistol.sweeper.gui.i18n.I18n;
+
 import java.awt.Desktop;
 import java.awt.Window;
 import java.net.URI;
+import java.net.URISyntaxException;
 
-import javax.swing.Icon;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import com.google.common.base.Preconditions;
 
-class WebBrowserLauncher {
+public class WebBrowserLauncher {
 
     private final I18n i18n;
 
-    WebBrowserLauncher(I18n i18n) {
+    public WebBrowserLauncher(I18n i18n) {
         Preconditions.checkNotNull(i18n);
         this.i18n = i18n;
     }
 
-    void openWebBrowser(URI uri, Window nobrowserDialogOwner, String nobrowserTitle) {
-        Preconditions.checkNotNull(uri);
+    public void openWebBrowser(final String url, Window nobrowserDialogOwner, final String nobrowserTitleId) {
+        Preconditions.checkNotNull(url);
         Preconditions.checkNotNull(nobrowserDialogOwner);
-        Preconditions.checkNotNull(nobrowserTitle);
+        Preconditions.checkNotNull(nobrowserTitleId);
+
+        URI uri = null;
+        try {
+            uri = new URI(url);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
 
         boolean nobrowser = !Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
         if (!nobrowser) {
@@ -53,37 +60,16 @@ class WebBrowserLauncher {
             }
         }
         if (nobrowser) {
-            JDialog dialog = new NobrowserDialog(nobrowserDialogOwner, nobrowserTitle,
-                    i18n.getString(I18n.WEBBROWSER_NOBROWSER_ID), uri.toString());
+            DecoratedPanel panel = new DecoratedPanel(i18n, true, UIManager.getIcon("OptionPane.warningIcon")) {
+                @Override
+                protected void addComponents(JPanel contentPanel) {
+                    setTitle(i18n.getString(nobrowserTitleId));
+                    contentPanel.add(new JLabel(i18n.getString(I18n.WEBBROWSER_NOBROWSER_ID) + " "));
+                    contentPanel.add(createTextLabel(url));
+                }
+            };
+            BasicDialog dialog = new BasicDialog(nobrowserDialogOwner, panel, true);
             dialog.setVisible(true);
-        }
-    }
-
-    private class NobrowserDialog extends BorderedDialog {
-        private NobrowserDialog(Window owner, String title, String content, String url) {
-            super(owner, i18n);
-            setTitle(title);
-            setModal(true);
-
-            addCloseButton();
-
-            Icon warningIcon = UIManager.getIcon("OptionPane.warningIcon");
-            if (warningIcon != null) {
-                addSideImage(warningIcon);
-            }
-
-            getContentPanel().add(new JLabel(content));
-            getContentPanel().add(new JLabel(" "));
-
-            JTextField urlField = new JTextField(url);
-            urlField.setEditable(false);
-            urlField.setBorder(null);
-            urlField.setOpaque(false);
-            urlField.setCursor(new Cursor(Cursor.TEXT_CURSOR));
-            getContentPanel().add(urlField);
-
-            pack();
-            setLocationRelativeTo(owner);
         }
     }
 

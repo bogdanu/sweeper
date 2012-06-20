@@ -18,6 +18,8 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+    <entry key="language.name">Deutsch (German)</entry>
+
     <entry key="wizard.title">{0} - Doppelte Datei / Verzeichnis-Reiniger</entry>
 
     <entry key="webbrowser.nobrowser">Konnte nicht geöffnet werden die Web-Browser! Um den Inhalt anzeigen zu besuchen Sie bitte:</entry>
