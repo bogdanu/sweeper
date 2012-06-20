@@ -21,7 +21,7 @@ import gg.pistol.sweeper.gui.component.BasicDialog;
 import gg.pistol.sweeper.gui.component.DecoratedPanel;
 import gg.pistol.sweeper.gui.component.DynamicPanel;
 import gg.pistol.sweeper.gui.component.WebBrowserLauncher;
-import gg.pistol.sweeper.gui.i18n.I18n;
+import gg.pistol.sweeper.i18n.I18n;
 
 import java.awt.Cursor;
 import java.awt.Window;

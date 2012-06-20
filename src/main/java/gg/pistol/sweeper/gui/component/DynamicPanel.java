@@ -17,8 +17,8 @@
  */
 package gg.pistol.sweeper.gui.component;
 
-import gg.pistol.sweeper.gui.i18n.I18n;
-import gg.pistol.sweeper.gui.i18n.LocaleChangeListener;
+import gg.pistol.sweeper.i18n.I18n;
+import gg.pistol.sweeper.i18n.LocaleChangeListener;
 
 import java.awt.ComponentOrientation;
 import java.awt.Dialog;

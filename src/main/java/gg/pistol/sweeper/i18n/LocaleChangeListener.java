@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gg.pistol.sweeper.gui.i18n;
+package gg.pistol.sweeper.i18n;
 
 /**
  * Listener for changes of the locale.
