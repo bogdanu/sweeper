@@ -17,8 +17,14 @@
  */
 package gg.pistol.sweeper.gui;
 
+import gg.pistol.lumberjack.JackLogger;
+import gg.pistol.lumberjack.JackLoggerFactory;
+import gg.pistol.sweeper.core.Sweeper;
+import gg.pistol.sweeper.core.SweeperException;
+import gg.pistol.sweeper.core.SweeperImpl;
 import gg.pistol.sweeper.gui.component.BasicDialog;
 import gg.pistol.sweeper.gui.component.DecoratedPanel;
+import gg.pistol.sweeper.gui.component.MessageDialog;
 import gg.pistol.sweeper.gui.component.WebBrowserLauncher;
 import gg.pistol.sweeper.i18n.I18n;
 
@@ -32,6 +38,8 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * The main application dialog that will guide the user into cleaning the files/directories.
  *
@@ -40,14 +48,15 @@ import javax.swing.SwingUtilities;
 public class Wizard {
 
     private static final String HELP_URL = "https://github.com/bogdanu/sweeper";
+    private static final String SOUTH_BUTTON_GROUP = "south-buttons";
 
-    private final I18n i18n;
+    private static final JackLogger LOG = JackLoggerFactory.getLogger(LoggerFactory.getLogger(Wizard.class));
+
+    private final Sweeper sweeper;
     private final WebBrowserLauncher webBrowserLauncher;
 
-    private final BasicDialog window;
-    private final About aboutDialog;
-
-    private Wizard() {
+    private Wizard(I18n i18n) throws SweeperException {
+        sweeper = new SweeperImpl();
         i18n = new I18n();
         webBrowserLauncher = new WebBrowserLauncher(i18n);
 
@@ -68,31 +77,31 @@ public class Wizard {
                 southPanel.add(buttons, BorderLayout.SOUTH);
                 buttons.setBorder(BorderFactory.createEmptyBorder(7, 0, 0, 0));
 
-                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_HELP_ID), helpAction(), "buttons"));
+                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_HELP_ID), helpAction(), SOUTH_BUTTON_GROUP));
                 buttons.add(Box.createHorizontalStrut(5));
-                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_ABOUT_ID), aboutAction(), "buttons"));
+                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_ABOUT_ID), aboutAction(), SOUTH_BUTTON_GROUP));
                 buttons.add(Box.createHorizontalGlue());
                 buttons.add(Box.createHorizontalStrut(40));
 
-                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_CANCEL_ID), aboutAction(), "buttons"));
+                buttons.add(createButton(i18n.getString(I18n.BUTTON_CANCEL_ID), aboutAction(), SOUTH_BUTTON_GROUP));
                 buttons.add(Box.createHorizontalStrut(10));
-                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_BACK_ID), aboutAction(), "buttons"));
+                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_BACK_ID), aboutAction(), SOUTH_BUTTON_GROUP));
                 buttons.add(Box.createHorizontalStrut(5));
-                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_NEXT_ID), aboutAction(), "buttons"));
+                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_NEXT_ID), aboutAction(), SOUTH_BUTTON_GROUP));
                 buttons.add(Box.createHorizontalStrut(10));
-                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_FINISH_ID), aboutAction(), "buttons"));
+                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_FINISH_ID), aboutAction(), SOUTH_BUTTON_GROUP));
             }
         };
-        window = new BasicDialog(null, panel, false);
-        aboutDialog = new About(window, i18n, webBrowserLauncher);
-
-        window.setVisible(true);
+//        window = new BasicDialog(null, panel, false);
+//        aboutDialog = new About(window, i18n, webBrowserLauncher);
+//
+//        window.setVisible(true);
     }
 
     private ActionListener helpAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                webBrowserLauncher.openWebBrowser(HELP_URL, window, I18n.WIZARD_BUTTON_HELP_ID);
+//                webBrowserLauncher.openWebBrowser(HELP_URL, window, I18n.WIZARD_BUTTON_HELP_ID);
             }
         };
     }
@@ -100,15 +109,29 @@ public class Wizard {
     private ActionListener aboutAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                aboutDialog.show();
+//                aboutDialog.show();
             }
         };
     }
 
+    public I18n getI18n() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     public static void open() {
+        LOG.info("Opening the wizard.");
+        final I18n i18n = new I18n();
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new Wizard();
+                try {
+                    new Wizard(i18n);
+                } catch(SweeperException e) {
+                    LOG.error("Exception thrown while opening the wizard:", e);
+                    new MessageDialog(null, MessageDialog.Type.ERROR, i18n, i18n.getString(I18n.LABEL_ERROR_ID),
+                            i18n.getString(I18n.WIZARD_ERROR_OPEN_ID, e.getLocalizedMessage()));
+                }
             }
         });
     }
