@@ -19,20 +19,26 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
     <entry key="language.name">English</entry>
-
-    <entry key="wizard.title">{0} - Duplicate file/directory cleaner</entry>
-
     <entry key="webbrowser.nobrowser">Could not open the web browser! To view the content please visit:</entry>
 
+    <entry key="wizard.title">{0} - Duplicate file/directory cleaner</entry>
     <entry key="wizard.button.help">Help</entry>
     <entry key="wizard.button.about">About</entry>
-    <entry key="wizard.button.cancel">Cancel</entry>
     <entry key="wizard.button.back">&lt; Back</entry>
     <entry key="wizard.button.next">Next &gt;</entry>
     <entry key="wizard.button.finish">Finish</entry>
+    <entry key="wizard.error.open">The application cannot start because an error occurred. The error message is "{0}".</entry>
+
+    <entry key="label.error">Error</entry>
 
     <entry key="button.close">Close</entry>
+    <entry key="button.ok">OK</entry>
+    <entry key="button.cancel">Cancel</entry>
 
     <entry key="about.label.website">Website</entry>
     <entry key="about.button.license">License</entry>
+
+    <entry key="page.welcome.header">Welcome</entry>
+    <entry key="page.welcome.introduction">This wizard will guide you to discover and clean your duplicate files and directories.</entry>
+    <entry key="page.welcome.language-label">Please choose your preferred language</entry>
 </properties>

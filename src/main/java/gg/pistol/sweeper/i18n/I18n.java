@@ -59,27 +59,38 @@ public class I18n {
             + "along with this program.  If not, see <http://www.gnu.org/licenses/>.\n";
 
     public static final String LANGUAGE_NAME_ID = "language.name";
-    public static final String WIZARD_TITLE_ID = "wizard.title";
     public static final String WEBBROWSER_NOBROWSER_ID = "webbrowser.nobrowser";
 
+    public static final String WIZARD_TITLE_ID = "wizard.title";
     public static final String WIZARD_BUTTON_HELP_ID = "wizard.button.help";
     public static final String WIZARD_BUTTON_ABOUT_ID = "wizard.button.about";
-    public static final String WIZARD_BUTTON_CANCEL_ID = "wizard.button.cancel";
     public static final String WIZARD_BUTTON_BACK_ID = "wizard.button.back";
     public static final String WIZARD_BUTTON_NEXT_ID = "wizard.button.next";
     public static final String WIZARD_BUTTON_FINISH_ID = "wizard.button.finish";
+    public static final String WIZARD_ERROR_OPEN_ID = "wizard.error.open";
+
+    public static final String LABEL_ERROR_ID = "label.error";
 
     public static final String BUTTON_CLOSE_ID = "button.close";
+    public static final String BUTTON_OK_ID = "button.ok";
+    public static final String BUTTON_CANCEL_ID = "button.cancel";
 
     public static final String ABOUT_LABEL_WEBSITE_ID = "about.label.website";
     public static final String ABOUT_BUTTON_LICENSE_ID = "about.button.license";
 
+    public static final String PAGE_WELCOME_HEADER_ID = "page.welcome.header";
+    public static final String PAGE_WELCOME_INTRODUCTION_ID = "page.welcome.introduction";
+    public static final String PAGE_WELCOME_LANGUAGE_LABEL_ID = "page.welcome.language-label";
+
     private static final String MESSAGES_BASENAME = "messages";
     private static final String[] SUPPORTED_LANGUAGES = new String[] {"en", "de", "fr", "es", "pt", "ro", "ru", "ar", "ja", "hi", "zh_CN", "zh_TW"};
 
-    private final ResourceBundle.Control resourceBundleControl;
-    private final Collection<LocaleChangeListener> listeners;
+    private final JackLogger log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(I18n.class));
+
     private final Map<Locale, String> supportedLocales;
+    private final Collection<LocaleChangeListener> listeners;
+
+    private final ResourceBundle.Control resourceBundleControl;
     private ResourceBundle resourceBundle;
     private Locale locale;
 
@@ -87,9 +98,9 @@ public class I18n {
      * Initialize the internationalization using the default locale.
      */
     public I18n() {
-        resourceBundleControl = new XMLResourceBundleControl();
-        listeners = new LinkedHashSet<LocaleChangeListener>();
         supportedLocales = new LinkedHashMap<Locale, String>();
+        listeners = new LinkedHashSet<LocaleChangeListener>();
+        resourceBundleControl = new XMLResourceBundleControl();
         populateSupportedLocales();
         setLocale(getDefaultLocale());
     }
