@@ -100,7 +100,7 @@ class Analyzer {
         Preconditions.checkNotNull(listener);
         Preconditions.checkArgument(!targetResources.isEmpty());
 
-        log.trace("Computing the analysis for the resources {}", targetResources);
+        log.trace("Computing the analysis for the resources {}.", targetResources);
         analyzing = true;
         deleting = false;
         abortAnalysis.set(false);
@@ -137,7 +137,7 @@ class Analyzer {
      */
     private TargetImpl traverseResources(Collection<? extends Resource> targetResources, MutableInteger totalTargets,
             OperationTrackingListener listener) throws SweeperAbortException {
-        log.trace("Traversing the resources");
+        log.trace("Traversing the resources.");
         listener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
         TargetImpl root = new TargetImpl(new LinkedHashSet<Resource>(targetResources));
         totalTargets.setValue(1);
@@ -189,7 +189,7 @@ class Analyzer {
      */
     private int expand(Collection<TargetImpl> targets, Collection<TargetImpl> rootChildren, int limit,
             @Nullable Collection<TargetImpl> nextTargets, OperationTrackingListener listener) throws SweeperAbortException {
-        log.trace("Expanding {} with limit <{}>", targets, limit);
+        log.trace("Expanding {} with limit <{}>.", targets, limit);
 
         Set<TargetImpl> rootChildrenSet = new HashSet<TargetImpl>(rootChildren);
         LinkedList<TargetImpl> next = new LinkedList<TargetImpl>();
@@ -235,11 +235,11 @@ class Analyzer {
 
     private void checkAbortFlag() throws SweeperAbortException {
         if (analyzing && abortAnalysis.get()) {
-            log.info("Aborting the analysis");
+            log.info("Aborting the analysis.");
             throw new SweeperAbortException();
         }
         if (deleting && abortDeletion.get()) {
-            log.info("Aborting the deletion");
+            log.info("Aborting the deletion.");
             throw new SweeperAbortException();
         }
     }
@@ -252,7 +252,7 @@ class Analyzer {
      */
     private Collection<TargetImpl> computeSize(TargetImpl root, int totalTargets,
             final OperationTrackingListener listener) throws SweeperAbortException {
-        log.trace("Computing the size for {} that has <{}> total sub-targets", root, totalTargets);
+        log.trace("Computing the size for {} that has <{}> total sub-targets.", root, totalTargets);
         final Collection<TargetImpl> ret = new ArrayList<TargetImpl>();
         listener.updateOperation(SweeperOperation.SIZE_COMPUTATION);
         listener.setOperationMaxProgress(totalTargets);
@@ -316,7 +316,7 @@ class Analyzer {
      */
     private Multimap<Long, TargetImpl> filterDuplicateSize(Collection<TargetImpl> list,
             OperationTrackingListener listener) throws SweeperAbortException {
-        log.trace("Deduplicating the size");
+        log.trace("Deduplicating the size.");
         listener.updateOperation(SweeperOperation.SIZE_DEDUPLICATION);
 
         Multimap<Long, TargetImpl> sizeDups = filterDuplicates(list, new Function<TargetImpl, Long>() {
@@ -385,7 +385,7 @@ class Analyzer {
      */
     private void computeHash(Collection<TargetImpl> targets, final OperationTrackingListener listener)
             throws SweeperAbortException {
-        log.trace("Computing the hash for targets {}", targets);
+        log.trace("Computing the hash for targets {}.", targets);
         listener.updateOperation(SweeperOperation.HASH_COMPUTATION);
 
         // Filter the targets that are not the children of other targets. All the children targets will have the hash
@@ -462,7 +462,7 @@ class Analyzer {
      */
     private Multimap<String, TargetImpl> filterDuplicateHash(Collection<TargetImpl> targets,
             OperationTrackingListener listener) throws SweeperAbortException {
-        log.trace("Deduplicating the hash for targets {}", targets);
+        log.trace("Deduplicating the hash for targets {}.", targets);
         listener.updateOperation(SweeperOperation.HASH_DEDUPLICATION);
 
         Multimap<String, TargetImpl> hashDups = filterDuplicates(targets,
@@ -479,7 +479,7 @@ class Analyzer {
 
     private SweeperCountImpl computeCount(TargetImpl root, Multimap<String, TargetImpl> hashDups,
             OperationTrackingListener listener) throws SweeperAbortException {
-        log.trace("Counting the root {} and the hash duplicates {}", root, hashDups);
+        log.trace("Counting the root {} and the hash duplicates {}.", root, hashDups);
         listener.updateOperation(SweeperOperation.COUNTING);
 
         int totalTargets = root.getTotalTargets();
@@ -523,7 +523,7 @@ class Analyzer {
 
     private NavigableSet<DuplicateGroup> createDuplicateGroups(Multimap<String, TargetImpl> hashDups,
             OperationTrackingListener listener) throws SweeperAbortException {
-        log.trace("Duplicate grouping");
+        log.trace("Duplicate grouping.");
         listener.updateOperation(SweeperOperation.DUPLICATE_GROUPING);
 
         NavigableSet<DuplicateGroup> ret = new TreeSet<DuplicateGroup>();
@@ -542,7 +542,7 @@ class Analyzer {
         Preconditions.checkNotNull(listener);
         Preconditions.checkArgument(!targets.isEmpty());
 
-        log.trace("Deleting targets");
+        log.trace("Deleting targets.");
         analyzing = false;
         deleting = true;
         abortDeletion.set(false);
@@ -612,7 +612,7 @@ class Analyzer {
      * <p>This method is thread safe.
      */
     void abortAnalysis() {
-        log.trace("Turning on the analysis abort flag");
+        log.trace("Turning on the analysis abort flag.");
         abortAnalysis.set(true);
     }
 
@@ -622,7 +622,7 @@ class Analyzer {
      * <p>This method is thread safe.
      */
     void abortDeletion() {
-        log.trace("Turning on the deletion abort flag");
+        log.trace("Turning on the deletion abort flag.");
         abortDeletion.set(true);
     }
 

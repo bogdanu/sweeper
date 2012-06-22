@@ -38,6 +38,7 @@ import com.google.common.base.Preconditions;
  *
  * @author Bogdan Pistol
  */
+//package private
 class XMLResourceBundle extends ResourceBundle {
     private final Properties properties;
     @Nullable private Collection<String> keys;
@@ -53,6 +54,9 @@ class XMLResourceBundle extends ResourceBundle {
         return properties.getProperty(key);
     }
 
+    /*
+     * It is synchronized to ensure thread-safeness when concurrently accessing the keys.
+     */
     @Override
     synchronized public Enumeration<String> getKeys() {
         if (keys == null) {

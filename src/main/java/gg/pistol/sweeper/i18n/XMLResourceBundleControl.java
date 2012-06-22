@@ -37,6 +37,7 @@ import com.google.common.io.Closeables;
  *
  * @author Bogdan Pistol
  */
+// package private
 class XMLResourceBundleControl extends ResourceBundle.Control {
 
     @Override

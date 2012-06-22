@@ -17,6 +17,9 @@
  */
 package gg.pistol.sweeper.i18n;
 
+import gg.pistol.lumberjack.JackLogger;
+import gg.pistol.lumberjack.JackLoggerFactory;
+
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -25,6 +28,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
 /**
@@ -37,7 +43,6 @@ import com.google.common.base.Preconditions;
 public class I18n {
 
     public static final String APPLICATION_NAME = "Sweeper";
-
     public static final String COPYRIGHT = "Copyright (C) 2012 Bogdan Ciprian Pistol";
 
     public static final String LICENSE = "Sweeper - Duplicate file/folder cleaner\n"
@@ -117,6 +122,8 @@ public class I18n {
                 matchedLocale = loc;
             }
         }
+
+        log.info("Internationalization default locale matched with the supported locales is <{}>.", matchedLocale);
         return matchedLocale;
     }
 
@@ -133,6 +140,9 @@ public class I18n {
             supportedLocales.put(locale, langName);
         }
         Preconditions.checkState(supportedLocales.containsKey(Locale.ENGLISH));
+        if (log.isInfoEnabled()) {
+            log.info("Internationalization supports the locales: {}.", Joiner.on(", ").join(supportedLocales.keySet()));
+        }
     }
 
     /**
@@ -147,12 +157,13 @@ public class I18n {
         if (!supportedLocales.containsKey(locale)) {
             locale = Locale.ENGLISH;
         }
+        log.info("Internationalization is configured with the locale <{}>.", locale);
 
-        synchronized (this) {
+        synchronized (this) { // the locale and the resource bundle are synchronized on the monitor of the "I18n" instance
             this.locale = locale;
             resourceBundle = ResourceBundle.getBundle(MESSAGES_BASENAME, locale, resourceBundleControl);
         }
-        synchronized (listeners) {
+        synchronized (listeners) { // the listeners are synchronized on the monitor of the "listeners" field
             for (LocaleChangeListener listener: listeners) {
                 listener.onLocaleChange();
             }

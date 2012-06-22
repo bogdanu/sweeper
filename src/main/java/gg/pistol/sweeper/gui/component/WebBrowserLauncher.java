@@ -17,6 +17,8 @@
  */
 package gg.pistol.sweeper.gui.component;
 
+import gg.pistol.lumberjack.JackLogger;
+import gg.pistol.lumberjack.JackLoggerFactory;
 import gg.pistol.sweeper.i18n.I18n;
 
 import java.awt.Desktop;
@@ -28,10 +30,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 
+/**
+ * Utility class that provides functionality to access a URL address with the operating system's default web browser.
+ *
+ * @author Bogdan Pistol
+ */
 public class WebBrowserLauncher {
 
+    private final JackLogger log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(WebBrowserLauncher.class));
     private final I18n i18n;
 
     public WebBrowserLauncher(I18n i18n) {
@@ -54,12 +64,14 @@ public class WebBrowserLauncher {
         boolean nobrowser = !Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
         if (!nobrowser) {
             try {
+                log.info("Opening the operating system default web browser with the URL <{}>.", url);
                 Desktop.getDesktop().browse(uri);
             } catch (Exception e) {
                 nobrowser = true;
             }
         }
         if (nobrowser) {
+            log.warn("Could not open the operating system default web browser.");
             DecoratedPanel panel = new DecoratedPanel(i18n, true, UIManager.getIcon("OptionPane.warningIcon")) {
                 @Override
                 protected void addComponents(JPanel contentPanel) {
