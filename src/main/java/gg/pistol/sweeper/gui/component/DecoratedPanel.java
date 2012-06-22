@@ -113,7 +113,8 @@ public abstract class DecoratedPanel extends DynamicPanel {
         if (sideImage != null) {
             addSideImage();
         }
-        JPanel contentPanel = createHorizontalPanel();
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         add(contentPanel, BorderLayout.CENTER);
 
         addComponents(contentPanel);
@@ -184,17 +185,18 @@ public abstract class DecoratedPanel extends DynamicPanel {
         add(panel, BorderLayout.SOUTH);
     }
 
-    private ActionListener closeAction() {
+    /**
+     * The action to dispose the parent window.
+     *
+     * @return the action
+     */
+    protected ActionListener closeAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (parentWindow == null) { // if there is no parent yet configured then ignore the action
                     return;
                 }
-                if (parentWindow.getOwner() == null) { // dispose the windows without any owner
-                    parentWindow.dispose();
-                } else {
-                    parentWindow.setVisible(false);
-                }
+                parentWindow.dispose();
             }
         };
     }

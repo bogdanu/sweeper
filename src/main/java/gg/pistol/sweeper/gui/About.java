@@ -38,27 +38,22 @@ import javax.swing.JTextArea;
 
 import com.google.common.base.Preconditions;
 
+// package private
 class About {
 
     private static final String WEBSITE_URL = "https://github.com/bogdanu/sweeper";
 
-    private final BasicDialog window;
-    private final I18n i18n;
-    private final WebBrowserLauncher webBrowserLauncher;
-
-    private final BasicDialog licenseDialog;
+    private static final String BUTTON_GROUP = "buttons";
 
     About(@Nullable Window owner, I18n i18n, WebBrowserLauncher webBrowserLauncher) {
         Preconditions.checkNotNull(i18n);
         Preconditions.checkNotNull(webBrowserLauncher);
-        this.i18n = i18n;
-        this.webBrowserLauncher = webBrowserLauncher;
 
-        window = new BasicDialog(owner, createAboutPanel(), true);
-        licenseDialog = new BasicDialog(window, createLicensePanel(), true);
+        BasicDialog dialog = new BasicDialog(owner, createAboutPanel(i18n, webBrowserLauncher));
+        dialog.setVisible(true);
     }
 
-    private DynamicPanel createAboutPanel() {
+    private DynamicPanel createAboutPanel(I18n i18n, final WebBrowserLauncher webBrowserLauncher) {
         return new DecoratedPanel(i18n, false, null) {
             @Override
             protected void addComponents(JPanel contentPanel) {
@@ -72,46 +67,39 @@ class About {
 
                 JPanel linkPanel = createHorizontalPanel();
                 linkPanel.add(new JLabel(i18n.getString(I18n.ABOUT_LABEL_WEBSITE_ID) + ": "));
-                linkPanel.add(createLink(WEBSITE_URL, websiteAction()));
+                linkPanel.add(createLink(WEBSITE_URL, websiteAction(webBrowserLauncher, i18n, parentWindow)));
                 contentPanel.add(alignVertically(linkPanel));
 
                 contentPanel.add(Box.createVerticalStrut(50));
                 contentPanel.add(Box.createVerticalGlue());
 
                 JPanel buttons = createHorizontalPanel();
-                buttons.add(createButton(i18n.getString(I18n.ABOUT_BUTTON_LICENSE_ID), licenseAction(), "buttons"));
+                buttons.add(createButton(i18n.getString(I18n.ABOUT_BUTTON_LICENSE_ID), licenseAction(parentWindow, i18n), BUTTON_GROUP));
                 buttons.add(Box.createHorizontalGlue());
-                buttons.add(createButton(i18n.getString(I18n.BUTTON_CLOSE_ID), closeAction(), "buttons"));
+                buttons.add(createButton(i18n.getString(I18n.BUTTON_CLOSE_ID), closeAction(), BUTTON_GROUP));
                 contentPanel.add(alignVertically(buttons));
             }
         };
     }
 
-    private Runnable websiteAction() {
+    private Runnable websiteAction(final WebBrowserLauncher webBrowserLauncher, final I18n i18n, final Window parentWindow) {
         return new Runnable() {
             public void run() {
-                webBrowserLauncher.openWebBrowser(WEBSITE_URL, window, i18n.getString(I18n.ABOUT_LABEL_WEBSITE_ID));
+                webBrowserLauncher.openWebBrowser(WEBSITE_URL, parentWindow, i18n.getString(I18n.ABOUT_LABEL_WEBSITE_ID));
             }
         };
     }
 
-    private ActionListener licenseAction() {
+    private ActionListener licenseAction(final Window parentWindow, final I18n i18n) {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                licenseDialog.setVisible(true);
+                BasicDialog license = new BasicDialog(parentWindow, createLicensePanel(i18n));
+                license.setVisible(true);
             }
         };
     }
 
-    private ActionListener closeAction() {
-        return new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                window.setVisible(false);
-            }
-        };
-    }
-
-    private DynamicPanel createLicensePanel() {
+    private DynamicPanel createLicensePanel(I18n i18n) {
         return new DecoratedPanel(i18n, true, null) {
             @Override
             protected void addComponents(JPanel contentPanel) {
@@ -128,10 +116,6 @@ class About {
                 contentPanel.add(scroll);
             }
         };
-    }
-
-    void show() {
-        window.setVisible(true);
     }
 
 }

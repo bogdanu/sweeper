@@ -33,20 +33,17 @@ import com.google.common.base.Preconditions;
  */
 public class BasicDialog extends JDialog {
 
-    public BasicDialog(@Nullable Window owner, DynamicPanel panel, boolean modal) {
+    public BasicDialog(@Nullable Window owner, DynamicPanel panel) {
         super(owner);
         Preconditions.checkNotNull(panel);
-
-        if (modal) {
-            setModalityType(ModalityType.APPLICATION_MODAL);
-        }
 
         setLayout(new BorderLayout());
         getContentPane().add(panel, BorderLayout.CENTER);
         panel.setParentWindow(this);
 
-        if (owner == null) {
-            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        if (owner != null) {
+            setModalityType(ModalityType.APPLICATION_MODAL);
         }
     }
 

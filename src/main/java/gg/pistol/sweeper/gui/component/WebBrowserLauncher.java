@@ -80,7 +80,7 @@ public class WebBrowserLauncher {
                     contentPanel.add(createTextLabel(url));
                 }
             };
-            BasicDialog dialog = new BasicDialog(nobrowserDialogOwner, panel, true);
+            BasicDialog dialog = new BasicDialog(nobrowserDialogOwner, panel);
             dialog.setVisible(true);
         }
     }
