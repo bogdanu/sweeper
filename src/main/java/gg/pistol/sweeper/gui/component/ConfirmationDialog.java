@@ -44,11 +44,11 @@ public class ConfirmationDialog {
             @Override
             protected void addComponents(JPanel contentPanel) {
                 setTitle(title);
-                contentPanel.add(alignVertically(new JLabel(message)));
+                contentPanel.add(alignLeft(new JLabel(message)));
                 contentPanel.add(Box.createVerticalStrut(20));
 
                 JPanel buttons = createHorizontalPanel();
-                contentPanel.add(alignVertically(buttons));
+                contentPanel.add(alignLeft(buttons));
 
                 buttons.add(Box.createHorizontalGlue());
                 buttons.add(createButton(i18n.getString(I18n.BUTTON_CANCEL_ID), closeAction()));

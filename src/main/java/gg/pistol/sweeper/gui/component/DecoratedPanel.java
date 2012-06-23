@@ -245,17 +245,32 @@ public abstract class DecoratedPanel extends DynamicPanel {
     }
 
     /**
-     * Helper method to set the alignment.
+     * Helper method to set the left alignment.
      *
      * @param component
      *            the component to align
      * @return the aligned component
      */
-    protected <T extends JComponent> T alignVertically(T component) {
+    protected <T extends JComponent> T alignLeft(T component) {
+        return alignVertically(component, Component.LEFT_ALIGNMENT);
+    }
+
+    /**
+     * Helper method to set the right alignment.
+     *
+     * @param component
+     *            the component to align
+     * @return the aligned component
+     */
+    protected <T extends JComponent> T alignRight(T component) {
+        return alignVertically(component, Component.RIGHT_ALIGNMENT);
+    }
+
+    private <T extends JComponent> T alignVertically(T component, float alignment) {
         Preconditions.checkNotNull(component);
 
         component.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
-        component.setAlignmentX(Component.LEFT_ALIGNMENT);
+        component.setAlignmentX(alignment);
         return component;
     }
 

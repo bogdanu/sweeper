@@ -17,36 +17,71 @@
  */
 package gg.pistol.sweeper.gui;
 
+import gg.pistol.sweeper.core.Sweeper;
+import gg.pistol.sweeper.gui.component.DecoratedPanel;
+import gg.pistol.sweeper.i18n.I18n;
+
 import java.awt.Font;
 
-import gg.pistol.sweeper.gui.component.DecoratedPanel;
-
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.google.common.base.Preconditions;
+
+//package private
 abstract class WizardPage extends DecoratedPanel {
 
-    protected final Wizard wizard;
+    protected final WizardPageListener listener;
+    protected final Sweeper sweeper;
 
-    WizardPage(Wizard wizard) {
-        super(wizard.getI18n(), false, null);
-        this.wizard = wizard;
+    WizardPage(I18n i18n, WizardPageListener listener, Sweeper sweeper) {
+        super(Preconditions.checkNotNull(i18n), false, null);
+        Preconditions.checkNotNull(listener);
+        Preconditions.checkNotNull(sweeper);
+        this.listener = listener;
+        this.sweeper = sweeper;
     }
 
     @Override
     protected void addComponents(JPanel contentPanel) {
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-
         JLabel header = new JLabel(getPageHeader());
         Font font = header.getFont();
         header.setFont(font.deriveFont(font.getSize2D() + 2));
-        contentPanel.add(alignVertically(header));
+        contentPanel.add(alignLeft(header));
 
         contentPanel.add(Box.createVerticalStrut(20));
     }
 
     protected abstract String getPageHeader();
+
+    abstract boolean isCancelButtonVisible();
+
+    abstract boolean isCancelButtonEnabled();
+
+    abstract boolean isBackButtonEnabled();
+
+    abstract boolean isNextButtonEnabled();
+
+    abstract boolean isFinishButtonEnabled();
+
+    abstract boolean isLastPage();
+
+    abstract boolean isLanguageSelectorVisible();
+
+    abstract void cancel();
+
+    abstract WizardPage back();
+
+    abstract WizardPage next();
+
+    abstract WizardPage finish();
+
+
+    interface WizardPageListener {
+
+        void onButtonStateChange();
+
+    }
 
 }

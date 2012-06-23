@@ -49,10 +49,17 @@ public class WebBrowserLauncher {
         this.i18n = i18n;
     }
 
-    public void openWebBrowser(final String url, Window nobrowserDialogOwner, final String nobrowserTitleId) {
+    /**
+     * Open the operating system's default web browser and access the provided {@code url}.
+     *
+     * @param url
+     *            the web address to access
+     * @param parentWindow
+     *            in case of error this parameter specifies which window will be the parent of the error dialog box
+     */
+    public void openWebBrowser(final String url, Window parentWindow) {
         Preconditions.checkNotNull(url);
-        Preconditions.checkNotNull(nobrowserDialogOwner);
-        Preconditions.checkNotNull(nobrowserTitleId);
+        Preconditions.checkNotNull(parentWindow);
 
         URI uri = null;
         try {
@@ -75,12 +82,12 @@ public class WebBrowserLauncher {
             DecoratedPanel panel = new DecoratedPanel(i18n, true, UIManager.getIcon("OptionPane.warningIcon")) {
                 @Override
                 protected void addComponents(JPanel contentPanel) {
-                    setTitle(i18n.getString(nobrowserTitleId));
-                    contentPanel.add(new JLabel(i18n.getString(I18n.WEBBROWSER_NOBROWSER_ID) + " "));
+                    setTitle(i18n.getString(I18n.LABEL_ERROR_ID));
+                    contentPanel.add(new JLabel(i18n.getString(I18n.WEB_BROWSER_LAUNCHER_ERROR_ID) + " "));
                     contentPanel.add(createTextLabel(url));
                 }
             };
-            BasicDialog dialog = new BasicDialog(nobrowserDialogOwner, panel);
+            BasicDialog dialog = new BasicDialog(parentWindow, panel);
             dialog.setVisible(true);
         }
     }
