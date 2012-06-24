@@ -18,7 +18,7 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="language.name">日本の (Japanese)</entry>
+    <entry key="language.name">日本の</entry>
 
     <entry key="wizard.title">{0} - ファイル/ディレクトリのクリーナーが重複しています</entry>
 

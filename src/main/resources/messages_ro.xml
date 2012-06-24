@@ -18,7 +18,7 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="language.name">Română (Romanian)</entry>
+    <entry key="language.name">Română</entry>
 
     <entry key="wizard.title">{0} - Curăţă fişierele/directoarele duplicate</entry>
 

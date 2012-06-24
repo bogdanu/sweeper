@@ -18,7 +18,7 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="language.name">Português (Portuguese)</entry>
+    <entry key="language.name">Português</entry>
 
     <entry key="wizard.title">{0} - Duplicar arquivo / diretório limpo</entry>
 

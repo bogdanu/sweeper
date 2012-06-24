@@ -18,7 +18,7 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="language.name">Русский (Russian)</entry>
+    <entry key="language.name">Русский</entry>
 
     <entry key="wizard.title">{0} - дубликат файла / каталога чистых</entry>
 

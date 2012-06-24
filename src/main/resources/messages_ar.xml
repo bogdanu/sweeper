@@ -18,7 +18,7 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="language.name">العربية (Arabic)</entry>
+    <entry key="language.name">العربية</entry>
 
     <entry key="wizard.title">تكرار ملف / الدليل نظافة - {0}</entry>
 

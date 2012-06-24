@@ -18,7 +18,7 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="language.name">हिंदी (Hindi)</entry>
+    <entry key="language.name">हिंदी</entry>
 
     <entry key="wizard.title">{0} फ़ाइल / निर्देशिका क्लीनर डुप्लिकेट</entry>
 

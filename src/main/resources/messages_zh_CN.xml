@@ -18,7 +18,7 @@
 -->
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="language.name">中文（简体）(Chinese Simplified)</entry>
+    <entry key="language.name">中文（简体）</entry>
 
     <entry key="wizard.title">{0} - 重复的文件/目录的清洁剂</entry>
 
