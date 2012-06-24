@@ -49,7 +49,6 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
     protected DynamicPanel(I18n i18n) {
         Preconditions.checkNotNull(i18n);
         this.i18n = i18n;
-        i18n.registerListener(this);
         setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
     }
 
@@ -57,7 +56,9 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
         setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
         removeAll();
         addComponents();
-        parentWindow.pack();
+        if (parentWindow != null) {
+            parentWindow.pack();
+        }
     }
 
     /**
@@ -76,10 +77,14 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
      * @param parentWindow
      *            the parent window
      */
-    public void setParentWindow(Window parentWindow) {
-        Preconditions.checkNotNull(parentWindow);
-        this.parentWindow = parentWindow;
-        addComponents();
+    public void setParentWindow(@Nullable Window parentWindow) {
+        if (parentWindow == null) {
+            i18n.unregisterListener(this);
+        } else {
+            this.parentWindow = parentWindow;
+            i18n.registerListener(this);
+            addComponents();
+        }
     }
 
     /**
@@ -91,6 +96,7 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
      *            the title string
      */
     protected void setTitle(String title) {
+        Preconditions.checkNotNull(title);
         if (parentWindow instanceof Dialog) {
             ((Dialog) parentWindow).setTitle(title);
         } else if (parentWindow instanceof Frame) {

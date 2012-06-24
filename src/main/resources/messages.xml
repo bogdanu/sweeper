@@ -41,5 +41,5 @@
 
     <entry key="page.welcome.header">Welcome</entry>
     <entry key="page.welcome.introduction">This wizard will guide you to discover and clean your duplicate files and directories.</entry>
-    <entry key="page.welcome.language-label">Please choose your preferred language</entry>
+    <entry key="page.welcome.change-language">Please choose your preferred language</entry>
 </properties>

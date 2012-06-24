@@ -30,6 +30,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Internationalized confirmation dialog with confirmation and cancellation buttons.
  *
@@ -40,19 +42,25 @@ public class ConfirmationDialog {
     private boolean confirmed;
 
     public ConfirmationDialog(@Nullable Window owner, Type type, I18n i18n, final String title, final String message) {
+        Preconditions.checkNotNull(type);
+        Preconditions.checkNotNull(i18n);
+        Preconditions.checkNotNull(title);
+        Preconditions.checkNotNull(message);
+
         DecoratedPanel panel = new DecoratedPanel(i18n, false, UIManager.getIcon("OptionPane.questionIcon")) {
             @Override
             protected void addComponents(JPanel contentPanel) {
+                Preconditions.checkNotNull(contentPanel);
                 setTitle(title);
                 contentPanel.add(alignLeft(new JLabel(message)));
-                contentPanel.add(Box.createVerticalStrut(20));
+                contentPanel.add(createVerticalStrut(20));
 
                 JPanel buttons = createHorizontalPanel();
                 contentPanel.add(alignLeft(buttons));
 
                 buttons.add(Box.createHorizontalGlue());
                 buttons.add(createButton(i18n.getString(I18n.BUTTON_CANCEL_ID), closeAction()));
-                buttons.add(Box.createHorizontalStrut(20));
+                buttons.add(createHorizontalStrut(20));
                 buttons.add(createButton(i18n.getString(I18n.BUTTON_OK_ID), okAction(parentWindow)));
                 buttons.add(Box.createHorizontalGlue());
             }

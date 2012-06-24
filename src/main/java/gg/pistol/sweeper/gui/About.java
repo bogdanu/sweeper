@@ -30,7 +30,6 @@ import java.awt.event.ActionListener;
 
 import javax.annotation.Nullable;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -63,20 +62,20 @@ class About {
         return new DecoratedPanel(i18n, false, null) {
             @Override
             protected void addComponents(JPanel contentPanel) {
+                Preconditions.checkNotNull(contentPanel);
                 setTitle(i18n.getString(I18n.WIZARD_BUTTON_ABOUT_ID));
-                contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
                 contentPanel.add(alignLeft(new JLabel(I18n.APPLICATION_NAME)));
-                contentPanel.add(Box.createVerticalStrut(3));
+                contentPanel.add(createVerticalStrut(3));
                 contentPanel.add(alignLeft(new JLabel(I18n.COPYRIGHT)));
-                contentPanel.add(Box.createVerticalStrut(30));
+                contentPanel.add(createVerticalStrut(30));
 
                 JPanel linkPanel = createHorizontalPanel();
                 linkPanel.add(new JLabel(i18n.getString(I18n.ABOUT_WEBSITE_ID) + ": "));
                 linkPanel.add(createLink(WEBSITE_URL, websiteAction()));
                 contentPanel.add(alignLeft(linkPanel));
 
-                contentPanel.add(Box.createVerticalStrut(50));
+                contentPanel.add(createVerticalStrut(50));
                 contentPanel.add(Box.createVerticalGlue());
 
                 JPanel buttons = createHorizontalPanel();
@@ -109,6 +108,7 @@ class About {
         return new DecoratedPanel(i18n, true, null) {
             @Override
             protected void addComponents(JPanel contentPanel) {
+                Preconditions.checkNotNull(contentPanel);
                 setTitle(i18n.getString(I18n.ABOUT_BUTTON_LICENSE_ID));
 
                 JTextArea license = new JTextArea(I18n.LICENSE);

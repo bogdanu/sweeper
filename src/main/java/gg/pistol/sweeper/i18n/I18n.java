@@ -21,11 +21,11 @@ import gg.pistol.lumberjack.JackLogger;
 import gg.pistol.lumberjack.JackLoggerFactory;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.slf4j.LoggerFactory;
@@ -88,18 +88,18 @@ public class I18n {
 
     private final JackLogger log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(I18n.class));
 
-    private final Map<Locale, String> supportedLocales;
+    private final Collection<SupportedLocale> supportedLocales;
     private final Collection<LocaleChangeListener> listeners;
 
     private final ResourceBundle.Control resourceBundleControl;
     private ResourceBundle resourceBundle;
-    private Locale locale;
+    private SupportedLocale locale;
 
     /**
      * Initialize the internationalization using the default locale.
      */
     public I18n() {
-        supportedLocales = new LinkedHashMap<Locale, String>();
+        supportedLocales = new ArrayList<SupportedLocale>();
         listeners = new LinkedHashSet<LocaleChangeListener>();
         resourceBundleControl = new XMLResourceBundleControl();
         populateSupportedLocales();
@@ -111,22 +111,22 @@ public class I18n {
      *
      * @return the matched default locale or if there is no match then the locale for the English language is returned
      */
-    private Locale getDefaultLocale() {
+    private SupportedLocale getDefaultLocale() {
         Locale defaultLocale = Locale.getDefault();
 
         // 0 = no match; 1 = language match; 2 = language and country match; 3 = language, country and variant match
         int matchLevel = 0;
-        Locale matchedLocale = Locale.ENGLISH;
+        SupportedLocale matchedLocale = resolveSupportedLocale(Locale.ENGLISH);
 
-        for (Locale loc : supportedLocales.keySet()) {
+        for (SupportedLocale loc : supportedLocales) {
             int currentMatchLevel = 0;
-            if (loc.getLanguage().equals(defaultLocale.getLanguage())) {
+            if (loc.getLocale().getLanguage().equals(defaultLocale.getLanguage())) {
                 currentMatchLevel++;
             }
-            if (loc.getCountry().equals(defaultLocale.getCountry())) {
+            if (loc.getLocale().getCountry().equals(defaultLocale.getCountry())) {
                 currentMatchLevel++;
             }
-            if (loc.getVariant().equals(defaultLocale.getVariant())) {
+            if (loc.getLocale().getVariant().equals(defaultLocale.getVariant())) {
                 currentMatchLevel++;
             }
             if (currentMatchLevel > matchLevel) {
@@ -135,8 +135,17 @@ public class I18n {
             }
         }
 
-        log.info("Internationalization default locale matched with the supported locales is <{}>.", matchedLocale);
+        log.info("Internationalization default language matched with the supported locales is <{}>.", matchedLocale);
         return matchedLocale;
+    }
+
+    private SupportedLocale resolveSupportedLocale(Locale locale) {
+        for (SupportedLocale supportedLocale : supportedLocales) {
+            if (supportedLocale.getLocale().equals(locale)) {
+                return supportedLocale;
+            }
+        }
+        return null;
     }
 
     private void populateSupportedLocales() {
@@ -149,11 +158,11 @@ public class I18n {
                 locale = new Locale(lang);
             }
             String langName = ResourceBundle.getBundle(MESSAGES_BASENAME, locale, resourceBundleControl).getString(LANGUAGE_NAME_ID);
-            supportedLocales.put(locale, langName);
+            supportedLocales.add(new SupportedLocale(locale, langName));
         }
-        Preconditions.checkState(supportedLocales.containsKey(Locale.ENGLISH));
+        Preconditions.checkState(resolveSupportedLocale(Locale.ENGLISH) != null);
         if (log.isInfoEnabled()) {
-            log.info("Internationalization supports the locales: {}.", Joiner.on(", ").join(supportedLocales.keySet()));
+            log.info("Internationalization supports the languages: {}.", Joiner.on(", ").join(supportedLocales));
         }
     }
 
@@ -166,14 +175,27 @@ public class I18n {
      */
     public void setLocale(Locale locale) {
         Preconditions.checkNotNull(locale);
-        if (!supportedLocales.containsKey(locale)) {
-            locale = Locale.ENGLISH;
+        SupportedLocale supportedLocale = resolveSupportedLocale(locale);
+        if (supportedLocale == null) {
+            supportedLocale = resolveSupportedLocale(Locale.ENGLISH);
         }
-        log.info("Internationalization is configured with the locale <{}>.", locale);
+        setLocale(supportedLocale);
+    }
+
+    /**
+     * Change the current locale, the registered {@link LocaleChangeListener}s will be notified.
+     * If the provided {@code locale} is not supported it will fall back to the English locale.
+     *
+     * @param locale
+     *            the new locale
+     */
+    public void setLocale(SupportedLocale locale) {
+        Preconditions.checkNotNull(locale);
+        log.info("Internationalization is configured with the language <{}>.", locale);
 
         synchronized (this) { // the locale and the resource bundle are synchronized on the monitor of the "I18n" instance
             this.locale = locale;
-            resourceBundle = ResourceBundle.getBundle(MESSAGES_BASENAME, locale, resourceBundleControl);
+            resourceBundle = ResourceBundle.getBundle(MESSAGES_BASENAME, locale.getLocale(), resourceBundleControl);
         }
         synchronized (listeners) { // the listeners are synchronized on the monitor of the "listeners" field
             for (LocaleChangeListener listener: listeners) {
@@ -186,6 +208,13 @@ public class I18n {
      * @return the current locale
      */
     synchronized public Locale getLocale() {
+        return locale.getLocale();
+    }
+
+    /**
+     * @return the current supported locale
+     */
+    synchronized public SupportedLocale getCurrentSupportedLocale() {
         return locale;
     }
 
@@ -237,10 +266,10 @@ public class I18n {
     /**
      * Retrieve the supported locales.
      *
-     * @return the map of supported locales and for every locale its localized language name
+     * @return the supported locales
      */
-    public Map<Locale, String> getSupportedLocales() {
-        return new LinkedHashMap<Locale, String>(supportedLocales);
+    public Collection<SupportedLocale> getSupportedLocales() {
+        return Collections.unmodifiableCollection(supportedLocales);
     }
 
 }

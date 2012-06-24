@@ -31,6 +31,7 @@ import gg.pistol.sweeper.gui.component.WebBrowserLauncher;
 import gg.pistol.sweeper.i18n.I18n;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -87,14 +88,24 @@ public class Wizard implements WizardPageListener {
         return new DecoratedPanel(i18n, false, null) {
             @Override
             protected void addComponents(JPanel contentPanel) {
+                Preconditions.checkNotNull(contentPanel);
                 contentPanel.setLayout(new BorderLayout());
                 setTitle(i18n.getString(I18n.WIZARD_TITLE_ID, I18n.APPLICATION_NAME));
+
+                currentPage.onLocaleChange();
                 contentPanel.add(currentPage, BorderLayout.CENTER);
 
+                JPanel northPanel = createHorizontalPanel();
+                contentPanel.add(northPanel, BorderLayout.NORTH);
+
                 languagePanel = createHorizontalPanel();
-                contentPanel.add(languagePanel, BorderLayout.NORTH);
+                northPanel.add(languagePanel);
                 languagePanel.add(Box.createHorizontalGlue());
                 languagePanel.add(new JLabel(i18n.getString(I18n.WIZARD_CHANGE_LANGUAGE_ID)));
+                languagePanel.add(createHorizontalStrut(8));
+                languagePanel.add(createLanguageSelector(130));
+
+                northPanel.setPreferredSize(new Dimension(northPanel.getPreferredSize().width, languagePanel.getPreferredSize().height));
 
                 JPanel southPanel = new JPanel(new BorderLayout());
                 contentPanel.add(southPanel, BorderLayout.SOUTH);
@@ -105,17 +116,17 @@ public class Wizard implements WizardPageListener {
                 buttons.setBorder(BorderFactory.createEmptyBorder(7, 0, 0, 0));
 
                 buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_HELP_ID), helpAction(), BUTTON_GROUP));
-                buttons.add(Box.createHorizontalStrut(5));
+                buttons.add(createHorizontalStrut(5));
                 buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_ABOUT_ID), aboutAction(), BUTTON_GROUP));
                 buttons.add(Box.createHorizontalGlue());
-                buttons.add(Box.createHorizontalStrut(40));
+                buttons.add(createHorizontalStrut(40));
 
                 buttons.add(cancelButton = createButton(i18n.getString(I18n.BUTTON_CANCEL_ID), cancelAction(), BUTTON_GROUP));
-                buttons.add(Box.createHorizontalStrut(10));
+                buttons.add(createHorizontalStrut(10));
                 buttons.add(backButton = createButton(i18n.getString(I18n.WIZARD_BUTTON_BACK_ID), backAction(), BUTTON_GROUP));
-                buttons.add(Box.createHorizontalStrut(5));
+                buttons.add(createHorizontalStrut(5));
                 buttons.add(nextButton = createButton(i18n.getString(I18n.WIZARD_BUTTON_NEXT_ID), nextAction(), BUTTON_GROUP));
-                buttons.add(Box.createHorizontalStrut(10));
+                buttons.add(createHorizontalStrut(10));
                 buttons.add(finishButton = createButton(i18n.getString(I18n.WIZARD_BUTTON_FINISH_ID), finishAction(), BUTTON_GROUP));
                 buttons.add(closeButton = createButton(i18n.getString(I18n.BUTTON_CLOSE_ID), closeAction(), BUTTON_GROUP));
 

@@ -35,13 +35,20 @@ class WelcomePage extends WizardPage {
 
     @Override
     protected void addComponents(JPanel contentPanel) {
+        Preconditions.checkNotNull(contentPanel);
         super.addComponents(contentPanel);
-        contentPanel.add(alignLeft(new JLabel(i18n.getString(I18n.PAGE_WELCOME_INTRODUCTION_ID))));
-        contentPanel.add(Box.createVerticalStrut(20));
 
-        JPanel panel = createHorizontalPanel();
-        panel.add(new JLabel(i18n.getString(I18n.PAGE_WELCOME_CHANGE_LANGUAGE_ID)));
-        contentPanel.add(alignLeft(panel));
+        contentPanel.add(createVerticalStrut(20));
+        contentPanel.add(alignLeft(new JLabel(i18n.getString(I18n.PAGE_WELCOME_INTRODUCTION_ID))));
+        contentPanel.add(createVerticalStrut(20));
+
+        JPanel languagePanel = createHorizontalPanel();
+        contentPanel.add(alignLeft(languagePanel));
+        languagePanel.add(new JLabel(i18n.getString(I18n.PAGE_WELCOME_CHANGE_LANGUAGE_ID)));
+        languagePanel.add(createHorizontalStrut(10));
+        languagePanel.add(createLanguageSelector(200));
+
+        contentPanel.add(Box.createVerticalGlue());
     }
 
     @Override
@@ -66,7 +73,7 @@ class WelcomePage extends WizardPage {
 
     @Override
     boolean isNextButtonEnabled() {
-        return false;
+        return true;
     }
 
     @Override
@@ -81,7 +88,7 @@ class WelcomePage extends WizardPage {
 
     @Override
     boolean isLanguageSelectorVisible() {
-        return true;
+        return false;
     }
 
     @Override

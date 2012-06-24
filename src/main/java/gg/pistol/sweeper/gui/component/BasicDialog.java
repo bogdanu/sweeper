@@ -33,9 +33,12 @@ import com.google.common.base.Preconditions;
  */
 public class BasicDialog extends JDialog {
 
+    private final DynamicPanel panel;
+
     public BasicDialog(@Nullable Window owner, DynamicPanel panel) {
         super(owner);
         Preconditions.checkNotNull(panel);
+        this.panel = panel;
 
         setLayout(new BorderLayout());
         getContentPane().add(panel, BorderLayout.CENTER);
@@ -45,6 +48,12 @@ public class BasicDialog extends JDialog {
         if (owner != null) {
             setModalityType(ModalityType.APPLICATION_MODAL);
         }
+    }
+
+    @Override
+    public void dispose() {
+        panel.setParentWindow(null);
+        super.dispose();
     }
 
     @Override

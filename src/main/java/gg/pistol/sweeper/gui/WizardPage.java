@@ -21,9 +21,9 @@ import gg.pistol.sweeper.core.Sweeper;
 import gg.pistol.sweeper.gui.component.DecoratedPanel;
 import gg.pistol.sweeper.i18n.I18n;
 
+import java.awt.Dimension;
 import java.awt.Font;
 
-import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -45,12 +45,15 @@ abstract class WizardPage extends DecoratedPanel {
 
     @Override
     protected void addComponents(JPanel contentPanel) {
+        Preconditions.checkNotNull(contentPanel);
+
         JLabel header = new JLabel(getPageHeader());
         Font font = header.getFont();
-        header.setFont(font.deriveFont(font.getSize2D() + 2));
+        header.setFont(font.deriveFont(font.getSize2D() + 5));
         contentPanel.add(alignLeft(header));
 
-        contentPanel.add(Box.createVerticalStrut(20));
+        contentPanel.add(createVerticalStrut(10));
+        contentPanel.setPreferredSize(new Dimension(700, 400));
     }
 
     protected abstract String getPageHeader();

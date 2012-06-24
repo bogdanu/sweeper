@@ -18,6 +18,7 @@
 package gg.pistol.sweeper.gui.component;
 
 import gg.pistol.sweeper.i18n.I18n;
+import gg.pistol.sweeper.i18n.SupportedLocale;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -35,6 +36,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -89,7 +91,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      *            the side image or null
      */
     protected DecoratedPanel(I18n i18n, int border, boolean closeButton, @Nullable Icon sideImage) {
-        super(i18n);
+        super(Preconditions.checkNotNull(i18n));
         Preconditions.checkArgument(border >= 0);
         this.border = border;
         this.closeButton = closeButton;
@@ -269,6 +271,13 @@ public abstract class DecoratedPanel extends DynamicPanel {
     private <T extends JComponent> T alignVertically(T component, float alignment) {
         Preconditions.checkNotNull(component);
 
+        if (!ComponentOrientation.getOrientation(i18n.getLocale()).isLeftToRight()) {
+            if (alignment == Component.LEFT_ALIGNMENT) {
+                alignment = Component.RIGHT_ALIGNMENT;
+            } else if (alignment == Component.RIGHT_ALIGNMENT) {
+                alignment = Component.LEFT_ALIGNMENT;
+            }
+        }
         component.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
         component.setAlignmentX(alignment);
         return component;
@@ -284,6 +293,34 @@ public abstract class DecoratedPanel extends DynamicPanel {
         panel.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         return panel;
+    }
+
+    /**
+     * Creates an invisible, fixed-width component. This is useful for spacing components.
+     *
+     * <p>It provides the same functionality as {@link Box#createHorizontalStrut} with the difference that the created
+     * fixed-width component does not expand vertically at all (has a maximum height of 0).
+     *
+     * @param width
+     *            the width of the invisible component in pixels
+     * @return
+     */
+    protected JComponent createHorizontalStrut(int width) {
+        return new Box.Filler(new Dimension(width, 0), new Dimension(width, 0), new Dimension(width, 0));
+    }
+
+    /**
+     * Creates an invisible, fixed-height component. This is useful for spacing components.
+     *
+     * <p>It provides the same functionality as {@link Box#createVerticalStrut} with the difference that the created
+     * fixed-height component does not expand horizontally at all (has a maximum width of 0).
+     *
+     * @param height
+     *            the height of the invisible component in pixels
+     * @return
+     */
+    protected JComponent createVerticalStrut(int height) {
+        return new Box.Filler(new Dimension(0, height), new Dimension(0, height), new Dimension(0, height));
     }
 
     /**
@@ -341,6 +378,29 @@ public abstract class DecoratedPanel extends DynamicPanel {
         JButton button = new JButton(text);
         button.addActionListener(action);
         return sizeGroup(sizeGroupId, button);
+    }
+
+    /**
+     * Helper factory method for creating a language selector that provides functionality to change the locale.
+     *
+     * @param width
+     *            the preferred width of the component in pixels
+     * @return the newly created language selector
+     */
+    protected JComboBox createLanguageSelector(int width) {
+        Preconditions.checkArgument(width >= 0);
+        final JComboBox selector = new JComboBox(i18n.getSupportedLocales().toArray());
+        selector.setSelectedItem(i18n.getCurrentSupportedLocale());
+        selector.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                i18n.setLocale((SupportedLocale) selector.getSelectedItem());
+            }
+        });
+        int height = selector.getPreferredSize().height;
+        selector.setMinimumSize(new Dimension(width, height));
+        selector.setMaximumSize(new Dimension(width, height));
+        selector.setPreferredSize(new Dimension(width, height));
+        return selector;
     }
 
 }
