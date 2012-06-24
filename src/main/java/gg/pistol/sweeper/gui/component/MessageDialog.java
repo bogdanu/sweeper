@@ -25,10 +25,13 @@ import javax.annotation.Nullable;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 /**
  * A simple dialog that displays a text message.
+ *
+ * <p>Use this class only from the AWT event dispatching thread (see {@link SwingUtilities#invokeLater}).
  *
  * @author Bogdan Pistol
  */

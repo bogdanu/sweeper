@@ -27,11 +27,14 @@ import java.awt.Window;
 
 import javax.annotation.Nullable;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import com.google.common.base.Preconditions;
 
 /**
  * A JPanel that changes its layout dynamically based on locale changes.
+ *
+ * <p>Use this class only from the AWT event dispatching thread (see {@link SwingUtilities#invokeLater}).
  *
  * @author Bogdan Pistol
  */

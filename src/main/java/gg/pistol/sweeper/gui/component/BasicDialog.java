@@ -22,12 +22,15 @@ import java.awt.Window;
 
 import javax.annotation.Nullable;
 import javax.swing.JDialog;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import com.google.common.base.Preconditions;
 
 /**
  * A reusable dialog that provides basic functionality and wraps a {@link DynamicPanel}.
+ *
+ * <p>Use this class only from the AWT event dispatching thread (see {@link SwingUtilities#invokeLater}).
  *
  * @author Bogdan Pistol
  */

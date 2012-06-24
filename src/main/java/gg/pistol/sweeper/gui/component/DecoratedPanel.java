@@ -41,6 +41,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
@@ -51,6 +52,8 @@ import com.google.common.collect.Multimap;
  *
  * <p>The side image position is taking into account the locale (left-to-right or right-to-left language) and the close
  * button contains a localized string message.
+ *
+ * <p>Use this class only from the AWT event dispatching thread (see {@link SwingUtilities#invokeLater}).
  *
  * @author Bogdan Pistol
  */

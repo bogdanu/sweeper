@@ -28,12 +28,15 @@ import javax.annotation.Nullable;
 import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import com.google.common.base.Preconditions;
 
 /**
  * Internationalized confirmation dialog with confirmation and cancellation buttons.
+ *
+ * <p>Use this class only from the AWT event dispatching thread (see {@link SwingUtilities#invokeLater}).
  *
  * @author Bogdan Pistol
  */

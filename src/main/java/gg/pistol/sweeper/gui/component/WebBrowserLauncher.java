@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,8 @@ import com.google.common.base.Preconditions;
 
 /**
  * Utility class that provides functionality to access a URL address with the operating system's default web browser.
+ *
+ * <p>Use this class only from the AWT event dispatching thread (see {@link SwingUtilities#invokeLater}).
  *
  * @author Bogdan Pistol
  */
