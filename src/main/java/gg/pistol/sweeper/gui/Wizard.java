@@ -66,6 +66,7 @@ public class Wizard implements WizardPageListener {
     private final Window window;
     private final WebBrowserLauncher webBrowserLauncher;
 
+    @Nullable private JPanel pageContainer;
     @Nullable private WizardPage currentPage;
     @Nullable private JButton cancelButton;
     @Nullable private JButton backButton;
@@ -91,8 +92,10 @@ public class Wizard implements WizardPageListener {
                 contentPanel.setLayout(new BorderLayout());
                 setTitle(i18n.getString(I18n.WIZARD_TITLE_ID, I18n.APPLICATION_NAME));
 
-                getCurrentPage().onLocaleChange();
-                contentPanel.add(getCurrentPage(), BorderLayout.CENTER);
+                pageContainer = createHorizontalPanel();
+                contentPanel.add(pageContainer, BorderLayout.CENTER);
+                pageContainer.add(getCurrentPage());
+                getCurrentPage().update();
 
                 JPanel northPanel = createHorizontalPanel();
                 contentPanel.add(northPanel, BorderLayout.NORTH);
@@ -195,8 +198,14 @@ public class Wizard implements WizardPageListener {
     }
 
     private void updatePage(WizardPage page) {
+        Preconditions.checkState(pageContainer != null);
+        Preconditions.checkState(currentPage != null);
         Preconditions.checkState(page != null);
+
+        pageContainer.remove(currentPage);
         currentPage = page;
+        pageContainer.add(currentPage);
+        currentPage.update();
         onButtonStateChange();
     }
 

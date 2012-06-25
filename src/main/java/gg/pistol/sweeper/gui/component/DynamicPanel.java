@@ -57,17 +57,20 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
 
     public void onLocaleChange() {
         if (SwingUtilities.isEventDispatchThread()) {
-            localeChanged();
+            update();
         } else {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    localeChanged();
+                    update();
                 }
             });
         }
     }
 
-    private void localeChanged() {
+    /**
+     * Update the panel by removing all its components and re-adding them again according to the locale and layout.
+     */
+    public void update() {
         setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
         removeAll();
         addComponents();

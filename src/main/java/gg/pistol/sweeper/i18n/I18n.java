@@ -87,6 +87,8 @@ public class I18n {
     public static final String PAGE_WELCOME_INTRODUCTION_ID = "page.welcome.introduction";
     public static final String PAGE_WELCOME_CHANGE_LANGUAGE_ID = "page.welcome.change-language";
 
+    public static final String PAGE_TARGET_SELECTION_HEADER_ID = "page.target-selection.header";
+
     private static final String MESSAGES_BASENAME = "messages";
     private static final String[] SUPPORTED_LANGUAGES = new String[] {"en", "de", "fr", "es", "pt", "ro", "ru", "ar", "ja", "hi", "zh_CN", "zh_TW"};
 
