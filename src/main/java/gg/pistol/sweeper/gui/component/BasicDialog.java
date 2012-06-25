@@ -45,7 +45,6 @@ public class BasicDialog extends JDialog {
 
         setLayout(new BorderLayout());
         getContentPane().add(panel, BorderLayout.CENTER);
-        panel.setParentWindow(this);
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         if (owner != null) {
@@ -62,6 +61,9 @@ public class BasicDialog extends JDialog {
     @Override
     public void setVisible(boolean visible) {
         if (visible) {
+            if (panel.getParentWindow() == null) {
+                panel.setParentWindow(this);
+            }
             pack();
             if (!isVisible()) {
                 setLocationRelativeTo(getOwner());

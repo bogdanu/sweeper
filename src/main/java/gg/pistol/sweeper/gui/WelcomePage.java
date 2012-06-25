@@ -20,6 +20,7 @@ package gg.pistol.sweeper.gui;
 import gg.pistol.sweeper.core.Sweeper;
 import gg.pistol.sweeper.i18n.I18n;
 
+import javax.annotation.Nullable;
 import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -28,6 +29,8 @@ import com.google.common.base.Preconditions;
 
 // package private
 class WelcomePage extends WizardPage {
+
+    @Nullable private WizardPage nextPage;
 
     WelcomePage(I18n i18n, WizardPageListener listener, Sweeper sweeper) {
         super(Preconditions.checkNotNull(i18n), Preconditions.checkNotNull(listener), Preconditions.checkNotNull(sweeper));

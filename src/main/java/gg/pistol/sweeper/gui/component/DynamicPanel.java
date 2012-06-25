@@ -66,7 +66,7 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
             });
         }
     }
-    
+
     private void localeChanged() {
         setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
         removeAll();
@@ -95,11 +95,21 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
     public void setParentWindow(@Nullable Window parentWindow) {
         if (parentWindow == null) {
             i18n.unregisterListener(this);
+            removeAll();
         } else {
             this.parentWindow = parentWindow;
             i18n.registerListener(this);
             addComponents();
         }
+    }
+
+    /**
+     * Getter for the parent window.
+     *
+     * @return the parent window or {@code null} if none configured
+     */
+    public Window getParentWindow() {
+        return parentWindow;
     }
 
     /**

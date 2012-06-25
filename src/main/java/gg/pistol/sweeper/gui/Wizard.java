@@ -66,7 +66,7 @@ public class Wizard implements WizardPageListener {
     private final Window window;
     private final WebBrowserLauncher webBrowserLauncher;
 
-    private WizardPage currentPage;
+    @Nullable private WizardPage currentPage;
     @Nullable private JButton cancelButton;
     @Nullable private JButton backButton;
     @Nullable private JButton nextButton;
@@ -79,7 +79,6 @@ public class Wizard implements WizardPageListener {
         sweeper = new SweeperImpl();
         webBrowserLauncher = new WebBrowserLauncher(i18n);
 
-        currentPage = new WelcomePage(i18n, this, sweeper);
         window = new BasicDialog(null, createWizardPanel());
         window.setVisible(true);
     }
@@ -92,8 +91,8 @@ public class Wizard implements WizardPageListener {
                 contentPanel.setLayout(new BorderLayout());
                 setTitle(i18n.getString(I18n.WIZARD_TITLE_ID, I18n.APPLICATION_NAME));
 
-                currentPage.onLocaleChange();
-                contentPanel.add(currentPage, BorderLayout.CENTER);
+                getCurrentPage().onLocaleChange();
+                contentPanel.add(getCurrentPage(), BorderLayout.CENTER);
 
                 JPanel northPanel = createHorizontalPanel();
                 contentPanel.add(northPanel, BorderLayout.NORTH);
@@ -135,6 +134,13 @@ public class Wizard implements WizardPageListener {
         };
     }
 
+    private WizardPage getCurrentPage() {
+        if (currentPage == null) {
+            currentPage = new WelcomePage(i18n, this, sweeper);
+        }
+        return currentPage;
+    }
+
     private ActionListener helpAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -154,6 +160,7 @@ public class Wizard implements WizardPageListener {
     private ActionListener cancelAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                Preconditions.checkState(currentPage != null);
                 currentPage.cancel();
                 onButtonStateChange();
             }
@@ -163,6 +170,7 @@ public class Wizard implements WizardPageListener {
     private ActionListener backAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                Preconditions.checkState(currentPage != null);
                 updatePage(currentPage.back());
             }
         };
@@ -171,6 +179,7 @@ public class Wizard implements WizardPageListener {
     private ActionListener nextAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                Preconditions.checkState(currentPage != null);
                 updatePage(currentPage.next());
             }
         };
@@ -179,6 +188,7 @@ public class Wizard implements WizardPageListener {
     private ActionListener finishAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                Preconditions.checkState(currentPage != null);
                 updatePage(currentPage.finish());
             }
         };
@@ -191,10 +201,13 @@ public class Wizard implements WizardPageListener {
     }
 
     public void onButtonStateChange() {
+        Preconditions.checkState(currentPage != null);
         Preconditions.checkState(cancelButton != null);
         Preconditions.checkState(backButton != null);
         Preconditions.checkState(nextButton != null);
         Preconditions.checkState(finishButton != null);
+        Preconditions.checkState(closeButton != null);
+        Preconditions.checkState(languagePanel != null);
 
         cancelButton.setVisible(currentPage.isCancelButtonVisible());
         cancelButton.setEnabled(currentPage.isCancelButtonEnabled());
