@@ -108,6 +108,7 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
      *
      * @return the parent window or {@code null} if none configured
      */
+    @Nullable
     public Window getParentWindow() {
         return parentWindow;
     }

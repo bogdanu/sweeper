@@ -309,6 +309,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * @return
      */
     protected JComponent createHorizontalStrut(int width) {
+        Preconditions.checkArgument(width >= 0);
         return new Box.Filler(new Dimension(width, 0), new Dimension(width, 0), new Dimension(width, 0));
     }
 
@@ -323,6 +324,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * @return
      */
     protected JComponent createVerticalStrut(int height) {
+        Preconditions.checkArgument(height >= 0);
         return new Box.Filler(new Dimension(0, height), new Dimension(0, height), new Dimension(0, height));
     }
 

@@ -48,7 +48,6 @@ class XMLResourceBundleControl extends ResourceBundle.Control {
 
     @Override
     public List<String> getFormats(String baseName) {
-        Preconditions.checkNotNull(baseName);
         return Arrays.asList("xml");
     }
 

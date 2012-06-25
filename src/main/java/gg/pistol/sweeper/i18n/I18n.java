@@ -117,6 +117,7 @@ public class I18n {
         // 0 = no match; 1 = language match; 2 = language and country match; 3 = language, country and variant match
         int matchLevel = 0;
         SupportedLocale matchedLocale = resolveSupportedLocale(Locale.ENGLISH);
+        Preconditions.checkState(matchedLocale != null);
 
         for (SupportedLocale loc : supportedLocales) {
             int currentMatchLevel = 0;
@@ -139,6 +140,7 @@ public class I18n {
         return matchedLocale;
     }
 
+    @Nullable
     private SupportedLocale resolveSupportedLocale(Locale locale) {
         for (SupportedLocale supportedLocale : supportedLocales) {
             if (supportedLocale.getLocale().equals(locale)) {
@@ -178,6 +180,7 @@ public class I18n {
         SupportedLocale supportedLocale = resolveSupportedLocale(locale);
         if (supportedLocale == null) {
             supportedLocale = resolveSupportedLocale(Locale.ENGLISH);
+            Preconditions.checkState(supportedLocale != null);
         }
         setLocale(supportedLocale);
     }

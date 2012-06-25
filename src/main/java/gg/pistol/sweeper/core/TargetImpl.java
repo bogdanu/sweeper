@@ -327,7 +327,6 @@ class TargetImpl implements Target {
         return type;
     }
 
-    @Nullable
     public Resource getResource() {
         return resource;
     }
@@ -361,7 +360,6 @@ class TargetImpl implements Target {
         return hash;
     }
 
-    @Nullable
     public DateTime getModificationDate() {
         Preconditions.checkState(isHashed(), "not computed");
         return modificationDate;

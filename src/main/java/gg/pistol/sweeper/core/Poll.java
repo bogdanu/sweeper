@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 
 /**
@@ -85,6 +87,7 @@ class Poll implements SweeperPoll, Cloneable {
     }
 
     public Mark getMark(Target target) {
+        Preconditions.checkNotNull(target);
         Preconditions.checkState(targets.contains(target), "The target is not from this poll");
         if (toDeleteTargets.contains(target)) {
             return Mark.DELETE;
@@ -112,7 +115,7 @@ class Poll implements SweeperPoll, Cloneable {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }

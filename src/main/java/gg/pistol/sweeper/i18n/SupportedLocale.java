@@ -19,6 +19,8 @@ package gg.pistol.sweeper.i18n;
 
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 
 /**
@@ -59,7 +61,7 @@ public class SupportedLocale {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }

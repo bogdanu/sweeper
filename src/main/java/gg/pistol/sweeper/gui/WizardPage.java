@@ -24,6 +24,7 @@ import gg.pistol.sweeper.i18n.I18n;
 import java.awt.Dimension;
 import java.awt.Font;
 
+import javax.annotation.Nullable;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -74,17 +75,17 @@ abstract class WizardPage extends DecoratedPanel {
 
     abstract void cancel();
 
+    @Nullable
     abstract WizardPage back();
 
+    @Nullable
     abstract WizardPage next();
 
+    @Nullable
     abstract WizardPage finish();
 
 
     interface WizardPageListener {
-
         void onButtonStateChange();
-
     }
-
 }

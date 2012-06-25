@@ -43,6 +43,7 @@ public class ResourceDirectoryFs extends AbstractResource implements ResourceDir
                 "The provided File <" + file.getPath() + "> is not representing a directory");
         resource = file.getCanonicalFile();
         name = resource.getPath();
+        Preconditions.checkArgument(name != null, "The canonical path of the provided file is null");
     }
 
     public String getName() {

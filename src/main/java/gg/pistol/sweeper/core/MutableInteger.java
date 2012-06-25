@@ -17,6 +17,8 @@
  */
 package gg.pistol.sweeper.core;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 
@@ -85,7 +87,7 @@ class MutableInteger extends Number implements Comparable<MutableInteger> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }

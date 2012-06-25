@@ -44,6 +44,7 @@ public class ResourceFileFs extends AbstractResource implements ResourceFile {
                 "The provided File <" + file.getPath() + "> is not representing a normal file");
         resource = file.getCanonicalFile();
         name = resource.getPath();
+        Preconditions.checkArgument(name != null, "The canonical path of the provided file is null");
     }
 
     public String getName() {
