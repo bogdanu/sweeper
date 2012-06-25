@@ -26,6 +26,8 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
 
@@ -41,11 +43,13 @@ import com.google.common.base.Preconditions;
 //package private
 class XMLResourceBundle extends ResourceBundle {
     private final Properties properties;
+    private final Lock lock;
     @Nullable private Collection<String> keys;
 
     XMLResourceBundle(InputStream stream) throws InvalidPropertiesFormatException, IOException {
         Preconditions.checkNotNull(stream);
         properties = new Properties();
+        lock = new ReentrantLock();
         properties.loadFromXML(stream);
     }
 
@@ -54,11 +58,18 @@ class XMLResourceBundle extends ResourceBundle {
         return properties.getProperty(key);
     }
 
-    /*
-     * It is synchronized to ensure thread-safeness when concurrently accessing the keys.
-     */
     @Override
-    synchronized public Enumeration<String> getKeys() {
+    public Enumeration<String> getKeys() {
+        // It is synchronized to ensure thread-safeness when concurrently accessing the keys.
+        lock.lock();
+        try {
+            return getKeys0();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private Enumeration<String> getKeys0() {
         if (keys == null) {
             keys = new LinkedHashSet<String>();
             for (Object o : properties.keySet()) {

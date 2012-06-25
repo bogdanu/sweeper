@@ -27,6 +27,10 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.annotation.Nullable;
 
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +90,9 @@ public class I18n {
     private static final String MESSAGES_BASENAME = "messages";
     private static final String[] SUPPORTED_LANGUAGES = new String[] {"en", "de", "fr", "es", "pt", "ro", "ru", "ar", "ja", "hi", "zh_CN", "zh_TW"};
 
-    private final JackLogger log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(I18n.class));
+
+    private final JackLogger log;
+    private final Lock lock;
 
     private final Collection<SupportedLocale> supportedLocales;
     private final Collection<LocaleChangeListener> listeners;
@@ -99,6 +105,8 @@ public class I18n {
      * Initialize the internationalization using the default locale.
      */
     public I18n() {
+        log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(I18n.class));
+        lock = new ReentrantLock();
         supportedLocales = new ArrayList<SupportedLocale>();
         listeners = new LinkedHashSet<LocaleChangeListener>();
         resourceBundleControl = new XMLResourceBundleControl();
@@ -189,36 +197,49 @@ public class I18n {
      * Change the current locale, the registered {@link LocaleChangeListener}s will be notified.
      * If the provided {@code locale} is not supported it will fall back to the English locale.
      *
-     * @param locale
+     * @param supportedLocale
      *            the new locale
      */
-    public void setLocale(SupportedLocale locale) {
-        Preconditions.checkNotNull(locale);
-        log.info("Internationalization is configured with the language <{}>.", locale);
+    public void setLocale(SupportedLocale supportedLocale) {
+        Preconditions.checkNotNull(supportedLocale);
+        log.info("Internationalization is configured with the language <{}>.", supportedLocale);
 
-        synchronized (this) { // the locale and the resource bundle are synchronized on the monitor of the "I18n" instance
-            this.locale = locale;
-            resourceBundle = ResourceBundle.getBundle(MESSAGES_BASENAME, locale.getLocale(), resourceBundleControl);
+        Collection<LocaleChangeListener> toNotify;
+        lock.lock();
+        try {
+            locale = supportedLocale;
+            resourceBundle = ResourceBundle.getBundle(MESSAGES_BASENAME, supportedLocale.getLocale(), resourceBundleControl);
+            toNotify = new ArrayList(listeners);
+        } finally {
+            lock.unlock();
         }
-        synchronized (listeners) { // the listeners are synchronized on the monitor of the "listeners" field
-            for (LocaleChangeListener listener: listeners) {
-                listener.onLocaleChange();
-            }
+        for (LocaleChangeListener listener: toNotify) {
+            listener.onLocaleChange();
         }
     }
 
     /**
      * @return the current locale
      */
-    synchronized public Locale getLocale() {
-        return locale.getLocale();
+    public Locale getLocale() {
+        lock.lock();
+        try {
+            return locale.getLocale();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
      * @return the current supported locale
      */
-    synchronized public SupportedLocale getCurrentSupportedLocale() {
-        return locale;
+    public SupportedLocale getCurrentSupportedLocale() {
+        lock.lock();
+        try {
+            return locale;
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -230,14 +251,20 @@ public class I18n {
      *            optional arguments to be injected in the localized string
      * @return the localized string message
      */
-    synchronized public String getString(String id, String... args) {
+    public String getString(String id, @Nullable String... args) {
         Preconditions.checkNotNull(id);
-        String msg = resourceBundle.getString(id);
 
-        if (args != null && args.length > 0) {
-            msg = MessageFormat.format(msg, (Object[]) args);
+        lock.lock();
+        try {
+            String msg = resourceBundle.getString(id);
+
+            if (args != null && args.length > 0) {
+                msg = MessageFormat.format(msg, (Object[]) args);
+            }
+            return msg;
+        } finally {
+            lock.unlock();
         }
-        return msg;
     }
 
     /**
@@ -248,8 +275,11 @@ public class I18n {
      */
     public void registerListener(LocaleChangeListener listener) {
         Preconditions.checkNotNull(listener);
-        synchronized (listeners) {
+        lock.lock();
+        try {
             listeners.add(listener);
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -261,8 +291,11 @@ public class I18n {
      */
     public void unregisterListener(LocaleChangeListener listener) {
         Preconditions.checkNotNull(listener);
-        synchronized (listeners) {
+        lock.lock();
+        try {
             listeners.remove(listener);
+        } finally {
+            lock.unlock();
         }
     }
 
