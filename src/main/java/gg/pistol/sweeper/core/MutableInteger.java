@@ -25,31 +25,32 @@ import com.google.common.primitives.Ints;
  *
  * @author Bogdan Pistol
  */
-public class MutableInteger extends Number implements Comparable<MutableInteger> {
+// package private
+class MutableInteger extends Number implements Comparable<MutableInteger> {
 
     private int value;
 
-    public MutableInteger(int value) {
+    MutableInteger(int value) {
         this.value = value;
     }
 
-    public void setValue(int value) {
+    void setValue(int value) {
         this.value = value;
     }
 
-    public void increment() {
+    void increment() {
         value++;
     }
 
-    public void decrement() {
+    void decrement() {
         value--;
     }
 
-    public void add(int surplus) {
+    void add(int surplus) {
         value += surplus;
     }
 
-    public void remove(int excess) {
+    void remove(int excess) {
         value -= excess;
     }
 

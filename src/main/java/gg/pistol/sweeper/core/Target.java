@@ -58,14 +58,16 @@ public interface Target extends Comparable<Target> {
      *
      * @return the modification date or {@code null} in case the target is an empty directory
      */
-    @Nullable DateTime getModificationDate();
+    @Nullable
+    DateTime getModificationDate();
 
     /**
      * Getter for the resource wrapped by this target.
      *
      * @return the wrapped resource or {@code null} in case of a {@link Type#ROOT} target
      */
-    @Nullable Resource getResource();
+    @Nullable
+    Resource getResource();
 
     /**
      * The target types.

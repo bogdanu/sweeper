@@ -63,7 +63,7 @@ class DuplicateGroup implements Comparable<DuplicateGroup> {
         size = sizeValue;
     }
 
-    public Collection<? extends Target> getTargets() {
+    Collection<? extends Target> getTargets() {
         return targets;
     }
 

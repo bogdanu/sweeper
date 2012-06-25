@@ -43,8 +43,7 @@ class OperationTrackingListener implements SweeperOperationListener {
     // The wrapped listener.
     private final SweeperOperationListener listener;
 
-    @Nullable
-    private SweeperOperation operation;
+    @Nullable private SweeperOperation operation;
 
     private long progress;
     private long maxProgress = 1; // the smallest operation will be completed in one step
