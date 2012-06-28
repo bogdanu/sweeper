@@ -100,7 +100,7 @@ public class I18n {
     public static final String FILE_CHOOSER_SHOW_LIST_ID = "fileChooser.showList";
     public static final String FILE_CHOOSER_SHOW_DETAILS_ID = "fileChooser.showDetails";
     public static final String FILE_CHOOSER_NAME_ID = "fileChooser.name";
-    public static final String FILE_CHOOSER_FILTER_TYPE_ID = "fileChooser.filterType";
+    public static final String FILE_CHOOSER_FILTER_LABEL_ID = "fileChooser.filterLabel";
     public static final String FILE_CHOOSER_FILTER_ALL_ID = "fileChooser.filterAll";
     public static final String FILE_CHOOSER_DETAILS_NAME_ID = "fileChooser.detailsName";
     public static final String FILE_CHOOSER_DETAILS_SIZE_ID = "fileChooser.detailsSize";

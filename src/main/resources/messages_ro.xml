@@ -55,8 +55,8 @@
      <entry key="fileChooser.home">Directorul "Home"</entry>
      <entry key="fileChooser.showList">Vizualizează ca listă</entry>
      <entry key="fileChooser.showDetails">Vizualizează cu detalii</entry>
-     <entry key="fileChooser.name">Numele fişierului/directorului:</entry>
-     <entry key="fileChooser.filterType">Tipul fişierelor şi directoarelor:</entry>
+     <entry key="fileChooser.name">Nume:</entry>
+     <entry key="fileChooser.filterLabel">Filtrează:</entry>
      <entry key="fileChooser.filterAll">Toate fişierele şi directoarele</entry>
      <entry key="fileChooser.detailsName">Nume</entry>
      <entry key="fileChooser.detailsSize">Mărime</entry>

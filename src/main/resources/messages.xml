@@ -55,8 +55,8 @@
      <entry key="fileChooser.home">Home directory</entry>
      <entry key="fileChooser.showList">Show as list</entry>
      <entry key="fileChooser.showDetails">Show with details</entry>
-     <entry key="fileChooser.name">File/directory name:</entry>
-     <entry key="fileChooser.filterType">Files and directories of type:</entry>
+     <entry key="fileChooser.name">Name:</entry>
+     <entry key="fileChooser.filterLabel">Filter:</entry>
      <entry key="fileChooser.filterAll">All files and directories</entry>
      <entry key="fileChooser.detailsName">Name</entry>
      <entry key="fileChooser.detailsSize">Size</entry>
