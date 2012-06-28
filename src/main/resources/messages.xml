@@ -63,4 +63,7 @@
      <entry key="fileChooser.detailsModified">Date modified</entry>
      <entry key="fileChooser.menuView">View</entry>
      <entry key="fileChooser.menuRefresh">Refresh</entry>
+
+     <entry key="text.copy">Copy</entry>
+     <entry key="text.selectAll">Select all</entry>
 </properties>

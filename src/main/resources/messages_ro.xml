@@ -63,4 +63,7 @@
      <entry key="fileChooser.detailsModified">Data modificării</entry>
      <entry key="fileChooser.menuView">Vizualizare</entry>
      <entry key="fileChooser.menuRefresh">Reîmprospătare</entry>
+
+     <entry key="text.copy">Copiază</entry>
+     <entry key="text.selectAll">Selectează tot</entry>
 </properties>

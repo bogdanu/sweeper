@@ -39,9 +39,12 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultEditorKit;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
@@ -221,6 +224,26 @@ public abstract class DecoratedPanel extends DynamicPanel {
         textLabel.setBorder(null);
         textLabel.setOpaque(false);
         textLabel.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+        textLabel.setHorizontalAlignment(JTextField.CENTER);
+
+        final JPopupMenu contextMenu = new JPopupMenu();
+        JMenuItem copy = new JMenuItem(textLabel.getActionMap().get(DefaultEditorKit.copyAction));
+        copy.setText(i18n.getString(I18n.TEXT_COPY_ID));
+        contextMenu.add(copy);
+        contextMenu.addSeparator();
+
+        JMenuItem selectAll = new JMenuItem(textLabel.getActionMap().get(DefaultEditorKit.selectAllAction));
+        selectAll.setText(i18n.getString(I18n.TEXT_SELECT_ALL_ID));
+        contextMenu.add(selectAll);
+
+        textLabel.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    contextMenu.show(DecoratedPanel.this, e.getX() + contextMenu.getPreferredSize().width / 2,
+                            e.getY() + contextMenu.getPreferredSize().height / 2);
+                }
+            }
+        });
         return textLabel;
     }
 

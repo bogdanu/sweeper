@@ -108,6 +108,9 @@ public class I18n {
     public static final String FILE_CHOOSER_MENU_VIEW_ID = "fileChooser.menuView";
     public static final String FILE_CHOOSER_MENU_REFRESH_ID = "fileChooser.menuRefresh";
 
+    public static final String TEXT_COPY_ID = "text.copy";
+    public static final String TEXT_SELECT_ALL_ID = "text.selectAll";
+
     private static final String MESSAGES_BASENAME = "messages";
     private static final String[] SUPPORTED_LANGUAGES = new String[] {"en", "de", "fr", "es", "pt", "ro", "ru", "ar", "iw", "ja", "hi", "zh_CN", "zh_TW"};
 
