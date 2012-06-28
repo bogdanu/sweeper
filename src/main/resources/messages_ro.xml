@@ -20,19 +20,47 @@
 <properties>
     <entry key="language.name">Română</entry>
 
-    <entry key="wizard.title">{0} - Curăţă fişierele/directoarele duplicate</entry>
+    <entry key="label.error">Eroare</entry>
 
-    <entry key="webbrowser.nobrowser">Nu s-a putut deschide navigatorul web! Pentru a accesa conţinutul vă rugăm să vizitaţi:</entry>
-
-    <entry key="wizard.button.help">Ajutor</entry>
-    <entry key="wizard.button.about">Despre</entry>
-    <entry key="wizard.button.cancel">Anulează</entry>
-    <entry key="wizard.button.back">&lt; Înapoi</entry>
-    <entry key="wizard.button.next">Înainte &gt;</entry>
-    <entry key="wizard.button.finish">Finalizează</entry>
-
+    <entry key="button.ok">Bine</entry>
+    <entry key="button.cancel">Anulează</entry>
+    <entry key="button.add">Adaugă</entry>
+    <entry key="button.remove">Elimină</entry>
+    <entry key="button.help">Ajutor</entry>
+    <entry key="button.about">Despre</entry>
+    <entry key="button.finish">Termină</entry>
     <entry key="button.close">Închide</entry>
 
-    <entry key="about.label.website">Website</entry>
+    <entry key="wizard.title">{0} - Curăţă fişierele duplicate</entry>
+    <entry key="wizard.languageSelector">Limbă</entry>
+    <entry key="wizard.error.open">Programul nu poate porni din cauza unei erori. Mesajul de eroare este:</entry>
+    <entry key="wizard.button.back">&lt; Înapoi</entry>
+    <entry key="wizard.button.next">Înainte &gt;</entry>
+
+    <entry key="webBrowserLauncher.error">Nu pot deschide navigatorul Web! Pentru a accesa conţinutul vă rugăm să vizitaţi:</entry>
+
+    <entry key="about.website">Site Web:</entry>
     <entry key="about.button.license">Licenţă</entry>
+
+    <entry key="page.welcome.header">Bun venit</entry>
+    <entry key="page.welcome.introduction">Acest program vă va ghida pentru a descoperi şi a curăţa fişierele şi directoarele duplicate.</entry>
+    <entry key="page.welcome.changeLanguage">Vă rugăm să alegeţi limba preferată</entry>
+
+    <entry key="page.targetSelection.header">Alegeţi fişierele şi directoarele dorite pentru a le analiza</entry>
+    <entry key="page.targetSelection.introduction">Analiza va căuta fişiere şi directoare duplicate.</entry>
+    <entry key="page.targetSelection.fileChooser.title">Selectaţi fişierele şi directoarele</entry>
+
+     <entry key="fileChooser.currentDirectory">Directorul curent</entry>
+     <entry key="fileChooser.up">Directorul părinte</entry>
+     <entry key="fileChooser.home">Directorul "Home"</entry>
+     <entry key="fileChooser.showList">Vizualizează ca listă</entry>
+     <entry key="fileChooser.showDetails">Vizualizează cu detalii</entry>
+     <entry key="fileChooser.name">Numele fişierului/directorului:</entry>
+     <entry key="fileChooser.filterType">Tipul fişierelor şi directoarelor:</entry>
+     <entry key="fileChooser.filterAll">Toate fişierele şi directoarele</entry>
+     <entry key="fileChooser.detailsName">Nume</entry>
+     <entry key="fileChooser.detailsSize">Mărime</entry>
+     <entry key="fileChooser.detailsModified">Data modificării</entry>
+     <entry key="fileChooser.menuView">Vizualizare</entry>
+     <entry key="fileChooser.menuRefresh">Reîmprospătare</entry>
 </properties>
