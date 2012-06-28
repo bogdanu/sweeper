@@ -28,6 +28,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.google.common.base.Preconditions;
+
 /**
  * A simple dialog that displays a text message.
  *
@@ -37,7 +39,30 @@ import javax.swing.UIManager;
  */
 public class MessageDialog {
 
-    public MessageDialog(@Nullable Window owner, Type type, I18n i18n, final String title, final String message) {
+    /**
+     * Displays a message in a dialog box with optionally an extra selectable message (a text that can be selected for
+     * copy & paste purposes).
+     *
+     * @param owner
+     *            the parent window of the dialog box or {@code null} for no parent
+     * @param type
+     *            the type of message will affect the icon displayed on the dialog box
+     * @param i18n
+     *            internationalization
+     * @param title
+     *            the title of the dialog box
+     * @param message
+     *            the message to display
+     * @param selectableMessage
+     *            the extra selectable message or {@code null}
+     */
+    public MessageDialog(@Nullable Window owner, MessageType type, I18n i18n, final String title, final String message,
+            @Nullable final String selectableMessage) {
+        Preconditions.checkNotNull(type);
+        Preconditions.checkNotNull(i18n);
+        Preconditions.checkNotNull(title);
+        Preconditions.checkNotNull(message);
+
         Icon image = null;
         switch (type) {
         case INFORMATION:
@@ -54,7 +79,13 @@ public class MessageDialog {
             @Override
             protected void addComponents(JPanel contentPanel) {
                 setTitle(title);
-                contentPanel.add(new JLabel(message));
+                contentPanel.add(createVerticalStrut(5));
+                contentPanel.add(alignCenter(new JLabel(message)));
+                if (selectableMessage != null) {
+                    contentPanel.add(createVerticalStrut(5));
+                    contentPanel.add(alignCenter(createTextLabel(selectableMessage)));
+                }
+                contentPanel.add(createVerticalStrut(15));
             }
         };
         BasicDialog dialog = new BasicDialog(owner, panel);
@@ -64,7 +95,7 @@ public class MessageDialog {
     /**
      * Dialog types
      */
-    public static enum Type {
+    public static enum MessageType {
         PLAIN, INFORMATION, WARNING, ERROR
     }
 

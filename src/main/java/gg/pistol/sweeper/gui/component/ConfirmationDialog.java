@@ -17,7 +17,6 @@
  */
 package gg.pistol.sweeper.gui.component;
 
-import gg.pistol.sweeper.gui.component.MessageDialog.Type;
 import gg.pistol.sweeper.i18n.I18n;
 
 import java.awt.Window;
@@ -42,29 +41,38 @@ import com.google.common.base.Preconditions;
  */
 public class ConfirmationDialog {
 
+    private static final String BUTTON_GROUP = "buttons";
+
     private boolean confirmed;
 
-    public ConfirmationDialog(@Nullable Window owner, Type type, I18n i18n, final String title, final String message) {
-        Preconditions.checkNotNull(type);
+    public ConfirmationDialog(@Nullable Window owner, I18n i18n, final String title, final String message) {
         Preconditions.checkNotNull(i18n);
         Preconditions.checkNotNull(title);
         Preconditions.checkNotNull(message);
 
-        DecoratedPanel panel = new DecoratedPanel(i18n, false, UIManager.getIcon("OptionPane.questionIcon")) {
+        DecoratedPanel panel = new DecoratedPanel(i18n, false, null) {
             @Override
             protected void addComponents(JPanel contentPanel) {
                 Preconditions.checkNotNull(contentPanel);
                 setTitle(title);
-                contentPanel.add(alignLeft(new JLabel(message)));
+
+                JPanel messagePanel = createHorizontalPanel();
+                contentPanel.add(alignCenter(messagePanel));
+                messagePanel.add(new JLabel(UIManager.getIcon("OptionPane.questionIcon")));
+                messagePanel.add(createHorizontalStrut(5));
+                messagePanel.add(new JLabel(message));
+
+                messagePanel.add(Box.createHorizontalGlue());
+
                 contentPanel.add(createVerticalStrut(20));
 
                 JPanel buttons = createHorizontalPanel();
-                contentPanel.add(alignLeft(buttons));
+                contentPanel.add(alignCenter((buttons)));
 
                 buttons.add(Box.createHorizontalGlue());
-                buttons.add(createButton(i18n.getString(I18n.BUTTON_CANCEL_ID), closeAction()));
+                buttons.add(createButton(i18n.getString(I18n.BUTTON_OK_ID), okAction(parentWindow), BUTTON_GROUP));
                 buttons.add(createHorizontalStrut(20));
-                buttons.add(createButton(i18n.getString(I18n.BUTTON_OK_ID), okAction(parentWindow)));
+                buttons.add(createButton(i18n.getString(I18n.BUTTON_CANCEL_ID), closeAction(), BUTTON_GROUP));
                 buttons.add(Box.createHorizontalGlue());
             }
         };
