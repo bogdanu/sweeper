@@ -19,6 +19,7 @@ package gg.pistol.sweeper.gui.component;
 
 import gg.pistol.lumberjack.JackLogger;
 import gg.pistol.lumberjack.JackLoggerFactory;
+import gg.pistol.sweeper.gui.component.MessageDialog.MessageType;
 import gg.pistol.sweeper.i18n.I18n;
 
 import java.awt.Desktop;
@@ -26,10 +27,8 @@ import java.awt.Window;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.annotation.Nullable;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import org.slf4j.LoggerFactory;
 
@@ -58,11 +57,11 @@ public class WebBrowserLauncher {
      * @param url
      *            the web address to access
      * @param parentWindow
-     *            in case of error this parameter specifies which window will be the parent of the error dialog box
+     *            in case of error this parameter specifies which window will be the parent of the error dialog box,
+     *            this parameter can be {@code null} for no parent
      */
-    public void openWebBrowser(final String url, Window parentWindow) {
+    public void openWebBrowser(final String url, @Nullable Window parentWindow) {
         Preconditions.checkNotNull(url);
-        Preconditions.checkNotNull(parentWindow);
 
         URI uri = null;
         try {
@@ -82,16 +81,8 @@ public class WebBrowserLauncher {
         }
         if (nobrowser) {
             log.warn("Could not open the operating system default web browser.");
-            DecoratedPanel panel = new DecoratedPanel(i18n, true, UIManager.getIcon("OptionPane.warningIcon")) {
-                @Override
-                protected void addComponents(JPanel contentPanel) {
-                    setTitle(i18n.getString(I18n.LABEL_ERROR_ID));
-                    contentPanel.add(new JLabel(i18n.getString(I18n.WEB_BROWSER_LAUNCHER_ERROR_ID) + " "));
-                    contentPanel.add(createTextLabel(url));
-                }
-            };
-            BasicDialog dialog = new BasicDialog(parentWindow, panel);
-            dialog.setVisible(true);
+            new MessageDialog(parentWindow, MessageType.ERROR, i18n, i18n.getString(I18n.LABEL_ERROR_ID),
+                    i18n.getString(I18n.WEB_BROWSER_LAUNCHER_ERROR_ID), url);
         }
     }
 
