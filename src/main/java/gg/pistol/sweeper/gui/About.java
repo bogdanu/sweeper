@@ -30,9 +30,9 @@ import java.awt.event.ActionListener;
 
 import javax.annotation.Nullable;
 import javax.swing.Box;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import com.google.common.base.Preconditions;
@@ -116,7 +116,7 @@ class About {
                 license.setCursor(new Cursor(Cursor.TEXT_CURSOR));
                 license.setOpaque(false);
 
-                JScrollPane scroll = new JScrollPane(license);
+                JComponent scroll = addScrollPane(license);
                 scroll.setBorder(null);
 
                 contentPanel.add(scroll);

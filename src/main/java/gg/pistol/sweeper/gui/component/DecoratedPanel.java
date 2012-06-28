@@ -42,6 +42,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
@@ -430,6 +431,21 @@ public abstract class DecoratedPanel extends DynamicPanel {
         JButton button = new JButton(text);
         button.addActionListener(action);
         return sizeGroup(sizeGroupId, button);
+    }
+
+    /**
+     * Helper method to add an internationalized scroll pane (that is sensible to the left-to-right or right-to-left
+     * languages) to the provided {@code component}.
+     *
+     * @param component
+     *            the component to wrap inside the scroll pane
+     * @return the newly created scroll pane that wraps the provided {@code component}
+     */
+    protected JComponent addScrollPane(JComponent component) {
+        Preconditions.checkNotNull(component);
+        JScrollPane scrollPane = new JScrollPane(component);
+        scrollPane.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
+        return scrollPane;
     }
 
     /**
