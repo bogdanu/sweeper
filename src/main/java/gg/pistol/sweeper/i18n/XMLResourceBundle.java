@@ -40,7 +40,7 @@ import com.google.common.base.Preconditions;
  *
  * @author Bogdan Pistol
  */
-//package private
+// package private
 class XMLResourceBundle extends ResourceBundle {
     private final Properties properties;
     private final Lock lock;

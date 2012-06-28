@@ -23,6 +23,7 @@ import gg.pistol.sweeper.i18n.I18n;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Window;
 
 import javax.annotation.Nullable;
 import javax.swing.JLabel;
@@ -30,7 +31,7 @@ import javax.swing.JPanel;
 
 import com.google.common.base.Preconditions;
 
-//package private
+// package private
 abstract class WizardPage extends DecoratedPanel {
 
     protected final WizardPageListener listener;
@@ -87,5 +88,7 @@ abstract class WizardPage extends DecoratedPanel {
 
     interface WizardPageListener {
         void onButtonStateChange();
+
+        Window getWindow();
     }
 }

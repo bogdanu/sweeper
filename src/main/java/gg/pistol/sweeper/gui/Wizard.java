@@ -27,6 +27,8 @@ import gg.pistol.sweeper.gui.component.BasicDialog;
 import gg.pistol.sweeper.gui.component.DecoratedPanel;
 import gg.pistol.sweeper.gui.component.DynamicPanel;
 import gg.pistol.sweeper.gui.component.MessageDialog;
+import gg.pistol.sweeper.gui.component.MessageDialog.MessageType;
+import gg.pistol.sweeper.gui.component.SwingMessages;
 import gg.pistol.sweeper.gui.component.WebBrowserLauncher;
 import gg.pistol.sweeper.i18n.I18n;
 
@@ -117,9 +119,9 @@ public class Wizard implements WizardPageListener {
                 southPanel.add(buttons, BorderLayout.SOUTH);
                 buttons.setBorder(BorderFactory.createEmptyBorder(7, 0, 0, 0));
 
-                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_HELP_ID), helpAction(), BUTTON_GROUP));
+                buttons.add(createButton(i18n.getString(I18n.BUTTON_HELP_ID), helpAction(), BUTTON_GROUP));
                 buttons.add(createHorizontalStrut(5));
-                buttons.add(createButton(i18n.getString(I18n.WIZARD_BUTTON_ABOUT_ID), aboutAction(), BUTTON_GROUP));
+                buttons.add(createButton(i18n.getString(I18n.BUTTON_ABOUT_ID), aboutAction(), BUTTON_GROUP));
                 buttons.add(Box.createHorizontalGlue());
                 buttons.add(createHorizontalStrut(40));
 
@@ -129,7 +131,7 @@ public class Wizard implements WizardPageListener {
                 buttons.add(createHorizontalStrut(5));
                 buttons.add(nextButton = createButton(i18n.getString(I18n.WIZARD_BUTTON_NEXT_ID), nextAction(), BUTTON_GROUP));
                 buttons.add(createHorizontalStrut(10));
-                buttons.add(finishButton = createButton(i18n.getString(I18n.WIZARD_BUTTON_FINISH_ID), finishAction(), BUTTON_GROUP));
+                buttons.add(finishButton = createButton(i18n.getString(I18n.BUTTON_FINISH_ID), finishAction(), BUTTON_GROUP));
                 buttons.add(closeButton = createButton(i18n.getString(I18n.BUTTON_CLOSE_ID), closeAction(), BUTTON_GROUP));
 
                 onButtonStateChange();
@@ -229,6 +231,10 @@ public class Wizard implements WizardPageListener {
         languagePanel.setVisible(currentPage.isLanguageSelectorVisible());
     }
 
+    public Window getWindow() {
+        return window;
+    }
+
     /**
      * Open the wizard window.
      */
@@ -239,11 +245,12 @@ public class Wizard implements WizardPageListener {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
+                    i18n.registerListener(new SwingMessages(i18n));
                     new Wizard(i18n);
-                } catch(SweeperException e) {
+                } catch(Exception e) {
                     LOG.error("Exception thrown while opening the wizard:", e);
-                    new MessageDialog(null, MessageDialog.Type.ERROR, i18n, i18n.getString(I18n.LABEL_ERROR_ID),
-                            i18n.getString(I18n.WIZARD_ERROR_OPEN_ID, e.getLocalizedMessage()));
+                    new MessageDialog(null, MessageType.ERROR, i18n, i18n.getString(I18n.LABEL_ERROR_ID),
+                            i18n.getString(I18n.WIZARD_ERROR_OPEN_ID), e.getLocalizedMessage());
                 }
             }
         });
