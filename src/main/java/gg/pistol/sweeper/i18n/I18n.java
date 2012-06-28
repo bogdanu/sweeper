@@ -65,32 +65,51 @@ public class I18n {
     public static final String LANGUAGE_NAME_ID = "language.name";
 
     public static final String LABEL_ERROR_ID = "label.error";
-    public static final String BUTTON_CLOSE_ID = "button.close";
+
     public static final String BUTTON_OK_ID = "button.ok";
     public static final String BUTTON_CANCEL_ID = "button.cancel";
+    public static final String BUTTON_ADD_ID = "button.add";
+    public static final String BUTTON_REMOVE_ID = "button.remove";
+    public static final String BUTTON_HELP_ID = "button.help";
+    public static final String BUTTON_ABOUT_ID = "button.about";
+    public static final String BUTTON_FINISH_ID = "button.finish";
+    public static final String BUTTON_CLOSE_ID = "button.close";
 
     public static final String WIZARD_TITLE_ID = "wizard.title";
-    public static final String WIZARD_CHANGE_LANGUAGE_ID = "wizard.language-selector";
-    public static final String WIZARD_BUTTON_HELP_ID = "wizard.button.help";
-    public static final String WIZARD_BUTTON_ABOUT_ID = "wizard.button.about";
+    public static final String WIZARD_CHANGE_LANGUAGE_ID = "wizard.languageSelector";
+    public static final String WIZARD_ERROR_OPEN_ID = "wizard.error.open";
     public static final String WIZARD_BUTTON_BACK_ID = "wizard.button.back";
     public static final String WIZARD_BUTTON_NEXT_ID = "wizard.button.next";
-    public static final String WIZARD_BUTTON_FINISH_ID = "wizard.button.finish";
-    public static final String WIZARD_ERROR_OPEN_ID = "wizard.error.open";
 
-    public static final String WEB_BROWSER_LAUNCHER_ERROR_ID = "web-browser-launcher.error";
+    public static final String WEB_BROWSER_LAUNCHER_ERROR_ID = "webBrowserLauncher.error";
 
     public static final String ABOUT_WEBSITE_ID = "about.website";
     public static final String ABOUT_BUTTON_LICENSE_ID = "about.button.license";
 
     public static final String PAGE_WELCOME_HEADER_ID = "page.welcome.header";
     public static final String PAGE_WELCOME_INTRODUCTION_ID = "page.welcome.introduction";
-    public static final String PAGE_WELCOME_CHANGE_LANGUAGE_ID = "page.welcome.change-language";
+    public static final String PAGE_WELCOME_CHANGE_LANGUAGE_ID = "page.welcome.changeLanguage";
 
-    public static final String PAGE_TARGET_SELECTION_HEADER_ID = "page.target-selection.header";
+    public static final String PAGE_TARGET_SELECTION_HEADER_ID = "page.targetSelection.header";
+    public static final String PAGE_TARGET_SELECTION_INTRODUCTION_ID = "page.targetSelection.introduction";
+    public static final String PAGE_TARGET_SELECTION_FILE_CHOOSER_TITLE_ID = "page.targetSelection.fileChooser.title";
+
+    public static final String FILE_CHOOSER_CURRENT_DIRECTORY_ID = "fileChooser.currentDirectory";
+    public static final String FILE_CHOOSER_UP_ID = "fileChooser.up";
+    public static final String FILE_CHOOSER_HOME_ID = "fileChooser.home";
+    public static final String FILE_CHOOSER_SHOW_LIST_ID = "fileChooser.showList";
+    public static final String FILE_CHOOSER_SHOW_DETAILS_ID = "fileChooser.showDetails";
+    public static final String FILE_CHOOSER_NAME_ID = "fileChooser.name";
+    public static final String FILE_CHOOSER_FILTER_TYPE_ID = "fileChooser.filterType";
+    public static final String FILE_CHOOSER_FILTER_ALL_ID = "fileChooser.filterAll";
+    public static final String FILE_CHOOSER_DETAILS_NAME_ID = "fileChooser.detailsName";
+    public static final String FILE_CHOOSER_DETAILS_SIZE_ID = "fileChooser.detailsSize";
+    public static final String FILE_CHOOSER_DETAILS_MODIFIED_ID = "fileChooser.detailsModified";
+    public static final String FILE_CHOOSER_MENU_VIEW_ID = "fileChooser.menuView";
+    public static final String FILE_CHOOSER_MENU_REFRESH_ID = "fileChooser.menuRefresh";
 
     private static final String MESSAGES_BASENAME = "messages";
-    private static final String[] SUPPORTED_LANGUAGES = new String[] {"en", "de", "fr", "es", "pt", "ro", "ru", "ar", "ja", "hi", "zh_CN", "zh_TW"};
+    private static final String[] SUPPORTED_LANGUAGES = new String[] {"en", "de", "fr", "es", "pt", "ro", "ru", "ar", "iw", "ja", "hi", "zh_CN", "zh_TW"};
 
 
     private final JackLogger log;
@@ -215,6 +234,7 @@ public class I18n {
         } finally {
             lock.unlock();
         }
+        Locale.setDefault(locale.getLocale());
         for (LocaleChangeListener listener: toNotify) {
             listener.onLocaleChange();
         }

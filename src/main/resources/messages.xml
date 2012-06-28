@@ -21,27 +21,46 @@
     <entry key="language.name">English</entry>
 
     <entry key="label.error">Error</entry>
-    <entry key="button.close">Close</entry>
+
     <entry key="button.ok">OK</entry>
     <entry key="button.cancel">Cancel</entry>
+    <entry key="button.add">Add</entry>
+    <entry key="button.remove">Remove</entry>
+    <entry key="button.help">Help</entry>
+    <entry key="button.about">About</entry>
+    <entry key="button.finish">Finish</entry>
+    <entry key="button.close">Close</entry>
 
-    <entry key="wizard.title">{0} - Duplicate file/directory cleaner</entry>
-    <entry key="wizard.language-selector">Language</entry>
-    <entry key="wizard.button.help">Help</entry>
-    <entry key="wizard.button.about">About</entry>
+    <entry key="wizard.title">{0} - Duplicate file cleaner</entry>
+    <entry key="wizard.languageSelector">Language</entry>
+    <entry key="wizard.error.open">The application cannot start because an error occurred. The error message is:</entry>
     <entry key="wizard.button.back">&lt; Back</entry>
     <entry key="wizard.button.next">Next &gt;</entry>
-    <entry key="wizard.button.finish">Finish</entry>
-    <entry key="wizard.error.open">The application cannot start because an error occurred. The error message is "{0}".</entry>
 
-    <entry key="web-browser-launcher.error">Could not open the web browser! To view the content please visit:</entry>
+    <entry key="webBrowserLauncher.error">Could not open the web browser! To view the content please visit:</entry>
 
-    <entry key="about.website">Website</entry>
+    <entry key="about.website">Website:</entry>
     <entry key="about.button.license">License</entry>
 
     <entry key="page.welcome.header">Welcome</entry>
     <entry key="page.welcome.introduction">This wizard will guide you to discover and clean your duplicate files and directories.</entry>
-    <entry key="page.welcome.change-language">Please choose your preferred language</entry>
+    <entry key="page.welcome.changeLanguage">Please choose your preferred language</entry>
 
-    <entry key="page.target-selection.header">Analyze files and directories</entry>
+    <entry key="page.targetSelection.header">Choose the files and directories to analyze</entry>
+    <entry key="page.targetSelection.introduction">The analysis will search for duplicate files and directories.</entry>
+    <entry key="page.targetSelection.fileChooser.title">Select files and directories</entry>
+
+     <entry key="fileChooser.currentDirectory">Current directory</entry>
+     <entry key="fileChooser.up">Parent directory</entry>
+     <entry key="fileChooser.home">Home directory</entry>
+     <entry key="fileChooser.showList">Show as list</entry>
+     <entry key="fileChooser.showDetails">Show with details</entry>
+     <entry key="fileChooser.name">File/directory name:</entry>
+     <entry key="fileChooser.filterType">Files and directories of type:</entry>
+     <entry key="fileChooser.filterAll">All files and directories</entry>
+     <entry key="fileChooser.detailsName">Name</entry>
+     <entry key="fileChooser.detailsSize">Size</entry>
+     <entry key="fileChooser.detailsModified">Date modified</entry>
+     <entry key="fileChooser.menuView">View</entry>
+     <entry key="fileChooser.menuRefresh">Refresh</entry>
 </properties>
