@@ -19,7 +19,6 @@ package gg.pistol.sweeper.core.resource;
 
 import javax.annotation.Nullable;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ComparisonChain;
 
@@ -47,7 +46,7 @@ abstract class AbstractResource implements Resource {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).add("name", getName()).toString();
+        return getName();
     }
 
 }
