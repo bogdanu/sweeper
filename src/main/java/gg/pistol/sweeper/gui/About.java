@@ -63,7 +63,7 @@ class About {
             @Override
             protected void addComponents(JPanel contentPanel) {
                 Preconditions.checkNotNull(contentPanel);
-                setTitle(i18n.getString(I18n.WIZARD_BUTTON_ABOUT_ID));
+                setTitle(i18n.getString(I18n.BUTTON_ABOUT_ID));
 
                 contentPanel.add(alignLeft(new JLabel(I18n.APPLICATION_NAME)));
                 contentPanel.add(createVerticalStrut(3));
@@ -71,7 +71,7 @@ class About {
                 contentPanel.add(createVerticalStrut(30));
 
                 JPanel linkPanel = createHorizontalPanel();
-                linkPanel.add(new JLabel(i18n.getString(I18n.ABOUT_WEBSITE_ID) + ": "));
+                linkPanel.add(new JLabel(i18n.getString(I18n.ABOUT_WEBSITE_ID) + " "));
                 linkPanel.add(createLink(WEBSITE_URL, websiteAction()));
                 contentPanel.add(alignLeft(linkPanel));
 
