@@ -56,6 +56,10 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
     }
 
     public void onLocaleChange() {
+        /*
+         * Ensure that the update() method is called only from the AWT event dispatching thread.
+         * This is required because the onLocaleChange() method is called without knowing that this is a Swing component.
+         */
         if (SwingUtilities.isEventDispatchThread()) {
             update();
         } else {

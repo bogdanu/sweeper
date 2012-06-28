@@ -118,8 +118,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
         if (sideImage != null) {
             addSideImage();
         }
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        JPanel contentPanel = createVerticalPanel();
         add(contentPanel, BorderLayout.CENTER);
 
         addComponents(contentPanel);
@@ -163,8 +162,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
     protected abstract void addComponents(JPanel contentPanel);
 
     private void addSideImage() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JPanel panel = createVerticalPanel();
         panel.add(new JLabel(sideImage));
         panel.add(Box.createVerticalGlue());
 
@@ -287,6 +285,19 @@ public abstract class DecoratedPanel extends DynamicPanel {
     }
 
     /**
+     * Helper method to set the center alignment.
+     *
+     * @param component
+     *            the component to align
+     * @return the aligned component
+     */
+    protected <T extends JComponent> T alignCenter(T component) {
+        Preconditions.checkNotNull(component);
+        component.setAlignmentX(Component.CENTER_ALIGNMENT);
+        return component;
+    }
+
+    /**
      * Helper factory method for creating a horizontal box layout {@link JPanel} that takes into account the locale.
      *
      * @return the created panel
@@ -295,6 +306,17 @@ public abstract class DecoratedPanel extends DynamicPanel {
         JPanel panel = new JPanel();
         panel.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+        return panel;
+    }
+
+    /**
+     * Helper factory method for creating a vertical box layout {@link JPanel}.
+     *
+     * @return the created panel
+     */
+    protected JPanel createVerticalPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         return panel;
     }
 
