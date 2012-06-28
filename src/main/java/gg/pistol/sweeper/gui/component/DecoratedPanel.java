@@ -143,6 +143,8 @@ public abstract class DecoratedPanel extends DynamicPanel {
             width += 2;
 
             for (JComponent component : sizeGroups.get(key)) {
+                component.setMinimumSize(new Dimension(width, height));
+                component.setMaximumSize(new Dimension(width, height));
                 component.setPreferredSize(new Dimension(width, height));
             }
         }
@@ -184,7 +186,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
         panel.add(Box.createHorizontalGlue());
         button.addActionListener(closeAction());
 
-        panel.setBorder(BorderFactory.createEmptyBorder(0, border, border, border));
+        panel.setBorder(BorderFactory.createEmptyBorder(border, 0, 0, 0));
         add(panel, BorderLayout.SOUTH);
     }
 
@@ -427,6 +429,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
         selector.setMinimumSize(new Dimension(width, height));
         selector.setMaximumSize(new Dimension(width, height));
         selector.setPreferredSize(new Dimension(width, height));
+        selector.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
         return selector;
     }
 
