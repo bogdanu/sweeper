@@ -1,5 +1,5 @@
 /*
- * Sweeper - Duplicate file/folder cleaner
+ * Sweeper - Duplicate file cleaner
  * Copyright (C) 2012 Bogdan Ciprian Pistol
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,7 +49,7 @@ public class I18n {
     public static final String APPLICATION_NAME = "Sweeper";
     public static final String COPYRIGHT = "Copyright (C) 2012 Bogdan Ciprian Pistol";
 
-    public static final String LICENSE = "Sweeper - Duplicate file/folder cleaner\n"
+    public static final String LICENSE = "Sweeper - Duplicate file cleaner\n"
             + COPYRIGHT + "\n\n"
             + "This program is free software: you can redistribute it and/or modify\n"
             + "it under the terms of the GNU General Public License as published by\n"

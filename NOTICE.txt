@@ -1,4 +1,4 @@
-Sweeper - Duplicate file/folder cleaner
+Sweeper - Duplicate file cleaner
 Copyright (C) 2012 Bogdan Ciprian Pistol
 
 This product depends on the logging library SLF4J (http://www.slf4j.org/),
