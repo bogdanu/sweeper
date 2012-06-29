@@ -37,6 +37,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -59,6 +60,7 @@ class ResourceSelectionPage extends WizardPage {
     private final DefaultListModel resources;
     @Nullable private JList resourceList;
     @Nullable private File latestOpenedDirectory;
+    @Nullable private JButton removeButton;
 
     ResourceSelectionPage(WizardPage previousPage, I18n i18n, WizardPageListener listener, Sweeper sweeper) {
         super(Preconditions.checkNotNull(i18n), Preconditions.checkNotNull(listener), Preconditions.checkNotNull(sweeper));
@@ -81,13 +83,17 @@ class ResourceSelectionPage extends WizardPage {
         contentPanel.add(alignLeft(selectionPanel));
 
         selectionPanel.add(addScrollPane(resourceList = new JList(resources)));
+        if (!resources.isEmpty()) {
+            resourceList.setSelectedIndex(0);
+        }
         selectionPanel.add(createHorizontalStrut(10));
 
         JPanel buttons = createVerticalPanel();
         selectionPanel.add(buttons);
         buttons.add(createButton(i18n.getString(I18n.BUTTON_ADD_ID), addAction(), BUTTON_GROUP));
         buttons.add(createVerticalStrut(5));
-        buttons.add(createButton(i18n.getString(I18n.BUTTON_REMOVE_ID), removeAction(), BUTTON_GROUP));
+        buttons.add(removeButton = createButton(i18n.getString(I18n.BUTTON_REMOVE_ID), removeAction(), BUTTON_GROUP));
+        removeButton.setEnabled(!resources.isEmpty());
         buttons.add(Box.createVerticalGlue());
 
         contentPanel.add(createVerticalStrut(15));
@@ -168,12 +174,29 @@ class ResourceSelectionPage extends WizardPage {
 
         if (latestResource != null) {
             resourceList.setSelectedValue(latestResource, true);
+            removeButton.setEnabled(true);
+            listener.onButtonStateChange();
         }
     }
 
     private ActionListener removeAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                int[] indexes = resourceList.getSelectedIndices();
+                if (indexes == null || indexes.length == 0) {
+                    return;
+                }
+                for (int i = indexes.length - 1; i >= 0; i--) {
+                    resources.remove(indexes[i]);
+                }
+                if (indexes[0] > 0) {
+                    resourceList.setSelectedValue(resources.get(indexes[0] - 1), true);
+                } else if (!resources.isEmpty()) {
+                    resourceList.setSelectedValue(resources.get(0), true);
+                } else {
+                    removeButton.setEnabled(false);
+                    listener.onButtonStateChange();
+                }
             }
         };
     }
@@ -200,7 +223,7 @@ class ResourceSelectionPage extends WizardPage {
 
     @Override
     boolean isNextButtonEnabled() {
-        return true;
+        return !resources.isEmpty();
     }
 
     @Override
