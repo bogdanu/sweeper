@@ -46,9 +46,10 @@
     <entry key="page.welcome.introduction">This wizard will guide you to discover and clean your duplicate files and directories.</entry>
     <entry key="page.welcome.changeLanguage">Please choose your preferred language</entry>
 
-    <entry key="page.targetSelection.header">Choose the files and directories to analyze</entry>
-    <entry key="page.targetSelection.introduction">The analysis will search for duplicate files and directories.</entry>
-    <entry key="page.targetSelection.fileChooser.title">Select files and directories</entry>
+    <entry key="page.resourceSelection.header">Choose the files and directories to analyze</entry>
+    <entry key="page.resourceSelection.introduction">The analysis will search for duplicate files and directories.</entry>
+    <entry key="page.resourceSelection.fileChooser.title">Select files and directories</entry>
+    <entry key="page.resourceSelection.fileChooser.resourceError">Encountered errors while trying to read the following resources:</entry>
 
      <entry key="fileChooser.currentDirectory">Current directory</entry>
      <entry key="fileChooser.up">Parent directory</entry>

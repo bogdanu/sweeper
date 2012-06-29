@@ -106,7 +106,7 @@ class WelcomePage extends WizardPage {
     @Override
     WizardPage next() {
         if (nextPage == null) {
-            nextPage = new TargetSelectionPage(this, i18n, listener, sweeper);
+            nextPage = new ResourceSelectionPage(this, i18n, listener, sweeper);
         }
         return nextPage;
     }

@@ -17,17 +17,22 @@
  */
 package gg.pistol.sweeper.gui;
 
+import gg.pistol.lumberjack.JackLogger;
+import gg.pistol.lumberjack.JackLoggerFactory;
 import gg.pistol.sweeper.core.Sweeper;
 import gg.pistol.sweeper.core.resource.Resource;
 import gg.pistol.sweeper.core.resource.ResourceDirectoryFs;
 import gg.pistol.sweeper.core.resource.ResourceFileFs;
+import gg.pistol.sweeper.gui.component.MessageDialog;
+import gg.pistol.sweeper.gui.component.MessageDialog.MessageType;
 import gg.pistol.sweeper.i18n.I18n;
 
 import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.swing.Box;
@@ -38,20 +43,28 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
 // package private
-class TargetSelectionPage extends WizardPage {
+class ResourceSelectionPage extends WizardPage {
 
     private static final String BUTTON_GROUP = "buttons";
 
+    private final JackLogger log;
+
     private final WizardPage previousPage;
     private final DefaultListModel resources;
+    @Nullable private JList resourceList;
     @Nullable private File latestOpenedDirectory;
 
-    TargetSelectionPage(WizardPage previousPage, I18n i18n, WizardPageListener listener, Sweeper sweeper) {
+    ResourceSelectionPage(WizardPage previousPage, I18n i18n, WizardPageListener listener, Sweeper sweeper) {
         super(Preconditions.checkNotNull(i18n), Preconditions.checkNotNull(listener), Preconditions.checkNotNull(sweeper));
         Preconditions.checkNotNull(previousPage);
+
+        log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(ResourceSelectionPage.class));
         this.previousPage = previousPage;
         resources = new DefaultListModel();
     }
@@ -61,13 +74,13 @@ class TargetSelectionPage extends WizardPage {
         Preconditions.checkNotNull(contentPanel);
         super.addComponents(contentPanel);
 
-        contentPanel.add(alignLeft(new JLabel(i18n.getString(I18n.PAGE_TARGET_SELECTION_INTRODUCTION_ID))));
+        contentPanel.add(alignLeft(new JLabel(i18n.getString(I18n.PAGE_RESOURCE_SELECTION_INTRODUCTION_ID))));
         contentPanel.add(createVerticalStrut(30));
 
         JPanel selectionPanel = createHorizontalPanel();
         contentPanel.add(alignLeft(selectionPanel));
 
-        selectionPanel.add(addScrollPane(new JList(resources)));
+        selectionPanel.add(addScrollPane(resourceList = new JList(resources)));
         selectionPanel.add(createHorizontalStrut(10));
 
         JPanel buttons = createVerticalPanel();
@@ -99,7 +112,7 @@ class TargetSelectionPage extends WizardPage {
                 opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 opener.setMultiSelectionEnabled(true);
 
-                opener.setDialogTitle(i18n.getString(I18n.PAGE_TARGET_SELECTION_FILE_CHOOSER_TITLE_ID));
+                opener.setDialogTitle(i18n.getString(I18n.PAGE_RESOURCE_SELECTION_FILE_CHOOSER_TITLE_ID));
                 opener.setApproveButtonText(i18n.getString(I18n.BUTTON_ADD_ID));
                 opener.setApproveButtonToolTipText(i18n.getString(I18n.BUTTON_ADD_ID));
 
@@ -117,22 +130,44 @@ class TargetSelectionPage extends WizardPage {
     }
 
     private void addResources(File[] files) {
+        List<File> erroneousFiles = new ArrayList<File>();
+        Resource latestResource = null;
+
         for (File file : files) {
             Resource resource = null;
-            if (file.isDirectory()) {
-                try {
+            try {
+                if (file.isDirectory()) {
                     resource = new ResourceDirectoryFs(file);
-                } catch (IOException e) {
-                }
-            } else if (file.isFile()) {
-                try {
+                } else if (file.isFile()) {
                     resource = new ResourceFileFs(file);
-                } catch (IOException e) {
+                } else {
+                    log.warn("Ignoring <{}> it is not a file or directory.", file);
                 }
+            } catch (Exception e) {
+                log.error("Exception while reading <" + file + ">.", e);
+                erroneousFiles.add(file);
             }
-            if (resource != null) {
+            if (resource == null) {
+                continue;
+            }
+
+            latestResource = resource;
+            if (!resources.contains(resource)) {
+                log.info("Adding <{}> to the selected resources.", resource);
                 resources.addElement(resource);
+            } else {
+                log.warn("The resource <{}> is already contained in the selected resources, ignoring it.", resource);
             }
+        }
+
+        if (!erroneousFiles.isEmpty()) {
+            String selectableMessage = Joiner.on(", ").join(erroneousFiles);
+            new MessageDialog(listener.getWindow(), MessageType.ERROR, i18n, i18n.getString(I18n.LABEL_ERROR_ID),
+                    i18n.getString(I18n.PAGE_RESOURCE_SELECTION_FILE_CHOOSER_RESOURCE_ERROR_ID), selectableMessage);
+        }
+
+        if (latestResource != null) {
+            resourceList.setSelectedValue(latestResource, true);
         }
     }
 
@@ -145,7 +180,7 @@ class TargetSelectionPage extends WizardPage {
 
     @Override
     protected String getPageHeader() {
-        return i18n.getString(I18n.PAGE_TARGET_SELECTION_HEADER_ID);
+        return i18n.getString(I18n.PAGE_RESOURCE_SELECTION_HEADER_ID);
     }
 
     @Override

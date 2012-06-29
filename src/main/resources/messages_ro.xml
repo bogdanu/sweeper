@@ -46,9 +46,10 @@
     <entry key="page.welcome.introduction">Acest program vă va ghida pentru a descoperi şi a curăţa fişierele şi directoarele duplicate.</entry>
     <entry key="page.welcome.changeLanguage">Vă rugăm să alegeţi limba preferată</entry>
 
-    <entry key="page.targetSelection.header">Alegeţi fişierele şi directoarele dorite pentru a le analiza</entry>
-    <entry key="page.targetSelection.introduction">Analiza va căuta fişiere şi directoare duplicate.</entry>
-    <entry key="page.targetSelection.fileChooser.title">Selectaţi fişiere şi directoare</entry>
+    <entry key="page.resourceSelection.header">Alegeţi fişierele şi directoarele dorite pentru a le analiza</entry>
+    <entry key="page.resourceSelection.introduction">Analiza va căuta fişiere şi directoare duplicate.</entry>
+    <entry key="page.resourceSelection.fileChooser.title">Selectaţi fişiere şi directoare</entry>
+    <entry key="page.resourceSelection.fileChooser.resourceError">S-au întâmplat erori la citirea următoarelor resurse:</entry>
 
      <entry key="fileChooser.currentDirectory">Directorul curent</entry>
      <entry key="fileChooser.up">Directorul părinte</entry>

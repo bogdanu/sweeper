@@ -90,9 +90,10 @@ public class I18n {
     public static final String PAGE_WELCOME_INTRODUCTION_ID = "page.welcome.introduction";
     public static final String PAGE_WELCOME_CHANGE_LANGUAGE_ID = "page.welcome.changeLanguage";
 
-    public static final String PAGE_TARGET_SELECTION_HEADER_ID = "page.targetSelection.header";
-    public static final String PAGE_TARGET_SELECTION_INTRODUCTION_ID = "page.targetSelection.introduction";
-    public static final String PAGE_TARGET_SELECTION_FILE_CHOOSER_TITLE_ID = "page.targetSelection.fileChooser.title";
+    public static final String PAGE_RESOURCE_SELECTION_HEADER_ID = "page.resourceSelection.header";
+    public static final String PAGE_RESOURCE_SELECTION_INTRODUCTION_ID = "page.resourceSelection.introduction";
+    public static final String PAGE_RESOURCE_SELECTION_FILE_CHOOSER_TITLE_ID = "page.resourceSelection.fileChooser.title";
+    public static final String PAGE_RESOURCE_SELECTION_FILE_CHOOSER_RESOURCE_ERROR_ID = "page.resourceSelection.fileChooser.resourceError";
 
     public static final String FILE_CHOOSER_CURRENT_DIRECTORY_ID = "fileChooser.currentDirectory";
     public static final String FILE_CHOOSER_UP_ID = "fileChooser.up";
