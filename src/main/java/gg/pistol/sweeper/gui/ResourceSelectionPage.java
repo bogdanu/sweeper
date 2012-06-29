@@ -55,8 +55,8 @@ class ResourceSelectionPage extends WizardPage {
     private static final String BUTTON_GROUP = "buttons";
 
     private final JackLogger log;
-
     private final WizardPage previousPage;
+
     private final DefaultListModel resources;
     @Nullable private JList resourceList;
     @Nullable private File latestOpenedDirectory;
@@ -252,7 +252,7 @@ class ResourceSelectionPage extends WizardPage {
 
     @Override
     WizardPage next() {
-        return null;
+        return new AnalysisPage(this, i18n, listener, sweeper);
     }
 
     @Override

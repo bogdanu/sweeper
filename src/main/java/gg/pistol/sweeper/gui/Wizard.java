@@ -209,6 +209,7 @@ public class Wizard implements WizardPageListener {
         pageContainer.add(currentPage);
         currentPage.update();
         onButtonStateChange();
+        window.pack();
     }
 
     public void onButtonStateChange() {

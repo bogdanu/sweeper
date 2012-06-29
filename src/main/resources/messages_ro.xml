@@ -51,20 +51,23 @@
     <entry key="page.resourceSelection.fileChooser.title">Selectaţi fişiere şi directoare</entry>
     <entry key="page.resourceSelection.fileChooser.resourceError">S-au întâmplat erori la citirea următoarelor resurse:</entry>
 
-     <entry key="fileChooser.currentDirectory">Directorul curent</entry>
-     <entry key="fileChooser.up">Directorul părinte</entry>
-     <entry key="fileChooser.home">Directorul "Home"</entry>
-     <entry key="fileChooser.showList">Vizualizează ca listă</entry>
-     <entry key="fileChooser.showDetails">Vizualizează cu detalii</entry>
-     <entry key="fileChooser.name">Nume:</entry>
-     <entry key="fileChooser.filterLabel">Filtrează:</entry>
-     <entry key="fileChooser.filterAll">Toate fişierele şi directoarele</entry>
-     <entry key="fileChooser.detailsName">Nume</entry>
-     <entry key="fileChooser.detailsSize">Mărime</entry>
-     <entry key="fileChooser.detailsModified">Data modificării</entry>
-     <entry key="fileChooser.menuView">Vizualizare</entry>
-     <entry key="fileChooser.menuRefresh">Reîmprospătare</entry>
+    <entry key="page.analysis.header">Analiză</entry>
+    <entry key="page.analysis.introduction">Se analizează fişierele şi directoarele pentru a găsi duplicate.</entry>
 
-     <entry key="text.copy">Copiază</entry>
-     <entry key="text.selectAll">Selectează tot</entry>
+    <entry key="fileChooser.currentDirectory">Directorul curent</entry>
+    <entry key="fileChooser.up">Directorul părinte</entry>
+    <entry key="fileChooser.home">Directorul "Home"</entry>
+    <entry key="fileChooser.showList">Vizualizează ca listă</entry>
+    <entry key="fileChooser.showDetails">Vizualizează cu detalii</entry>
+    <entry key="fileChooser.name">Nume:</entry>
+    <entry key="fileChooser.filterLabel">Filtrează:</entry>
+    <entry key="fileChooser.filterAll">Toate fişierele şi directoarele</entry>
+    <entry key="fileChooser.detailsName">Nume</entry>
+    <entry key="fileChooser.detailsSize">Mărime</entry>
+    <entry key="fileChooser.detailsModified">Data modificării</entry>
+    <entry key="fileChooser.menuView">Vizualizare</entry>
+    <entry key="fileChooser.menuRefresh">Reîmprospătare</entry>
+
+    <entry key="text.copy">Copiază</entry>
+    <entry key="text.selectAll">Selectează tot</entry>
 </properties>

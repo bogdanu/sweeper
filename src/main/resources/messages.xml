@@ -51,20 +51,23 @@
     <entry key="page.resourceSelection.fileChooser.title">Select files and directories</entry>
     <entry key="page.resourceSelection.fileChooser.resourceError">Encountered errors while trying to read the following resources:</entry>
 
-     <entry key="fileChooser.currentDirectory">Current directory</entry>
-     <entry key="fileChooser.up">Parent directory</entry>
-     <entry key="fileChooser.home">Home directory</entry>
-     <entry key="fileChooser.showList">Show as list</entry>
-     <entry key="fileChooser.showDetails">Show with details</entry>
-     <entry key="fileChooser.name">Name:</entry>
-     <entry key="fileChooser.filterLabel">Filter:</entry>
-     <entry key="fileChooser.filterAll">All files and directories</entry>
-     <entry key="fileChooser.detailsName">Name</entry>
-     <entry key="fileChooser.detailsSize">Size</entry>
-     <entry key="fileChooser.detailsModified">Date modified</entry>
-     <entry key="fileChooser.menuView">View</entry>
-     <entry key="fileChooser.menuRefresh">Refresh</entry>
+    <entry key="page.analysis.header">Analysis</entry>
+    <entry key="page.analysis.introduction">Analyzing the files and folders to find duplicates.</entry>
 
-     <entry key="text.copy">Copy</entry>
-     <entry key="text.selectAll">Select all</entry>
+    <entry key="fileChooser.currentDirectory">Current directory</entry>
+    <entry key="fileChooser.up">Parent directory</entry>
+    <entry key="fileChooser.home">Home directory</entry>
+    <entry key="fileChooser.showList">Show as list</entry>
+    <entry key="fileChooser.showDetails">Show with details</entry>
+    <entry key="fileChooser.name">Name:</entry>
+    <entry key="fileChooser.filterLabel">Filter:</entry>
+    <entry key="fileChooser.filterAll">All files and directories</entry>
+    <entry key="fileChooser.detailsName">Name</entry>
+    <entry key="fileChooser.detailsSize">Size</entry>
+    <entry key="fileChooser.detailsModified">Date modified</entry>
+    <entry key="fileChooser.menuView">View</entry>
+    <entry key="fileChooser.menuRefresh">Refresh</entry>
+
+    <entry key="text.copy">Copy</entry>
+    <entry key="text.selectAll">Select all</entry>
 </properties>

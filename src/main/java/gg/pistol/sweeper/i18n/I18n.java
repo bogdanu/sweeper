@@ -95,6 +95,9 @@ public class I18n {
     public static final String PAGE_RESOURCE_SELECTION_FILE_CHOOSER_TITLE_ID = "page.resourceSelection.fileChooser.title";
     public static final String PAGE_RESOURCE_SELECTION_FILE_CHOOSER_RESOURCE_ERROR_ID = "page.resourceSelection.fileChooser.resourceError";
 
+    public static final String PAGE_ANALYSIS_HEADER_ID = "page.analysis.header";
+    public static final String PAGE_ANALYSIS_INTRODUCTION_ID = "page.analysis.introduction";
+
     public static final String FILE_CHOOSER_CURRENT_DIRECTORY_ID = "fileChooser.currentDirectory";
     public static final String FILE_CHOOSER_UP_ID = "fileChooser.up";
     public static final String FILE_CHOOSER_HOME_ID = "fileChooser.home";
