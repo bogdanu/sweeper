@@ -1,3 +1,7 @@
+# IntelliJ IDEA related files
+.idea
+sweeper.iml
+
 # Eclipse related files
 .classpath
 .project
