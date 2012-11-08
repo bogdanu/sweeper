@@ -29,7 +29,7 @@ class SweeperCountImpl implements SweeperCount {
     private final long duplicateSize;
 
     private int toDeleteTargets;
-    private int toDeteleTargetFiles;
+    private int toDeleteTargetFiles;
     private long toDeleteSize;
 
     SweeperCountImpl(int totalTargets, int totalTargetFiles, long totalSize, int duplicateTargets,
@@ -84,15 +84,15 @@ class SweeperCountImpl implements SweeperCount {
     }
 
     public int getToDeleteTargetFiles() {
-        return toDeteleTargetFiles;
+        return toDeleteTargetFiles;
     }
 
     void setToDeleteTargetFiles(int value) {
-        toDeteleTargetFiles = value;
+        toDeleteTargetFiles = value;
     }
 
     public int getToDeleteTargetDirectories() {
-        return toDeleteTargets - toDeteleTargetFiles;
+        return toDeleteTargets - toDeleteTargetFiles;
     }
 
     public long getToDeleteSize() {

@@ -71,9 +71,9 @@ public class ResourceDirectoryFsTest {
         ResourceDirectoryFs res = new ResourceDirectoryFs(dir);
         Iterator<? extends Resource> iterator = res.getSubresources().getResources().iterator();
 
-        assertEquals("child1", ((ResourceDirectoryFs) iterator.next()).getName());
-        assertEquals("child2", ((ResourceDirectoryFs) iterator.next()).getName());
-        assertEquals("child3", ((ResourceFileFs) iterator.next()).getName());
+        assertEquals("child1", iterator.next().getName());
+        assertEquals("child2", iterator.next().getName());
+        assertEquals("child3", iterator.next().getName());
         assertTrue(res.getSubresources().getExceptions().isEmpty());
 
         when(child1.isDirectory()).thenReturn(false);

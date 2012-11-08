@@ -26,7 +26,7 @@ import javax.swing.UIManager;
 import com.google.common.base.Preconditions;
 
 /**
- * This class provides internationalization support for Swing out of the box components like {@link #JFileChooser}.
+ * This class provides internationalization support for Swing out of the box components like {@link javax.swing.JFileChooser}.
  *
  * @author Bogdan Pistol
  */

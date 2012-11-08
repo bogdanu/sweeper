@@ -261,7 +261,7 @@ class TargetImpl implements Target {
             if (child.getSize() == 0) {
                 continue;
             }
-            if (modificationDate == null || child.getModificationDate().isAfter(modificationDate)) {
+            if (modificationDate == null || (child.getModificationDate() != null && child.getModificationDate().isAfter(modificationDate))) {
                 modificationDate = child.getModificationDate();
             }
             hashes.add(child.getHash());
@@ -327,6 +327,7 @@ class TargetImpl implements Target {
         return type;
     }
 
+    @Nullable
     public Resource getResource() {
         return resource;
     }
@@ -360,6 +361,7 @@ class TargetImpl implements Target {
         return hash;
     }
 
+    @Nullable
     public DateTime getModificationDate() {
         Preconditions.checkState(isHashed(), "not computed");
         return modificationDate;

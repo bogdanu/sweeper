@@ -252,7 +252,7 @@ public class I18n {
         try {
             locale = supportedLocale;
             resourceBundle = ResourceBundle.getBundle(MESSAGES_BASENAME, supportedLocale.getLocale(), resourceBundleControl);
-            toNotify = new ArrayList(listeners);
+            toNotify = new ArrayList<LocaleChangeListener>(listeners);
         } finally {
             lock.unlock();
         }

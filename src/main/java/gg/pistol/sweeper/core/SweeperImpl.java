@@ -68,7 +68,7 @@ public class SweeperImpl implements Sweeper {
     }
 
     // package private
-    SweeperImpl(Analyzer analyzer) throws SweeperException {
+    SweeperImpl(Analyzer analyzer) {
         Preconditions.checkNotNull(analyzer);
 
         this.analyzer = analyzer;
@@ -101,6 +101,7 @@ public class SweeperImpl implements Sweeper {
         analyzer.abortAnalysis();
     }
 
+    @Nullable
     public SweeperPoll nextPoll() {
         Preconditions.checkState(analyzed, "not analyzed");
 
@@ -292,6 +293,7 @@ public class SweeperImpl implements Sweeper {
         return dup;
     }
 
+    @Nullable
     public SweeperPoll previousPoll() {
         Preconditions.checkState(analyzed, "not analyzed");
 
@@ -329,6 +331,7 @@ public class SweeperImpl implements Sweeper {
         }
     }
 
+    @Nullable
     public SweeperPoll getCurrentPoll() {
         Preconditions.checkState(analyzed, "not analyzed");
         return currentPoll;

@@ -107,6 +107,7 @@ class AnalysisPage extends WizardPage {
     }
 
     @Override
+    @Nullable
     WizardPage finish() {
         return null;
     }

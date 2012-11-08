@@ -39,14 +39,9 @@ public class PollTest {
 
     @Before
     public void setUp() throws Exception {
-        target1 = mockTarget();
-        target2 = mockTarget();
+        target1 = mock(TargetImpl.class);
+        target2 = mock(TargetImpl.class);
         poll = createPoll(target1, target2);
-    }
-
-    private TargetImpl mockTarget() {
-        TargetImpl target = mock(TargetImpl.class);
-        return target;
     }
 
     private Poll createPoll(TargetImpl... targets) {
@@ -127,7 +122,7 @@ public class PollTest {
         }
 
         try {
-            poll.mark(mockTarget(), Mark.DECIDE_LATER);
+            poll.mark(mock(TargetImpl.class), Mark.DECIDE_LATER);
             fail();
         } catch (IllegalStateException e) {
             // expected because the target is not from this poll

@@ -173,7 +173,7 @@ class Analyzer {
      * child will be removed from the {@code rootChildren} collection. This is done to prevent a target from having
      * multiple parents.
      *
-     * <p>Example of multiple parent situation: supposing that {@link #compute} is called with the resource arguments
+     * <p>Example of multiple parent situation: supposing that {@link #analyze} is called with the resource arguments
      * "res1" and "res2", it could be the case that res2 is a descendant of res1:
      *
      * <pre><code>
@@ -522,7 +522,7 @@ class Analyzer {
     }
 
     private NavigableSet<DuplicateGroup> createDuplicateGroups(Multimap<String, TargetImpl> hashDups,
-            OperationTrackingListener listener) throws SweeperAbortException {
+            OperationTrackingListener listener) {
         log.trace("Duplicate grouping.");
         listener.updateOperation(SweeperOperation.DUPLICATE_GROUPING);
 

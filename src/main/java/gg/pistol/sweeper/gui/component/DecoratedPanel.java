@@ -354,7 +354,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      *
      * @param width
      *            the width of the invisible component in pixels
-     * @return
+     * @return the horizontal fixed-width strut
      */
     protected JComponent createHorizontalStrut(int width) {
         Preconditions.checkArgument(width >= 0);
@@ -369,7 +369,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      *
      * @param height
      *            the height of the invisible component in pixels
-     * @return
+     * @return the vertical fixed-height strut
      */
     protected JComponent createVerticalStrut(int height) {
         Preconditions.checkArgument(height >= 0);
@@ -457,7 +457,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      */
     protected JComboBox createLanguageSelector(int width) {
         Preconditions.checkArgument(width >= 0);
-        final JComboBox selector = new JComboBox(i18n.getSupportedLocales().toArray());
+        final JComboBox<SupportedLocale> selector = new JComboBox(i18n.getSupportedLocales().toArray());
         selector.setSelectedItem(i18n.getCurrentSupportedLocale());
         selector.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

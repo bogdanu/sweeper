@@ -63,7 +63,7 @@ public class WebBrowserLauncher {
     public void openWebBrowser(final String url, @Nullable Window parentWindow) {
         Preconditions.checkNotNull(url);
 
-        URI uri = null;
+        URI uri;
         try {
             uri = new URI(url);
         } catch (URISyntaxException e) {

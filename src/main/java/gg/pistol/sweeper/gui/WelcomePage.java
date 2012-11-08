@@ -99,6 +99,7 @@ class WelcomePage extends WizardPage {
     }
 
     @Override
+    @Nullable
     WizardPage back() {
         return null;
     }
@@ -112,6 +113,7 @@ class WelcomePage extends WizardPage {
     }
 
     @Override
+    @Nullable
     WizardPage finish() {
         return null;
     }

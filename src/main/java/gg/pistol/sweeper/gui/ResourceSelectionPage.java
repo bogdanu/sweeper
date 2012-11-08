@@ -57,8 +57,8 @@ class ResourceSelectionPage extends WizardPage {
     private final JackLogger log;
     private final WizardPage previousPage;
 
-    private final DefaultListModel resources;
-    @Nullable private JList resourceList;
+    private final DefaultListModel<Resource> resources;
+    @Nullable private JList<Resource> resourceList;
     @Nullable private File latestOpenedDirectory;
     @Nullable private JButton removeButton;
 
@@ -68,7 +68,7 @@ class ResourceSelectionPage extends WizardPage {
 
         log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(ResourceSelectionPage.class));
         this.previousPage = previousPage;
-        resources = new DefaultListModel();
+        resources = new DefaultListModel<Resource>();
     }
 
     @Override
@@ -82,7 +82,7 @@ class ResourceSelectionPage extends WizardPage {
         JPanel selectionPanel = createHorizontalPanel();
         contentPanel.add(alignLeft(selectionPanel));
 
-        selectionPanel.add(addScrollPane(resourceList = new JList(resources)));
+        selectionPanel.add(addScrollPane(resourceList = new JList<Resource>(resources)));
         if (!resources.isEmpty()) {
             resourceList.setSelectedIndex(0);
         }
@@ -256,6 +256,7 @@ class ResourceSelectionPage extends WizardPage {
     }
 
     @Override
+    @Nullable
     WizardPage finish() {
         return null;
     }

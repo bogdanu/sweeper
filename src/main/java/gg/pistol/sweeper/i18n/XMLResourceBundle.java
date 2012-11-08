@@ -46,7 +46,7 @@ class XMLResourceBundle extends ResourceBundle {
     private final Lock lock;
     @Nullable private Collection<String> keys;
 
-    XMLResourceBundle(InputStream stream) throws InvalidPropertiesFormatException, IOException {
+    XMLResourceBundle(InputStream stream) throws IOException {
         Preconditions.checkNotNull(stream);
         properties = new Properties();
         lock = new ReentrantLock();

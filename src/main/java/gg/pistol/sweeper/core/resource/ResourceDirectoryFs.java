@@ -51,7 +51,7 @@ public class ResourceDirectoryFs extends AbstractResource implements ResourceDir
     }
 
     public ResourceDirectory.ResourceCollectionResponse getSubresources() {
-        File[] files = null;
+        File[] files;
         try {
             files = getFiles(resource);
         } catch (Exception e) {
@@ -74,7 +74,7 @@ public class ResourceDirectoryFs extends AbstractResource implements ResourceDir
         }
 
         if (exceptions == null) {
-            exceptions = Collections.<Exception>emptyList();
+            exceptions = Collections.emptyList();
         }
 
         return createResponse(resources, exceptions);

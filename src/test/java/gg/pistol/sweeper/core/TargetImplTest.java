@@ -74,7 +74,7 @@ public class TargetImplTest {
         hashFunction = new HashFunction();
     }
 
-    private ResourceFile mockResourceFile(String name) throws Exception {
+    private ResourceFile mockResourceFile(String name) {
         ResourceFile res = mock(ResourceFile.class);
         when(res.getName()).thenReturn(name);
         return res;
@@ -216,7 +216,7 @@ public class TargetImplTest {
         computeDirectorySize(true);
     }
 
-    private void computeDirectorySize(boolean isFullExpanded) throws Exception {
+    private void computeDirectorySize(boolean isFullExpanded) {
         long target1Size = 5L;
         int target1Subtargets = 1;
         int target1Files = 1;
