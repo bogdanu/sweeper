@@ -53,6 +53,21 @@
 
     <entry key="page.analysis.header">Analiză</entry>
     <entry key="page.analysis.introduction">Se analizează fişierele şi directoarele pentru a găsi duplicate.</entry>
+    <entry key="page.analysis.totalProgress">Progres total:</entry>
+    <entry key="page.analysis.totalElapsedTime">Timp total scurs:</entry>
+    <entry key="page.analysis.totalRemainingTime">Estimare timp total rămas:</entry>
+    <entry key="page.analysis.operationLabel">Operaţie:</entry>
+    <entry key="page.analysis.operationResourceTraversing">Se traversează fişierele şi directoarele.</entry>
+    <entry key="page.analysis.operationSizeComputation">Se calculează mărimea fişierelor şi directoarelor.</entry>
+    <entry key="page.analysis.operationSizeDeduplication">Se filtrează fişierele şi directoarele cu aceiaşi mărime.</entry>
+    <entry key="page.analysis.operationHashComputation">Se calculează "hash"-ul fişierelor şi directoarelor care au aceiaşi mărime.</entry>
+    <entry key="page.analysis.operationHashDeduplication">Se filtrează fişierele şi directoarele care au acelaşi "hash".</entry>
+    <entry key="page.analysis.operationCounting">Se numără fişierele şi directoarele duplicate.</entry>
+    <entry key="page.analysis.operationDuplicateGrouping">Se grupează fişierele şi directoarele duplicate.</entry>
+    <entry key="page.analysis.operationResourceDeletion">Se şterg fişierele şi directoarele duplicate.</entry>
+    <entry key="page.analysis.operationProgress">Progres:</entry>
+    <entry key="page.analysis.operationElapsedTime">Timp scurs:</entry>
+    <entry key="page.analysis.operationRemainingTime">Estimare timp rămas:</entry>
 
     <entry key="fileChooser.currentDirectory">Directorul curent</entry>
     <entry key="fileChooser.up">Directorul părinte</entry>

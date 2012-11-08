@@ -52,7 +52,22 @@
     <entry key="page.resourceSelection.fileChooser.resourceError">Encountered errors while trying to read the following resources:</entry>
 
     <entry key="page.analysis.header">Analysis</entry>
-    <entry key="page.analysis.introduction">Analyzing the files and folders to find duplicates.</entry>
+    <entry key="page.analysis.introduction">Analyzing the files and directories to find duplicates.</entry>
+    <entry key="page.analysis.totalProgress">Total progress:</entry>
+    <entry key="page.analysis.totalElapsedTime">Total elapsed time:</entry>
+    <entry key="page.analysis.totalRemainingTime">Total estimated remaining time:</entry>
+    <entry key="page.analysis.operationLabel">Operation:</entry>
+    <entry key="page.analysis.operationResourceTraversing">Traversing the files and directories.</entry>
+    <entry key="page.analysis.operationSizeComputation">Computing the size of files and directories.</entry>
+    <entry key="page.analysis.operationSizeDeduplication">Filtering the files and directories with the same size.</entry>
+    <entry key="page.analysis.operationHashComputation">Computing the hash for the files and directories that have the same size.</entry>
+    <entry key="page.analysis.operationHashDeduplication">Filtering the files and directories with the same hash.</entry>
+    <entry key="page.analysis.operationCounting">Counting the duplicate files and directories.</entry>
+    <entry key="page.analysis.operationDuplicateGrouping">Grouping the duplicate files and directories.</entry>
+    <entry key="page.analysis.operationResourceDeletion">Deleting the duplicate files and directories.</entry>
+    <entry key="page.analysis.operationProgress">Progress:</entry>
+    <entry key="page.analysis.operationElapsedTime">Elapsed time:</entry>
+    <entry key="page.analysis.operationRemainingTime">Estimated remaining time:</entry>
 
     <entry key="fileChooser.currentDirectory">Current directory</entry>
     <entry key="fileChooser.up">Parent directory</entry>

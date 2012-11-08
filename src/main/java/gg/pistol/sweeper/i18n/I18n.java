@@ -97,6 +97,21 @@ public class I18n {
 
     public static final String PAGE_ANALYSIS_HEADER_ID = "page.analysis.header";
     public static final String PAGE_ANALYSIS_INTRODUCTION_ID = "page.analysis.introduction";
+    public static final String PAGE_ANALYSIS_TOTAL_PROGRESS_ID = "page.analysis.totalProgress";
+    public static final String PAGE_ANALYSIS_TOTAL_ELAPSED_TIME_ID = "page.analysis.totalElapsedTime";
+    public static final String PAGE_ANALYSIS_TOTAL_REMAINING_TIME_ID = "page.analysis.totalRemainingTime";
+    public static final String PAGE_ANALYSIS_OPERATION_LABEL_ID = "page.analysis.operationLabel";
+    public static final String PAGE_ANALYSIS_OPERATION_RESOURCE_TRAVERSAL_ID = "page.analysis.operationResourceTraversing";
+    public static final String PAGE_ANALYSIS_OPERATION_SIZE_COMPUTATION_ID = "page.analysis.operationSizeComputation";
+    public static final String PAGE_ANALYSIS_OPERATION_SIZE_DEDUPLICATION_ID = "page.analysis.operationSizeDeduplication";
+    public static final String PAGE_ANALYSIS_OPERATION_HASH_COMPUTATION_ID = "page.analysis.operationHashComputation";
+    public static final String PAGE_ANALYSIS_OPERATION_HASH_DEDUPLICATION_ID = "page.analysis.operationHashDeduplication";
+    public static final String PAGE_ANALYSIS_OPERATION_COUNTING_ID = "page.analysis.operationCounting";
+    public static final String PAGE_ANALYSIS_OPERATION_DUPLICATE_GROUPING_ID = "page.analysis.operationDuplicateGrouping";
+    public static final String PAGE_ANALYSIS_OPERATION_RESOURCE_DELETION_ID = "page.analysis.operationResourceDeletion";
+    public static final String PAGE_ANALYSIS_OPERATION_PROGRESS_ID = "page.analysis.operationProgress";
+    public static final String PAGE_ANALYSIS_OPERATION_ELAPSED_TIME_ID = "page.analysis.operationElapsedTime";
+    public static final String PAGE_ANALYSIS_OPERATION_REMAINING_TIME_ID = "page.analysis.operationRemainingTime";
 
     public static final String FILE_CHOOSER_CURRENT_DIRECTORY_ID = "fileChooser.currentDirectory";
     public static final String FILE_CHOOSER_UP_ID = "fileChooser.up";
