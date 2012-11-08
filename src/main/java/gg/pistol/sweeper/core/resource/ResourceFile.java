@@ -34,7 +34,7 @@ public interface ResourceFile extends Resource {
      *
      * @return the resource input stream
      * @throws IOException
-     *             if the underlying implementation experiences I/O exceptions while opening the input stream
+     *         if the underlying implementation experiences I/O exceptions while opening the input stream
      */
     InputStream getInputStream() throws IOException;
 
@@ -43,7 +43,7 @@ public interface ResourceFile extends Resource {
      *
      * @return the size of the content in bytes
      * @throws IOException
-     *             if the underlying implementation experiences I/O exceptions while getting the size
+     *         if the underlying implementation experiences I/O exceptions while getting the size
      */
     long getSize() throws IOException;
 
@@ -52,7 +52,7 @@ public interface ResourceFile extends Resource {
      *
      * @return the latest modification date
      * @throws IOException
-     *             if the underlying implementation experiences I/O exceptions while getting the modification date
+     *         if the underlying implementation experiences I/O exceptions while getting the modification date
      */
     DateTime getModificationDate() throws IOException;
 

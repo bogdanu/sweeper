@@ -47,7 +47,7 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
      * Constructor that initializes the component orientation based on the locale value.
      *
      * @param i18n
-     *            the internationalization object
+     *         the internationalization object
      */
     protected DynamicPanel(I18n i18n) {
         Preconditions.checkNotNull(i18n);
@@ -87,7 +87,7 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
      * All the components contained by the panel should be added based on locale with this method.
      * The title of the parent window should be configured based on the locale with this method.
      *
-     *  <p>This method will be called whenever the locale changes.
+     * <p>This method will be called whenever the locale changes.
      */
     protected abstract void addComponents();
 
@@ -97,7 +97,7 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
      * <p>This method will call {@link #addComponents} to init the components.
      *
      * @param parentWindow
-     *            the parent window
+     *         the parent window
      */
     public void setParentWindow(@Nullable Window parentWindow) {
         if (parentWindow == null) {
@@ -126,7 +126,7 @@ public abstract class DynamicPanel extends JPanel implements LocaleChangeListene
      * <p>The title should be configured from the {@link #addComponents} method.
      *
      * @param title
-     *            the title string
+     *         the title string
      */
     protected void setTitle(String title) {
         Preconditions.checkNotNull(title);

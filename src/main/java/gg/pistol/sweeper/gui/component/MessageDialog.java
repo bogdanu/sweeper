@@ -44,20 +44,20 @@ public class MessageDialog {
      * copy & paste purposes).
      *
      * @param owner
-     *            the parent window of the dialog box or {@code null} for no parent
+     *         the parent window of the dialog box or {@code null} for no parent
      * @param type
-     *            the type of message will affect the icon displayed on the dialog box
+     *         the type of message will affect the icon displayed on the dialog box
      * @param i18n
-     *            internationalization
+     *         internationalization
      * @param title
-     *            the title of the dialog box
+     *         the title of the dialog box
      * @param message
-     *            the message to display
+     *         the message to display
      * @param selectableMessage
-     *            the extra selectable message or {@code null}
+     *         the extra selectable message or {@code null}
      */
     public MessageDialog(@Nullable Window owner, MessageType type, I18n i18n, final String title, final String message,
-            @Nullable final String selectableMessage) {
+                         @Nullable final String selectableMessage) {
         Preconditions.checkNotNull(type);
         Preconditions.checkNotNull(i18n);
         Preconditions.checkNotNull(title);
@@ -65,15 +65,15 @@ public class MessageDialog {
 
         Icon image = null;
         switch (type) {
-        case INFORMATION:
-            image = UIManager.getIcon("OptionPane.informationIcon");
-            break;
-        case WARNING:
-            image = UIManager.getIcon("OptionPane.warningIcon");
-            break;
-        case ERROR:
-            image = UIManager.getIcon("OptionPane.errorIcon");
-            break;
+            case INFORMATION:
+                image = UIManager.getIcon("OptionPane.informationIcon");
+                break;
+            case WARNING:
+                image = UIManager.getIcon("OptionPane.warningIcon");
+                break;
+            case ERROR:
+                image = UIManager.getIcon("OptionPane.errorIcon");
+                break;
         }
         DecoratedPanel panel = new DecoratedPanel(i18n, true, image) {
             @Override

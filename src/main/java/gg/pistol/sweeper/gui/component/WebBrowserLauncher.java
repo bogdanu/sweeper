@@ -55,10 +55,10 @@ public class WebBrowserLauncher {
      * Open the operating system's default web browser and access the provided {@code url}.
      *
      * @param url
-     *            the web address to access
+     *         the web address to access
      * @param parentWindow
-     *            in case of error this parameter specifies which window will be the parent of the error dialog box,
-     *            this parameter can be {@code null} for no parent
+     *         in case of error this parameter specifies which window will be the parent of the error dialog box,
+     *         this parameter can be {@code null} for no parent
      */
     public void openWebBrowser(final String url, @Nullable Window parentWindow) {
         Preconditions.checkNotNull(url);

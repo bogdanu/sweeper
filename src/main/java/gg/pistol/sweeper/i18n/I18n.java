@@ -131,7 +131,7 @@ public class I18n {
     public static final String TEXT_SELECT_ALL_ID = "text.selectAll";
 
     private static final String MESSAGES_BASENAME = "messages";
-    private static final String[] SUPPORTED_LANGUAGES = new String[] {"en", "de", "fr", "es", "pt", "ro", "ru", "ar", "iw", "ja", "hi", "zh_CN", "zh_TW"};
+    private static final String[] SUPPORTED_LANGUAGES = new String[]{"en", "de", "fr", "es", "pt", "ro", "ru", "ar", "iw", "ja", "hi", "zh_CN", "zh_TW"};
 
 
     private final JackLogger log;
@@ -224,7 +224,7 @@ public class I18n {
      * If the provided {@code locale} is not supported it will fall back to the English locale.
      *
      * @param locale
-     *            the new locale
+     *         the new locale
      */
     public void setLocale(Locale locale) {
         Preconditions.checkNotNull(locale);
@@ -241,7 +241,7 @@ public class I18n {
      * If the provided {@code locale} is not supported it will fall back to the English locale.
      *
      * @param supportedLocale
-     *            the new locale
+     *         the new locale
      */
     public void setLocale(SupportedLocale supportedLocale) {
         Preconditions.checkNotNull(supportedLocale);
@@ -257,7 +257,7 @@ public class I18n {
             lock.unlock();
         }
         Locale.setDefault(locale.getLocale());
-        for (LocaleChangeListener listener: toNotify) {
+        for (LocaleChangeListener listener : toNotify) {
             listener.onLocaleChange();
         }
     }
@@ -290,9 +290,9 @@ public class I18n {
      * Retrieve the localized string message identified by the provided {@code id}.
      *
      * @param id
-     *            the unique identifier of the string
+     *         the unique identifier of the string
      * @param args
-     *            optional arguments to be injected in the localized string
+     *         optional arguments to be injected in the localized string
      * @return the localized string message
      */
     public String getString(String id, @Nullable String... args) {
@@ -315,7 +315,7 @@ public class I18n {
      * Register to receive locale change notifications.
      *
      * @param listener
-     *            the locale change listener
+     *         the locale change listener
      */
     public void registerListener(LocaleChangeListener listener) {
         Preconditions.checkNotNull(listener);
@@ -331,7 +331,7 @@ public class I18n {
      * Unregister from locale change notifications.
      *
      * @param listener
-     *            the locale change listener
+     *         the locale change listener
      */
     public void unregisterListener(LocaleChangeListener listener) {
         Preconditions.checkNotNull(listener);

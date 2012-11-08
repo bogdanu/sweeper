@@ -46,12 +46,12 @@ public interface Sweeper {
      * Perform an analysis to find duplicate targets.
      *
      * @param resources
-     *            perform the analysis on these resources and their descendants
+     *         perform the analysis on these resources and their descendants
      * @param listener
-     *            the provided listener will be called back with progress notifications
+     *         the provided listener will be called back with progress notifications
      * @throws SweeperAbortException
-     *             in case the analysis is aborted this exception will be thrown, afterwards the analysis can be
-     *             restarted with a (possibly different) set of resources
+     *         in case the analysis is aborted this exception will be thrown, afterwards the analysis can be
+     *         restarted with a (possibly different) set of resources
      */
     void analyze(Collection<? extends Resource> resources, SweeperOperationListener listener) throws SweeperAbortException;
 
@@ -108,11 +108,11 @@ public interface Sweeper {
      * the already deleted targets.
      *
      * @param toDeleteTargets
-     *            the targets of the delete operation
+     *         the targets of the delete operation
      * @param listener
-     *            the provided listener will be called back with progress notifications
+     *         the provided listener will be called back with progress notifications
      * @throws SweeperAbortException
-     *             in case the deletion is aborted this exception will be thrown
+     *         in case the deletion is aborted this exception will be thrown
      */
     void delete(Collection<? extends Target> toDeleteTargets, SweeperOperationListener listener) throws SweeperAbortException;
 

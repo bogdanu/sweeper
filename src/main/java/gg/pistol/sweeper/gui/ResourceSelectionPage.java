@@ -111,7 +111,7 @@ class ResourceSelectionPage extends WizardPage {
                 UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 
                 JFileChooser opener = latestOpenedDirectory == null ? new JFileChooser() :
-                    new JFileChooser(latestOpenedDirectory);
+                        new JFileChooser(latestOpenedDirectory);
 
                 opener.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
                 opener.setFileHidingEnabled(false);

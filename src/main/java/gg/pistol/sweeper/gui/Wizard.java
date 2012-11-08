@@ -248,7 +248,7 @@ public class Wizard implements WizardPageListener {
                 try {
                     i18n.registerListener(new SwingMessages(i18n));
                     new Wizard(i18n);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     LOG.error("Exception thrown while opening the wizard:", e);
                     new MessageDialog(null, MessageType.ERROR, i18n, i18n.getString(I18n.LABEL_ERROR_ID),
                             i18n.getString(I18n.WIZARD_ERROR_OPEN_ID), e.getLocalizedMessage());

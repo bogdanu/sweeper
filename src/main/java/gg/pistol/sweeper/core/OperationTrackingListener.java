@@ -35,10 +35,13 @@ class OperationTrackingListener implements SweeperOperationListener {
      */
     static final OperationTrackingListener NOOP_LISTENER = new OperationTrackingListener(new SweeperOperationListener() {
         public void updateOperation(SweeperOperation operation) { /* ignore */ }
+
         public void updateOperationProgress(long progress, long maxProgress, int percentGlobal) { /* ignore */ }
+
         public void updateTargetAction(Target target, TargetAction action) { /* ignore */ }
+
         public void updateTargetException(Target target, TargetAction action, SweeperException e) { /* ignore */ }
-        });
+    });
 
     // The wrapped listener.
     private final SweeperOperationListener listener;
@@ -133,7 +136,7 @@ class OperationTrackingListener implements SweeperOperationListener {
      * <li>incrementOperationProgress(130)</li></ol>
      *
      * @param progress
-     *            an absolute value representing the progress
+     *         an absolute value representing the progress
      */
     void incrementOperationProgress(long progress) {
         checkOperation();
@@ -158,7 +161,7 @@ class OperationTrackingListener implements SweeperOperationListener {
      * At the end the progress will be 130 (the sum of all the relative action progress increments).
      *
      * @param actionProgress
-     *            a relative value representing the action progress increment
+     *         a relative value representing the action progress increment
      */
     void incrementTargetActionProgress(long actionProgress) {
         checkOperation();

@@ -73,7 +73,7 @@ public class AnalyzerTest {
         ResourceDirectory.ResourceCollectionResponse subresResponse = mock(ResourceDirectory.ResourceCollectionResponse.class);
         when(res.getSubresources()).thenReturn(subresResponse);
         if (children == null) {
-            children = new Resource[] {};
+            children = new Resource[]{};
         }
         doReturn(ImmutableList.copyOf(children)).when(subresResponse).getResources();
         doReturn(Collections.<Exception>emptyList()).when(subresResponse).getExceptions();

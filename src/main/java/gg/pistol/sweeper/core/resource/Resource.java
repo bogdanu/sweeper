@@ -37,7 +37,7 @@ public interface Resource extends Comparable<Resource> {
      * Delete the resource.
      *
      * @throws IOException
-     *             if the underlying implementation experiences I/O exceptions while deleting the resource
+     *         if the underlying implementation experiences I/O exceptions while deleting the resource
      */
     void delete() throws IOException;
 

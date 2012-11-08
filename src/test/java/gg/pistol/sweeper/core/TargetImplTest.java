@@ -362,7 +362,7 @@ public class TargetImplTest {
     }
 
     private void verifyComputeHashDirectory(long expectedLastModified, String expectedHash, long dirSize,
-            TargetImpl target, TargetImpl... children) throws Exception {
+                                            TargetImpl target, TargetImpl... children) throws Exception {
         target = prepareDirToHash(target, dirSize, children);
 
         assertFalse(target.isPartiallyHashed());

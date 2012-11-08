@@ -28,7 +28,7 @@ public interface SweeperOperationListener {
      * Notification that a new operation is started.
      *
      * @param operation
-     *            the newly started operation
+     *         the newly started operation
      */
     void updateOperation(SweeperOperation operation);
 
@@ -36,11 +36,11 @@ public interface SweeperOperationListener {
      * Indication that the operation progressed further.
      *
      * @param progress
-     *            the current progress of the operation
+     *         the current progress of the operation
      * @param maxProgress
-     *            the maximum progress that the current operation will reach when completed
+     *         the maximum progress that the current operation will reach when completed
      * @param percentGlobal
-     *            the global percentage of completion of all the operations
+     *         the global percentage of completion of all the operations
      */
     void updateOperationProgress(long progress, long maxProgress, int percentGlobal);
 
@@ -49,9 +49,9 @@ public interface SweeperOperationListener {
      * {@link TargetAction}s.
      *
      * @param target
-     *            the subject of the action
+     *         the subject of the action
      * @param action
-     *            the newly started action
+     *         the newly started action
      */
     void updateTargetAction(Target target, TargetAction action);
 
@@ -59,11 +59,11 @@ public interface SweeperOperationListener {
      * Notification that an exception occurred while executing an action for a target.
      *
      * @param target
-     *            the subject of the action
+     *         the subject of the action
      * @param action
-     *            the context of the exception
+     *         the context of the exception
      * @param e
-     *            the encountered exception
+     *         the encountered exception
      */
     void updateTargetException(Target target, TargetAction action, SweeperException e);
 

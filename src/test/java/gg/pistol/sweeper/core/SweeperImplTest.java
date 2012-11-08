@@ -60,7 +60,7 @@ public class SweeperImplTest {
 
     private void analyzerReturns(DuplicateGroup... dups) throws SweeperAbortException {
         if (dups == null) {
-            dups = new DuplicateGroup[] {};
+            dups = new DuplicateGroup[]{};
         }
         NavigableSet<DuplicateGroup> set = Sets.newTreeSet(ImmutableSet.copyOf(dups));
         when(analyzer.analyze(resources, listener)).thenReturn(set);

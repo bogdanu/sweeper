@@ -66,7 +66,7 @@ public class ResourceDirectoryFsTest {
         File child1 = mockFile("child1", true);
         File child2 = mockFile("child2", true);
         File child3 = mockFile("child3", false);
-        when(dir.listFiles()).thenReturn(new File[] {child1, child2, child3});
+        when(dir.listFiles()).thenReturn(new File[]{child1, child2, child3});
 
         ResourceDirectoryFs res = new ResourceDirectoryFs(dir);
         Iterator<? extends Resource> iterator = res.getSubresources().getResources().iterator();
@@ -95,7 +95,7 @@ public class ResourceDirectoryFsTest {
         try {
             res.delete();
             fail();
-        } catch(IOException e) {
+        } catch (IOException e) {
             // expected
             verify(file).delete();
         }

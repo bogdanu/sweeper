@@ -48,20 +48,20 @@ public interface SweeperPoll {
      * Mark the target.
      *
      * @param target
-     *            the target
+     *         the target
      * @param mark
-     *            the target mark
+     *         the target mark
      */
     void mark(Target target, Mark mark);
 
     /**
      * Retrieve the mark for the target.
      *
-     *<p>The default value is computed by taking into account the previous polls. See the class description for more
+     * <p>The default value is computed by taking into account the previous polls. See the class description for more
      * details.
      *
      * @param target
-     *            the target to query
+     *         the target to query
      * @return the mark of the target
      */
     Mark getMark(Target target);

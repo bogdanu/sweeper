@@ -75,11 +75,11 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * Creates an instance with a default border value.
      *
      * @param i18n
-     *            the internationalization instance
+     *         the internationalization instance
      * @param closeButton
-     *            whether to have a close button or not
+     *         whether to have a close button or not
      * @param sideImage
-     *            the side image or null
+     *         the side image or null
      */
     protected DecoratedPanel(I18n i18n, boolean closeButton, @Nullable Icon sideImage) {
         this(i18n, DEFAULT_BORDER, closeButton, sideImage);
@@ -89,13 +89,13 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * Constructor
      *
      * @param i18n
-     *            the internationalization instance
+     *         the internationalization instance
      * @param border
-     *            the border size or 0 for no border
+     *         the border size or 0 for no border
      * @param closeButton
-     *            whether to have a close button or not
+     *         whether to have a close button or not
      * @param sideImage
-     *            the side image or null
+     *         the side image or null
      */
     protected DecoratedPanel(I18n i18n, int border, boolean closeButton, @Nullable Icon sideImage) {
         super(Preconditions.checkNotNull(i18n));
@@ -162,8 +162,8 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * <p>This method will be called whenever the locale changes.
      *
      * @param contentPanel
-     *            the container where to add all the components, its layout manager is a horizontal {@link BoxLayout}
-     *            that takes into account the locale
+     *         the container where to add all the components, its layout manager is a horizontal {@link BoxLayout}
+     *         that takes into account the locale
      */
     protected abstract void addComponents(JPanel contentPanel);
 
@@ -214,7 +214,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * Helper factory method for creating selectable text labels (for copy & paste support)
      *
      * @param text
-     *            the string that will be selectable
+     *         the string that will be selectable
      * @return the selectable text component
      */
     protected JComponent createTextLabel(String text) {
@@ -252,9 +252,9 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * Helper factory method for creating clickable links.
      *
      * @param linkText
-     *            a string that will be displayed as a link
+     *         a string that will be displayed as a link
      * @param action
-     *            the action performed at click
+     *         the action performed at click
      * @return the link component
      */
     protected JComponent createLink(String linkText, final Runnable action) {
@@ -277,7 +277,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * Helper method to set the left alignment.
      *
      * @param component
-     *            the component to align
+     *         the component to align
      * @return the aligned component
      */
     protected <T extends JComponent> T alignLeft(T component) {
@@ -288,7 +288,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * Helper method to set the right alignment.
      *
      * @param component
-     *            the component to align
+     *         the component to align
      * @return the aligned component
      */
     protected <T extends JComponent> T alignRight(T component) {
@@ -314,7 +314,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * Helper method to set the center alignment.
      *
      * @param component
-     *            the component to align
+     *         the component to align
      * @return the aligned component
      */
     protected <T extends JComponent> T alignCenter(T component) {
@@ -353,7 +353,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * fixed-width component does not expand vertically at all (has a maximum height of 0).
      *
      * @param width
-     *            the width of the invisible component in pixels
+     *         the width of the invisible component in pixels
      * @return the horizontal fixed-width strut
      */
     protected JComponent createHorizontalStrut(int width) {
@@ -368,7 +368,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * fixed-height component does not expand horizontally at all (has a maximum width of 0).
      *
      * @param height
-     *            the height of the invisible component in pixels
+     *         the height of the invisible component in pixels
      * @return the vertical fixed-height strut
      */
     protected JComponent createVerticalStrut(int height) {
@@ -381,9 +381,9 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * the group will have the preferred size of the biggest component from the group.
      *
      * @param groupId
-     *            an identifier for the group
+     *         an identifier for the group
      * @param component
-     *            the component to add to the group
+     *         the component to add to the group
      * @return the grouped component
      */
     protected <T extends JComponent> T sizeGroup(String groupId, T component) {
@@ -398,9 +398,9 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * Helper factory method for creating a button.
      *
      * @param text
-     *            the text of the button
+     *         the text of the button
      * @param action
-     *            the action of the button
+     *         the action of the button
      * @return the newly created button
      */
     protected JButton createButton(String text, ActionListener action) {
@@ -416,11 +416,11 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * Helper factory method for creating a button and placing it in a group of same size components.
      *
      * @param text
-     *            the text of the button
+     *         the text of the button
      * @param action
-     *            the action of the button
+     *         the action of the button
      * @param sizeGroupId
-     *            the group identifier of the same size components
+     *         the group identifier of the same size components
      * @return the newly created button
      */
     protected JButton createButton(String text, ActionListener action, String sizeGroupId) {
@@ -438,7 +438,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * languages) to the provided {@code component}.
      *
      * @param component
-     *            the component to wrap inside the scroll pane
+     *         the component to wrap inside the scroll pane
      * @return the newly created scroll pane that wraps the provided {@code component}
      */
     protected JComponent addScrollPane(JComponent component) {
@@ -452,7 +452,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * Helper factory method for creating a language selector that provides functionality to change the locale.
      *
      * @param width
-     *            the preferred width of the component in pixels
+     *         the preferred width of the component in pixels
      * @return the newly created language selector
      */
     protected JComboBox createLanguageSelector(int width) {

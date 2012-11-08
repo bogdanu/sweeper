@@ -71,18 +71,18 @@ class Poll implements SweeperPoll, Cloneable {
         Preconditions.checkState(targets.contains(target), "The target is not from this poll");
 
         switch (mark) {
-        case DELETE:
-            retainedTargets.remove(target);
-            toDeleteTargets.add((TargetImpl) target);
-            break;
-        case RETAIN:
-            toDeleteTargets.remove(target);
-            retainedTargets.add((TargetImpl) target);
-            break;
-        case DECIDE_LATER:
-            toDeleteTargets.remove(target);
-            retainedTargets.remove(target);
-            break;
+            case DELETE:
+                retainedTargets.remove(target);
+                toDeleteTargets.add((TargetImpl) target);
+                break;
+            case RETAIN:
+                toDeleteTargets.remove(target);
+                retainedTargets.add((TargetImpl) target);
+                break;
+            case DECIDE_LATER:
+                toDeleteTargets.remove(target);
+                retainedTargets.remove(target);
+                break;
         }
     }
 

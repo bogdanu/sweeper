@@ -30,7 +30,7 @@ package gg.pistol.sweeper.core;
  */
 public enum SweeperOperation {
     RESOURCE_TRAVERSING(29), SIZE_COMPUTATION(20), SIZE_DEDUPLICATION(1), HASH_COMPUTATION(47), HASH_DEDUPLICATION(1),
-            COUNTING(1), DUPLICATE_GROUPING(1), RESOURCE_DELETION(100);
+    COUNTING(1), DUPLICATE_GROUPING(1), RESOURCE_DELETION(100);
 
     private final int percentQuota;
 

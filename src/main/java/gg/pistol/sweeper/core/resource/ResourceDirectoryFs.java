@@ -89,7 +89,7 @@ public class ResourceDirectoryFs extends AbstractResource implements ResourceDir
     }
 
     private ResourceDirectory.ResourceCollectionResponse createResponse(final Collection<? extends Resource> resources,
-            final Collection<? extends Exception> exceptions) {
+                                                                        final Collection<? extends Exception> exceptions) {
         return new ResourceDirectory.ResourceCollectionResponse() {
 
             public Collection<? extends Resource> getResources() {

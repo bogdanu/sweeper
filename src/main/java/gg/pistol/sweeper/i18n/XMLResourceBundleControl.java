@@ -52,7 +52,7 @@ class XMLResourceBundleControl extends ResourceBundle.Control {
     }
 
     public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader,
-            boolean reload) throws IllegalAccessException, InstantiationException, IOException {
+                                    boolean reload) throws IllegalAccessException, InstantiationException, IOException {
         Preconditions.checkNotNull(baseName);
         Preconditions.checkNotNull(locale);
         Preconditions.checkNotNull(format);

@@ -33,7 +33,7 @@ class SweeperCountImpl implements SweeperCount {
     private long toDeleteSize;
 
     SweeperCountImpl(int totalTargets, int totalTargetFiles, long totalSize, int duplicateTargets,
-            int duplicateTargetFiles, long duplicateSize) {
+                     int duplicateTargetFiles, long duplicateSize) {
         this.totalTargets = totalTargets;
         this.totalTargetFiles = totalTargetFiles;
         this.totalSize = totalSize;

@@ -83,7 +83,7 @@ public class ResourceFileFsTest {
         try {
             res.delete();
             fail();
-        } catch(IOException e) {
+        } catch (IOException e) {
             // expected
             verify(file).delete();
         }

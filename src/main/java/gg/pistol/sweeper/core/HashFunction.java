@@ -61,7 +61,7 @@ class HashFunction {
      * @return the hexadecimal representation of the computed SHA-1 hash
      */
     String compute(InputStream inputStream, OperationTrackingListener listener, AtomicBoolean abortFlag)
-            throws IOException,SweeperAbortException {
+            throws IOException, SweeperAbortException {
 
         Preconditions.checkNotNull(inputStream);
         Preconditions.checkNotNull(listener);
@@ -76,7 +76,7 @@ class HashFunction {
     }
 
     private String doCompute(InputStream inputStream, OperationTrackingListener listener, AtomicBoolean abortFlag)
-            throws IOException,SweeperAbortException {
+            throws IOException, SweeperAbortException {
         int len;
         int trackingSize = 0;
 

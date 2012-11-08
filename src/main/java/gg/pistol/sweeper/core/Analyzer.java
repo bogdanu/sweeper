@@ -136,7 +136,7 @@ class Analyzer {
      * @return a root target that wraps the {@code targetResources}</code>
      */
     private TargetImpl traverseResources(Collection<? extends Resource> targetResources, MutableInteger totalTargets,
-            OperationTrackingListener listener) throws SweeperAbortException {
+                                         OperationTrackingListener listener) throws SweeperAbortException {
         log.trace("Traversing the resources.");
         listener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
         TargetImpl root = new TargetImpl(new LinkedHashSet<Resource>(targetResources));
@@ -188,7 +188,7 @@ class Analyzer {
      * @return the number of traversed children targets
      */
     private int expand(Collection<TargetImpl> targets, Collection<TargetImpl> rootChildren, int limit,
-            @Nullable Collection<TargetImpl> nextTargets, OperationTrackingListener listener) throws SweeperAbortException {
+                       @Nullable Collection<TargetImpl> nextTargets, OperationTrackingListener listener) throws SweeperAbortException {
         log.trace("Expanding {} with limit <{}>.", targets, limit);
 
         Set<TargetImpl> rootChildrenSet = new HashSet<TargetImpl>(rootChildren);
@@ -251,7 +251,7 @@ class Analyzer {
      * @return the collection of all the targets with computed size traversed from the {@code root}
      */
     private Collection<TargetImpl> computeSize(TargetImpl root, int totalTargets,
-            final OperationTrackingListener listener) throws SweeperAbortException {
+                                               final OperationTrackingListener listener) throws SweeperAbortException {
         log.trace("Computing the size for {} that has <{}> total sub-targets.", root, totalTargets);
         final Collection<TargetImpl> ret = new ArrayList<TargetImpl>();
         listener.updateOperation(SweeperOperation.SIZE_COMPUTATION);
@@ -315,12 +315,13 @@ class Analyzer {
      * @return a multimap with sizes as keys and the targets with that same size as values for the key
      */
     private Multimap<Long, TargetImpl> filterDuplicateSize(Collection<TargetImpl> list,
-            OperationTrackingListener listener) throws SweeperAbortException {
+                                                           OperationTrackingListener listener) throws SweeperAbortException {
         log.trace("Deduplicating the size.");
         listener.updateOperation(SweeperOperation.SIZE_DEDUPLICATION);
 
         Multimap<Long, TargetImpl> sizeDups = filterDuplicates(list, new Function<TargetImpl, Long>() {
-            @Nullable public Long apply(TargetImpl input) {
+            @Nullable
+            public Long apply(TargetImpl input) {
                 // all the null return values will be ignored
                 return input.getType() != Target.Type.ROOT ? input.getSize() : null;
             }
@@ -336,10 +337,10 @@ class Analyzer {
      * the context of the criteria function).
      *
      * @return a multimap with function values as keys and the targets that are considered duplicates as values for
-     * the key
+     *         the key
      */
     private <T> Multimap<T, TargetImpl> filterDuplicates(Collection<TargetImpl> targets,
-            Function<TargetImpl, T> indexFunction) throws SweeperAbortException {
+                                                         Function<TargetImpl, T> indexFunction) throws SweeperAbortException {
 
         // Dumping all the targets into the multimap (Multimaps.index() doesn't work because it does not support
         // skipping null function values and also because of checking the abort flag).
@@ -461,13 +462,14 @@ class Analyzer {
      * @return a multimap with hashes as keys and duplicate targets as values for the key
      */
     private Multimap<String, TargetImpl> filterDuplicateHash(Collection<TargetImpl> targets,
-            OperationTrackingListener listener) throws SweeperAbortException {
+                                                             OperationTrackingListener listener) throws SweeperAbortException {
         log.trace("Deduplicating the hash for targets {}.", targets);
         listener.updateOperation(SweeperOperation.HASH_DEDUPLICATION);
 
         Multimap<String, TargetImpl> hashDups = filterDuplicates(targets,
                 new Function<TargetImpl, String>() {
-                    @Nullable public String apply(TargetImpl input) {
+                    @Nullable
+                    public String apply(TargetImpl input) {
                         // all the null return values will be ignored
                         return input.isHashed() ? input.getHash() : null;
                     }
@@ -478,7 +480,7 @@ class Analyzer {
     }
 
     private SweeperCountImpl computeCount(TargetImpl root, Multimap<String, TargetImpl> hashDups,
-            OperationTrackingListener listener) throws SweeperAbortException {
+                                          OperationTrackingListener listener) throws SweeperAbortException {
         log.trace("Counting the root {} and the hash duplicates {}.", root, hashDups);
         listener.updateOperation(SweeperOperation.COUNTING);
 
@@ -522,7 +524,7 @@ class Analyzer {
     }
 
     private NavigableSet<DuplicateGroup> createDuplicateGroups(Multimap<String, TargetImpl> hashDups,
-            OperationTrackingListener listener) {
+                                                               OperationTrackingListener listener) {
         log.trace("Duplicate grouping.");
         listener.updateOperation(SweeperOperation.DUPLICATE_GROUPING);
 
