@@ -50,7 +50,7 @@ import com.google.common.collect.Multimap;
  * Analyzes a set of targets to find duplicates.
  *
  * <p>The {@link #analyze} and {@link #delete} methods are not thread safe and must be called from the same thread or
- * using synchronization techniques. The {@link #abortAnalysis()} and {@link #abortDeletion()} methods are thread safe
+ * using synchronization techniques. The {@link #abortAnalysis} and {@link #abortDeletion} methods are thread safe
  * and can be called from any thread.
  *
  * @author Bogdan Pistol
