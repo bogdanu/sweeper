@@ -63,17 +63,17 @@ public class ResourceDirectoryFsTest {
     public void testGetSubresources() throws Exception {
         File dir = mockFile("foo", true);
 
-        File child1 = mockFile("child1", true);
-        File child2 = mockFile("child2", true);
-        File child3 = mockFile("child3", false);
+        File child1 = mockFile("foo/child1", true);
+        File child2 = mockFile("foo/child2", true);
+        File child3 = mockFile("foo/child3", false);
         when(dir.listFiles()).thenReturn(new File[]{child1, child2, child3});
 
         ResourceDirectoryFs res = new ResourceDirectoryFs(dir);
         Iterator<? extends Resource> iterator = res.getSubresources().getResources().iterator();
 
-        assertEquals("child1", iterator.next().getName());
-        assertEquals("child2", iterator.next().getName());
-        assertEquals("child3", iterator.next().getName());
+        assertEquals("foo/child1", iterator.next().getName());
+        assertEquals("foo/child2", iterator.next().getName());
+        assertEquals("foo/child3", iterator.next().getName());
         assertTrue(res.getSubresources().getExceptions().isEmpty());
 
         when(child1.isDirectory()).thenReturn(false);

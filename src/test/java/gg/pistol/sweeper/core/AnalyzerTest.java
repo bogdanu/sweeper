@@ -126,18 +126,18 @@ public class AnalyzerTest {
     public void testAnalyzeDuplicateDir() throws Exception {
         long file1Size = 1L;
         String file1Content = "file1Content";
-        ResourceFile file1 = mockFile("file1", file1Size, 10L, file1Content);
+        ResourceFile file1 = mockFile("upperDir/dir/file1", file1Size, 10L, file1Content);
 
         long file2Size = 2L;
         String file2Content = "file2Content";
-        ResourceFile file2 = mockFile("file2", file2Size, 11L, file2Content);
-        ResourceDirectory dir = mockDirectory("dir", file1, file2);
+        ResourceFile file2 = mockFile("upperDir/dir/file2", file2Size, 11L, file2Content);
+        ResourceDirectory dir = mockDirectory("upperDir/dir", file1, file2);
 
-        ResourceFile file1Copy = mockFile("file1Copy", file1Size, 20L, file1Content);
-        ResourceFile file2Copy = mockFile("file2Copy", file2Size, 21L, file2Content);
+        ResourceFile file1Copy = mockFile("dirCopy/file1Copy", file1Size, 20L, file1Content);
+        ResourceFile file2Copy = mockFile("dirCopy/file2Copy", file2Size, 21L, file2Content);
         ResourceDirectory dirCopy = mockDirectory("dirCopy", file1Copy, file2Copy);
 
-        ResourceFile someFile = mockFile("someFile", 5L, 30L, "someFileContent");
+        ResourceFile someFile = mockFile("upperDir/someFile", 5L, 30L, "someFileContent");
         ResourceDirectory upperDir = mockDirectory("upperDir", dir, someFile);
 
         Set<Resource> set = ImmutableSet.of((Resource) upperDir, dirCopy);
@@ -213,8 +213,8 @@ public class AnalyzerTest {
     public void testAnalyzeEmpty() throws Exception {
         ResourceDirectory emptyDir = mockDirectory("emptyDir");
         ResourceFile emptyFile1 = mockFile("emptyFile1", 0L, 10L, "");
-        ResourceFile emptyFile2 = mockFile("emptyFile2", 0L, 11L, "");
-        ResourceFile emptyFile3 = mockFile("emptyFile3", 0L, 12L, "");
+        ResourceFile emptyFile2 = mockFile("dir/emptyFile2", 0L, 11L, "");
+        ResourceFile emptyFile3 = mockFile("dir/emptyFile3", 0L, 12L, "");
         ResourceDirectory dir = mockDirectory("dir", emptyFile2, emptyFile3);
 
         Set<Resource> set = ImmutableSet.of(emptyDir, emptyFile1, dir);
@@ -254,7 +254,7 @@ public class AnalyzerTest {
     public void testAnalyzeSingleFile() throws Exception {
         long fileSize = 1L;
         String fileContent = "fileContent";
-        ResourceFile file = mockFile("file", fileSize, 10L, fileContent);
+        ResourceFile file = mockFile("dir/file", fileSize, 10L, fileContent);
         ResourceFile fileCopy = mockFile("fileCopy", fileSize, 11L, fileContent);
         ResourceDirectory dir = mockDirectory("dir", file);
 
@@ -284,49 +284,6 @@ public class AnalyzerTest {
     }
 
     /*
-     * Test the analyze() method on more than INITIAL_EXPAND_LIMIT targets.
-     */
-    @Test
-    public void testAnalyzeLimit() throws Exception {
-        int targets = 103;
-        Set<Resource> set = new HashSet<Resource>();
-        for (int i = 0; i < targets; i++) {
-            set.add(mockFile("file" + i, i, i, "file" + i));
-        }
-
-        NavigableSet<DuplicateGroup> dups = analyzer.analyze(set, listener);
-
-        assertTrue(dups.isEmpty());
-
-        verify(listener).updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
-        verify(listener, never()).updateTargetAction(any(TargetImpl.class), eq(TargetAction.EXPAND));
-
-        verify(listener).updateOperation(SweeperOperation.SIZE_COMPUTATION);
-        verify(listener, atLeastOnce()).updateTargetAction(any(TargetImpl.class), eq(TargetAction.COMPUTE_SIZE));
-
-        verify(listener).updateOperation(SweeperOperation.SIZE_DEDUPLICATION);
-
-        verify(listener).updateOperation(SweeperOperation.HASH_COMPUTATION);
-        verify(listener, never()).updateTargetAction(any(TargetImpl.class), eq(TargetAction.COMPUTE_HASH));
-
-        verify(listener).updateOperation(SweeperOperation.HASH_DEDUPLICATION);
-        verify(listener).updateOperation(SweeperOperation.COUNTING);
-        verify(listener).updateOperation(SweeperOperation.DUPLICATE_GROUPING);
-        verify(listener).updateOperationProgress(anyLong(), anyLong(), eq(100));
-
-        SweeperCountImpl count = analyzer.getCount();
-        assertEquals(targets, count.getTotalTargets());
-        assertEquals(targets, count.getTotalTargetFiles());
-        assertEquals(0, count.getTotalTargetDirectories());
-        assertEquals((targets - 1) * targets / 2, count.getTotalSize());
-
-        assertEquals(0, count.getDuplicateTargets());
-        assertEquals(0, count.getDuplicateTargetFiles());
-        assertEquals(0, count.getDuplicateTargetDirectories());
-        assertEquals(0L, count.getDuplicateSize());
-    }
-
-    /*
      * Test detecting duplicates while having exceptions computing the size/hash.
      *
      *      --file1
@@ -341,8 +298,8 @@ public class AnalyzerTest {
         long file1Size = 1L;
         String file1Content = "file1Content";
         ResourceFile file1 = mockFile("file1", file1Size, 10L, file1Content);
-        ResourceFile file1Copy = mockFile("file1Copy", file1Size, 11L, file1Content);
-        ResourceFile file2 = mockFile("file2", file1Size, 20L, "file2Content");
+        ResourceFile file1Copy = mockFile("dir/file1Copy", file1Size, 11L, file1Content);
+        ResourceFile file2 = mockFile("dir/file2", file1Size, 20L, "file2Content");
         ResourceFile file3 = mockFile("file3", 0L, 30L, "file3Content");
 
         when(file2.getInputStream()).thenThrow(new IOException());
@@ -390,8 +347,8 @@ public class AnalyzerTest {
      */
     @Test
     public void testAnalyzeMultipleParent() throws Exception {
-        ResourceFile res2 = mockFile("res2", 0L, 0L, "");
-        ResourceDirectory dir = mockDirectory("dir", res2);
+        ResourceFile res2 = mockFile("res1/dir/res2", 0L, 0L, "");
+        ResourceDirectory dir = mockDirectory("res1/dir", res2);
         ResourceDirectory res1 = mockDirectory("res1", dir);
 
         analyzer.analyze(ImmutableSet.of(res1, res2), listener);
@@ -436,10 +393,10 @@ public class AnalyzerTest {
      */
     @Test
     public void testRecursiveDelete() throws Exception {
-        ResourceFile file1 = mockFile("file1", 0, 0, "");
-        ResourceFile file2 = mockFile("file2", 0, 0, "");
-        ResourceFile file3 = mockFile("file3", 0, 0, "");
-        ResourceFile file4 = mockFile("file4", 0, 0, "");
+        ResourceFile file1 = mockFile("dir1/file1", 0, 0, "");
+        ResourceFile file2 = mockFile("dir1/file2", 0, 0, "");
+        ResourceFile file3 = mockFile("dir2/file3", 0, 0, "");
+        ResourceFile file4 = mockFile("dir2/file4", 0, 0, "");
         ResourceDirectory dir1 = mockDirectory("dir1", file1, file2);
         ResourceDirectory dir2 = mockDirectory("dir2", file3, file4);
         when(dir1.deleteOnlyEmpty()).thenReturn(true);
@@ -469,8 +426,8 @@ public class AnalyzerTest {
      */
     @Test
     public void testNonRecursiveDelete() throws Exception {
-        ResourceFile file1 = mockFile("file1", 0, 0, "");
-        ResourceFile file2 = mockFile("file2", 0, 0, "");
+        ResourceFile file1 = mockFile("dir/file1", 0, 0, "");
+        ResourceFile file2 = mockFile("dir/file2", 0, 0, "");
         ResourceDirectory dir = mockDirectory("dir", file1, file2);
         when(dir.deleteOnlyEmpty()).thenReturn(false);
 
