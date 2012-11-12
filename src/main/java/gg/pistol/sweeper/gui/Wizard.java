@@ -22,6 +22,7 @@ import gg.pistol.lumberjack.JackLoggerFactory;
 import gg.pistol.sweeper.core.Sweeper;
 import gg.pistol.sweeper.core.SweeperException;
 import gg.pistol.sweeper.core.SweeperImpl;
+import gg.pistol.sweeper.core.resource.ResourceDirectoryFs;
 import gg.pistol.sweeper.gui.WizardPage.WizardPageListener;
 import gg.pistol.sweeper.gui.component.BasicDialog;
 import gg.pistol.sweeper.gui.component.DecoratedPanel;
@@ -37,6 +38,9 @@ import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
 
 import javax.annotation.Nullable;
 import javax.swing.BorderFactory;
@@ -141,7 +145,13 @@ public class Wizard implements WizardPageListener {
 
     private WizardPage getCurrentPage() {
         if (currentPage == null) {
-            currentPage = new WelcomePage(i18n, this, sweeper);
+//            currentPage = new WelcomePage(i18n, this, sweeper);
+            try {
+                currentPage = new AnalysisPage(new WelcomePage(i18n, this, sweeper), i18n, this, sweeper, Collections.singleton(new ResourceDirectoryFs(new File("/"))));
+                currentPage.setParentWindow(window);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return currentPage;
     }

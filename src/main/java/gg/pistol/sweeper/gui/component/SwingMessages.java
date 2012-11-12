@@ -57,6 +57,7 @@ public class SwingMessages implements LocaleChangeListener {
 
     private void update() {
         updateFileChooser();
+        UIManager.put("swing.boldMetal", Boolean.FALSE); // switch off MetalLookAndFeel default bold fonts
     }
 
     private void updateFileChooser() {

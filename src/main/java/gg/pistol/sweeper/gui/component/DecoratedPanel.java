@@ -20,11 +20,7 @@ package gg.pistol.sweeper.gui.component;
 import gg.pistol.sweeper.i18n.I18n;
 import gg.pistol.sweeper.i18n.SupportedLocale;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.ComponentOrientation;
-import java.awt.Cursor;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -281,7 +277,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * @return the aligned component
      */
     protected <T extends JComponent> T alignLeft(T component) {
-        return alignVertically(component, Component.LEFT_ALIGNMENT);
+        return alignHorizontally(component, Component.LEFT_ALIGNMENT);
     }
 
     /**
@@ -292,10 +288,10 @@ public abstract class DecoratedPanel extends DynamicPanel {
      * @return the aligned component
      */
     protected <T extends JComponent> T alignRight(T component) {
-        return alignVertically(component, Component.RIGHT_ALIGNMENT);
+        return alignHorizontally(component, Component.RIGHT_ALIGNMENT);
     }
 
-    private <T extends JComponent> T alignVertically(T component, float alignment) {
+    private <T extends JComponent> T alignHorizontally(T component, float alignment) {
         Preconditions.checkNotNull(component);
 
         if (!ComponentOrientation.getOrientation(i18n.getLocale()).isLeftToRight()) {

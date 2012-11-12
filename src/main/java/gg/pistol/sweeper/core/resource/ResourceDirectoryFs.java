@@ -61,10 +61,16 @@ public class ResourceDirectoryFs extends AbstractResource implements ResourceDir
         Collection<Resource> resources = new ArrayList<Resource>();
         Collection<Exception> exceptions = null;
 
+        String prefix = name;
+        if (!prefix.endsWith(File.separator)) {
+            prefix += File.separator;
+        }
         for (File f : files) {
             try {
                 Resource r = createResource(f);
-                resources.add(r);
+                if (r.getName().startsWith(prefix)) { // defend against cycles created by symbolic links
+                    resources.add(r);
+                }
             } catch (Exception e) {
                 if (exceptions == null) {
                     exceptions = new ArrayList<Exception>();

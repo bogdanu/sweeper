@@ -32,6 +32,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -252,7 +254,12 @@ class ResourceSelectionPage extends WizardPage {
 
     @Override
     WizardPage next() {
-        return new AnalysisPage(this, i18n, listener, sweeper);
+        Collection<Resource> collection = new ArrayList<Resource>();
+        Enumeration<Resource> enumeration = resources.elements();
+        while (enumeration.hasMoreElements()) {
+            collection.add(enumeration.nextElement());
+        }
+        return new AnalysisPage(this, i18n, listener, sweeper, collection);
     }
 
     @Override

@@ -112,6 +112,8 @@ public class I18n {
     public static final String PAGE_ANALYSIS_OPERATION_PROGRESS_ID = "page.analysis.operationProgress";
     public static final String PAGE_ANALYSIS_OPERATION_ELAPSED_TIME_ID = "page.analysis.operationElapsedTime";
     public static final String PAGE_ANALYSIS_OPERATION_REMAINING_TIME_ID = "page.analysis.operationRemainingTime";
+    public static final String PAGE_ANALYSIS_OPERATION_TARGET_LABEL_ID = "page.analysis.operationTargetLabel";
+    public static final String PAGE_ANALYSIS_ERROR_COUNTER_ID = "page.analysis.error.counter";
 
     public static final String FILE_CHOOSER_CURRENT_DIRECTORY_ID = "fileChooser.currentDirectory";
     public static final String FILE_CHOOSER_UP_ID = "fileChooser.up";
@@ -129,6 +131,10 @@ public class I18n {
 
     public static final String TEXT_COPY_ID = "text.copy";
     public static final String TEXT_SELECT_ALL_ID = "text.selectAll";
+
+    public static final String TIME_DESCRIPTION_HOURS_ID = "time.description.hours";
+    public static final String TIME_DESCRIPTION_MINUTES_ID = "time.description.minutes";
+    public static final String TIME_DESCRIPTION_SECONDS_ID = "time.description.seconds";
 
     private static final String MESSAGES_BASENAME = "messages";
     private static final String[] SUPPORTED_LANGUAGES = new String[]{"en", "de", "fr", "es", "pt", "ro", "ru", "ar", "iw", "ja", "hi", "zh_CN", "zh_TW"};
