@@ -45,6 +45,8 @@ import java.util.concurrent.atomic.AtomicLong;
 // package private
 class AnalysisPage extends WizardPage {
 
+    public static final int PROGRESS_UPDATE_FREQUENCY = 40; // millis
+
     private final JackLogger log;
     private final WizardPage previousPage;
 
@@ -207,7 +209,7 @@ class AnalysisPage extends WizardPage {
             public void run() {
                 while (!analysisDone) {
                     try {
-                        Thread.sleep(40);
+                        Thread.sleep(PROGRESS_UPDATE_FREQUENCY);
                     } catch (InterruptedException e) {
                         break;
                     }
@@ -239,6 +241,8 @@ class AnalysisPage extends WizardPage {
                     sweeper.analyze(resources, operationListener);
                 } catch (SweeperAbortException e) {
                     // ignore
+                } catch (Exception e) {
+                    e.printStackTrace();
                 } finally {
                     analysisDone = true;
                     getParentWindow().removeWindowListener(windowListener);
