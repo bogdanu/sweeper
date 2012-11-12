@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -57,12 +58,6 @@ import com.google.common.collect.Multimap;
  */
 // package private
 class Analyzer {
-
-    /*
-     * Expand initially up to a limit and afterwards track the progress of expanding the remaining directories.
-     * For more details see the traverseResources() method.
-     */
-    private static final int INITIAL_EXPAND_LIMIT = 100;
 
     private final JackLogger log;
 
@@ -126,13 +121,6 @@ class Analyzer {
     /**
      * Traverse the resources and expand them.
      *
-     * <p>Because it is not known in advance how many resources need to be traversed, it is not possible to provide
-     * accurate progress on the traversed resources. In order to have some estimative progress, the tree of resources
-     * is traversed up to a limit {@link #INITIAL_EXPAND_LIMIT} without any progress indication and a collection of not
-     * yet expanded targets is filled (the leafs of the limited tree traversal).
-     * Afterwards the collection of not yet expanded targets is traversed with progress indication relative to the size
-     * of the collection.
-     *
      * @return a root target that wraps the {@code targetResources}</code>
      */
     private TargetImpl traverseResources(Collection<? extends Resource> targetResources, MutableInteger totalTargets,
@@ -142,34 +130,19 @@ class Analyzer {
         TargetImpl root = new TargetImpl(new LinkedHashSet<Resource>(targetResources));
         totalTargets.setValue(1);
 
-        Collection<TargetImpl> nextTargets = new ArrayList<TargetImpl>();
-        int initialTargets = expand(root.getChildren(), root.getChildren(), INITIAL_EXPAND_LIMIT, nextTargets, listener);
-        totalTargets.add(initialTargets);
-
-        Iterator<TargetImpl> iterator = nextTargets.iterator();
-        listener.setOperationMaxProgress(nextTargets.size());
-
-        // expand with progress indication
-        for (int i = 1; iterator.hasNext(); i++) {
-            TargetImpl target = iterator.next();
-
-            int expandedTargets = expand(Collections.singletonList(target), root.getChildren(), -1, null, listener);
-            totalTargets.add(expandedTargets);
-            listener.incrementOperationProgress(i);
-        }
+        long t = System.nanoTime();
+        int expandedTargets = expand(root.getChildren(), listener);
+        System.out.println("files = " + expandedTargets + ", time = " + (System.nanoTime() - t) / 1000000);
+        totalTargets.add(expandedTargets);
 
         listener.operationCompleted();
         return root;
     }
 
     /**
-     * Expand recursively a target up to the specified {@code limit} (the limit value -1 specifies no limit).
+     * Expand recursively.
      *
-     * <p>This method has side effects: if you specify a non-null {@code nextTargets} collection parameter then
-     * the collection will be filled with the remaining not yet expanded targets (that will possibly exist only if
-     * an expansion limit is specified).
-     *
-     * <p>Another side effect: if there is an expanded target equal to any of the {@code rootChildren} then that root
+     * <p>This method has side effects: if there is an expanded target equal to any of the {@code rootChildren} then that root
      * child will be removed from the {@code rootChildren} collection. This is done to prevent a target from having
      * multiple parents.
      *
@@ -187,49 +160,30 @@ class Analyzer {
      *
      * @return the number of traversed children targets
      */
-    private int expand(Collection<TargetImpl> targets, Collection<TargetImpl> rootChildren, int limit,
-                       @Nullable Collection<TargetImpl> nextTargets, OperationTrackingListener listener) throws SweeperAbortException {
-        log.trace("Expanding {} with limit <{}>.", targets, limit);
-
+    private int expand(Collection<TargetImpl> rootChildren, OperationTrackingListener listener) throws SweeperAbortException {
         Set<TargetImpl> rootChildrenSet = new HashSet<TargetImpl>(rootChildren);
-        LinkedList<TargetImpl> next = new LinkedList<TargetImpl>();
-        next.addAll(targets);
-
+        Deque<TargetImpl> stack = new LinkedList<TargetImpl>();
+        stack.addAll(rootChildren);
         int targetCount = 0;
 
-        int levelSize = 1; // the number of targets on the current BFS level
+        while (!stack.isEmpty()) {
+            TargetImpl target = stack.pop();
+            target.expand(listener);
+            targetCount++;
 
-        /*
-         * BFS traversal of the tree of targets.
-         * If there is a limit then the traversal will stop on the BFS level that has at least "limit" targets.
-         */
-        while (!next.isEmpty() && (limit == -1 || next.size() < limit || levelSize > 0)) {
+            for (TargetImpl t : target.getChildren()) {
+                if (t.getType() != Type.FILE) {
+                    stack.push(t);
+                }
 
-            if (levelSize == 0) { // next BFS level reached
-                levelSize = next.size();
-            }
-
-            TargetImpl currentTarget = next.poll();
-            currentTarget.expand(listener);
-            next.addAll(currentTarget.getChildren());
-
-            // resolve the multiple parent situations
-            for (TargetImpl t : currentTarget.getChildren()) {
+                // resolve the multiple parent situations
                 if (rootChildrenSet.contains(t)) {
                     rootChildrenSet.remove(t);
                     rootChildren.remove(t);
                 }
             }
-
-            levelSize--;
-            targetCount++;
             checkAbortFlag();
         }
-
-        if (nextTargets != null) {
-            nextTargets.addAll(next);
-        }
-
         return targetCount;
     }
 
