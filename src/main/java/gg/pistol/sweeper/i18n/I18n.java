@@ -110,8 +110,6 @@ public class I18n {
     public static final String PAGE_ANALYSIS_OPERATION_DUPLICATE_GROUPING_ID = "page.analysis.operationDuplicateGrouping";
     public static final String PAGE_ANALYSIS_OPERATION_RESOURCE_DELETION_ID = "page.analysis.operationResourceDeletion";
     public static final String PAGE_ANALYSIS_OPERATION_PROGRESS_ID = "page.analysis.operationProgress";
-    public static final String PAGE_ANALYSIS_OPERATION_ELAPSED_TIME_ID = "page.analysis.operationElapsedTime";
-    public static final String PAGE_ANALYSIS_OPERATION_REMAINING_TIME_ID = "page.analysis.operationRemainingTime";
     public static final String PAGE_ANALYSIS_OPERATION_TARGET_LABEL_ID = "page.analysis.operationTargetLabel";
     public static final String PAGE_ANALYSIS_ERROR_COUNTER_ID = "page.analysis.error.counter";
 

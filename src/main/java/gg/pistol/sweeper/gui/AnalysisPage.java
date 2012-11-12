@@ -54,7 +54,6 @@ class AnalysisPage extends WizardPage {
     private final long startTime;
     private volatile int totalProgressPercent;
     private SweeperOperation operation;
-    private long operationStartTime;
     private volatile long operationProgress;
     private volatile long operationMaxProgress;
     private volatile Target currentTarget;
@@ -69,8 +68,6 @@ class AnalysisPage extends WizardPage {
     @Nullable private JLabel totalRemainingTime;
     @Nullable private JLabel operationDescription;
     @Nullable private JProgressBar operationProgressBar;
-    @Nullable private JLabel operationElapsedTime;
-    @Nullable private JLabel operationRemainingTime;
     @Nullable private JLabel operationTargetLabel;
     @Nullable private JLabel operationTarget;
     @Nullable private JLabel errorCounter;
@@ -85,7 +82,6 @@ class AnalysisPage extends WizardPage {
         operationListener = getOperationListener();
 
         startTime = System.currentTimeMillis();
-        operationStartTime = startTime;
 
         executor = Executors.newFixedThreadPool(2);
         operation = SweeperOperation.RESOURCE_TRAVERSING;
@@ -122,14 +118,6 @@ class AnalysisPage extends WizardPage {
         addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_PROGRESS_ID)), false, false);
         operationProgressBar = createProgressBar();
         addGridComponent(grid, operationProgressBar, true, false);
-
-        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_ELAPSED_TIME_ID)), false, false);
-        operationElapsedTime = new JLabel(formatTime(getOperationElapsedTime()));
-        addGridComponent(grid, operationElapsedTime, true, false);
-
-        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_REMAINING_TIME_ID)), false, false);
-        operationRemainingTime = new JLabel();
-        addGridComponent(grid, operationRemainingTime, true, false);
 
         operationTargetLabel = new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_TARGET_LABEL_ID));
         addGridComponent(grid, operationTargetLabel, false, true);
@@ -211,10 +199,6 @@ class AnalysisPage extends WizardPage {
         if (totalProgressPercent > 0) {
             totalRemainingTime.setText(formatTime(getRemainingTime()));
         }
-        operationElapsedTime.setText(formatTime(getOperationElapsedTime()));
-        if (operationMaxProgress > 0) {
-            operationRemainingTime.setText(formatTime(getOperationRemainingTime()));
-        }
     }
 
     private Runnable getRunnableProgress() {
@@ -267,16 +251,8 @@ class AnalysisPage extends WizardPage {
         return System.currentTimeMillis() - startTime;
     }
 
-    private long getOperationElapsedTime() {
-        return System.currentTimeMillis() - operationStartTime;
-    }
-
     private long getRemainingTime() {
         return (100 - totalProgressPercent) * getElapsedTime() / totalProgressPercent;
-    }
-
-    private long getOperationRemainingTime() {
-        return (operationMaxProgress - operationProgress) * getOperationElapsedTime() / operationProgress;
     }
 
     private String getOperationDescription(SweeperOperation operation) {

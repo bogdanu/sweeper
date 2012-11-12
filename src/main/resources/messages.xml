@@ -66,8 +66,6 @@
     <entry key="page.analysis.operationDuplicateGrouping">Grouping the duplicate files and directories</entry>
     <entry key="page.analysis.operationResourceDeletion">Deleting the duplicate files and directories</entry>
     <entry key="page.analysis.operationProgress">Operation progress:</entry>
-    <entry key="page.analysis.operationElapsedTime">Operation elapsed time:</entry>
-    <entry key="page.analysis.operationRemainingTime">Operation remaining time:</entry>
     <entry key="page.analysis.operationTargetLabel">Processing file:</entry>
     <entry key="page.analysis.error.counter">Errors:</entry>
 
