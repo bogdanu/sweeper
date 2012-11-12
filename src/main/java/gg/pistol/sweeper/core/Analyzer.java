@@ -172,6 +172,8 @@ class Analyzer {
             for (TargetImpl t : target.getChildren()) {
                 if (t.getType() != Type.FILE) {
                     stack.push(t);
+                } else {
+                    targetCount++;
                 }
 
                 // resolve the multiple parent situations
@@ -338,7 +340,7 @@ class Analyzer {
      */
     private void computeHash(Collection<TargetImpl> targets, final OperationTrackingListener listener)
             throws SweeperAbortException {
-        log.trace("Computing the hash for targets {}.", targets);
+        log.trace("Computing the hash for {} targets.", targets.size());
         listener.updateOperation(SweeperOperation.HASH_COMPUTATION);
 
         // Filter the targets that are not the children of other targets. All the children targets will have the hash
@@ -415,7 +417,7 @@ class Analyzer {
      */
     private Multimap<String, TargetImpl> filterDuplicateHash(Collection<TargetImpl> targets,
                                                              OperationTrackingListener listener) throws SweeperAbortException {
-        log.trace("Deduplicating the hash for targets {}.", targets);
+        log.trace("Deduplicating the hash for {} targets.", targets.size());
         listener.updateOperation(SweeperOperation.HASH_DEDUPLICATION);
 
         Multimap<String, TargetImpl> hashDups = filterDuplicates(targets,
