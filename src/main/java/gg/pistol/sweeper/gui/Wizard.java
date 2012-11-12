@@ -146,8 +146,9 @@ public class Wizard implements WizardPageListener {
     private WizardPage getCurrentPage() {
         if (currentPage == null) {
 //            currentPage = new WelcomePage(i18n, this, sweeper);
+//            currentPage.setParentWindow(window);
             try {
-                currentPage = new AnalysisPage(new WelcomePage(i18n, this, sweeper), i18n, this, sweeper, Collections.singleton(new ResourceDirectoryFs(new File("/"))));
+                currentPage = new AnalysisPage(new WelcomePage(i18n, this, sweeper), i18n, this, sweeper, Collections.singleton(new ResourceDirectoryFs(new File("/usr"))));
                 currentPage.setParentWindow(window);
             } catch (IOException e) {
                 e.printStackTrace();

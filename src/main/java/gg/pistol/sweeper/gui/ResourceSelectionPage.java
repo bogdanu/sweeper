@@ -259,7 +259,9 @@ class ResourceSelectionPage extends WizardPage {
         while (enumeration.hasMoreElements()) {
             collection.add(enumeration.nextElement());
         }
-        return new AnalysisPage(this, i18n, listener, sweeper, collection);
+        AnalysisPage analysisPage = new AnalysisPage(this, i18n, listener, sweeper, collection);
+        analysisPage.setParentWindow(getParentWindow());
+        return analysisPage;
     }
 
     @Override

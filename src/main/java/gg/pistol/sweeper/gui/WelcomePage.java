@@ -108,6 +108,7 @@ class WelcomePage extends WizardPage {
     WizardPage next() {
         if (nextPage == null) {
             nextPage = new ResourceSelectionPage(this, i18n, listener, sweeper);
+            nextPage.setParentWindow(getParentWindow());
         }
         return nextPage;
     }
