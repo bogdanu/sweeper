@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.TreeSet;
 
 import com.google.common.base.Preconditions;
 
@@ -58,7 +59,7 @@ public class ResourceDirectoryFs extends AbstractResource implements ResourceDir
             return createResponse(Collections.<Resource>emptyList(), Collections.singleton(e));
         }
 
-        Collection<Resource> resources = new ArrayList<Resource>();
+        Collection<Resource> resources = new TreeSet<Resource>();
         Collection<Exception> exceptions = null;
 
         String prefix = name;
@@ -68,7 +69,14 @@ public class ResourceDirectoryFs extends AbstractResource implements ResourceDir
         for (File f : files) {
             try {
                 Resource r = createResource(f);
-                if (r.getName().startsWith(prefix)) { // defend against cycles created by symbolic links
+                if (r.getName().startsWith(prefix) && r.getName().length() > prefix.length() &&
+                        !r.getName().substring(prefix.length() + 1).contains(File.separator)) {
+                    // Defend against cycles created by symbolic links and also ignore all the symbolic links.
+                    // In Java 1.6 there is no API to determine if a file is a symbolic link, the workaround is to
+                    // use the canonical path of the name of the resource and compare it with the parent canonical path.
+                    // Also it is possible to have a symlink in the same directory with the target original file,
+                    // and the canonical path is used again to guard against this by eliminating the symlink when both
+                    // are added to the "resources" TreeSet.
                     resources.add(r);
                 }
             } catch (Exception e) {
