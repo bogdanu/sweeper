@@ -130,9 +130,7 @@ class Analyzer {
         TargetImpl root = new TargetImpl(new LinkedHashSet<Resource>(targetResources));
         totalTargets.setValue(1);
 
-        long t = System.nanoTime();
         int expandedTargets = expand(root.getChildren(), listener);
-        System.out.println("files = " + expandedTargets + ", time = " + (System.nanoTime() - t) / 1000000);
         totalTargets.add(expandedTargets);
 
         listener.operationCompleted();
