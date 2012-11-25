@@ -136,8 +136,7 @@ public class I18n {
     public static final String TIME_DESCRIPTION_SECONDS_ID = "time.description.seconds";
 
     private static final String MESSAGES_BASENAME = "messages";
-    private static final String[] SUPPORTED_LANGUAGES = new String[]{"en", "de", "fr", "es", "pt", "ro", "ru", "ar", "iw", "ja", "hi", "zh_CN", "zh_TW"};
-
+    private static final String[] SUPPORTED_LANGUAGES = new String[]{"en", "es", "pt", "de", "fr", "ro", "zh_CN", "zh_TW", "hi", "ar", "ru", "ja", "iw"};
 
     private final JackLogger log;
     private final Lock lock;
