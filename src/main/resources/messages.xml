@@ -63,7 +63,8 @@
     <entry key="page.analysis.operationResourceDeletion">Deleting the duplicate files and directories</entry>
     <entry key="page.analysis.operationProgress">Operation progress:</entry>
     <entry key="page.analysis.operationTargetLabel">Processing file:</entry>
-    <entry key="page.analysis.error.counter">Errors:</entry>
+    <entry key="page.analysis.error.label">Errors:</entry>
+    <entry key="page.analysis.error.counter">{0} errors</entry>
 
     <entry key="fileChooser.currentDirectory">Current directory</entry>
     <entry key="fileChooser.up">Parent directory</entry>

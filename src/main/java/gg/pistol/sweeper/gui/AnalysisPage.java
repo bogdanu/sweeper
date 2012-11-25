@@ -18,8 +18,6 @@
 package gg.pistol.sweeper.gui;
 
 import com.google.common.base.Preconditions;
-import gg.pistol.lumberjack.JackLogger;
-import gg.pistol.lumberjack.JackLoggerFactory;
 import gg.pistol.sweeper.core.Sweeper;
 import gg.pistol.sweeper.core.SweeperAbortException;
 import gg.pistol.sweeper.core.SweeperException;
@@ -29,7 +27,6 @@ import gg.pistol.sweeper.core.Target;
 import gg.pistol.sweeper.core.TargetAction;
 import gg.pistol.sweeper.core.resource.Resource;
 import gg.pistol.sweeper.i18n.I18n;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
@@ -38,16 +35,16 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Collection;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.LinkedBlockingDeque;
 
 // package private
 class AnalysisPage extends WizardPage {
 
-    public static final int PROGRESS_UPDATE_FREQUENCY = 40; // millis
+    private static final int PROGRESS_UPDATE_FREQUENCY = 40; // millis
 
-    private final JackLogger log;
     private final WizardPage previousPage;
 
     private final Collection<? extends Resource> resources;
@@ -59,26 +56,27 @@ class AnalysisPage extends WizardPage {
     private volatile long operationProgress;
     private volatile long operationMaxProgress;
     private volatile Target currentTarget;
-    private AtomicLong errors = new AtomicLong();
 
-    private ExecutorService executor;
+    private final ExecutorService executor;
     private boolean analysisStarted;
     private volatile boolean analysisDone;
+
+    private int errorLineEnd;
+    private int errorCounter;
+    private final BlockingQueue<String> errorQueue;
 
     @Nullable private JProgressBar totalProgressBar;
     @Nullable private JLabel totalTime;
     @Nullable private JLabel totalRemainingTime;
     @Nullable private JLabel operationDescription;
     @Nullable private JProgressBar operationProgressBar;
-    @Nullable private JLabel operationTargetLabel;
     @Nullable private JLabel operationTarget;
-    @Nullable private JLabel errorCounter;
+    @Nullable private JTextArea errors;
 
     AnalysisPage(WizardPage previousPage, I18n i18n, WizardPageListener listener, Sweeper sweeper, Collection<? extends Resource> resources) {
         super(Preconditions.checkNotNull(i18n), Preconditions.checkNotNull(listener), Preconditions.checkNotNull(sweeper));
         Preconditions.checkNotNull(previousPage);
 
-        log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(ResourceSelectionPage.class));
         this.previousPage = previousPage;
         this.resources = resources;
         operationListener = getOperationListener();
@@ -87,6 +85,7 @@ class AnalysisPage extends WizardPage {
 
         executor = Executors.newFixedThreadPool(2);
         operation = SweeperOperation.RESOURCE_TRAVERSING;
+        errorQueue = new LinkedBlockingDeque<String>();
     }
 
     @Override
@@ -101,39 +100,35 @@ class AnalysisPage extends WizardPage {
         grid.setLayout(new GridBagLayout());
         contentPanel.add(alignLeft(grid));
 
-        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_TOTAL_PROGRESS_ID)), false, true);
+        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_TOTAL_PROGRESS_ID)), false, false, true);
         totalProgressBar = createProgressBar();
-        addGridComponent(grid, totalProgressBar, true, true);
+        addGridComponent(grid, totalProgressBar, true, false, true);
 
-        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_TOTAL_ELAPSED_TIME_ID)), false, false);
+        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_TOTAL_ELAPSED_TIME_ID)), false, false, false);
         totalTime = new JLabel(formatTime(getElapsedTime()));
-        addGridComponent(grid, totalTime, true, false);
+        addGridComponent(grid, totalTime, true, false, false);
 
-        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_TOTAL_REMAINING_TIME_ID)), false, false);
+        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_TOTAL_REMAINING_TIME_ID)), false, false, false);
         totalRemainingTime = new JLabel();
-        addGridComponent(grid, totalRemainingTime, true, false);
+        addGridComponent(grid, totalRemainingTime, true, false, false);
 
-        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_LABEL_ID)), false, true);
+        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_LABEL_ID)), false, false, true);
         operationDescription = new JLabel(getOperationDescription(operation));
-        addGridComponent(grid, operationDescription, true, true);
+        addGridComponent(grid, operationDescription, true, false, true);
 
-        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_PROGRESS_ID)), false, false);
+        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_PROGRESS_ID)), false, false, false);
         operationProgressBar = createProgressBar();
-        addGridComponent(grid, operationProgressBar, true, false);
+        addGridComponent(grid, operationProgressBar, true, false, false);
 
-        operationTargetLabel = new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_TARGET_LABEL_ID));
-        addGridComponent(grid, operationTargetLabel, false, true);
+        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_TARGET_LABEL_ID)), false, false, true);
         operationTarget = new JLabel();
-        addGridComponent(grid, operationTarget, true, true);
-        setOperationTargetVisibility(false);
+        addGridComponent(grid, operationTarget, true, false, true);
 
-        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_ERROR_COUNTER_ID)), false, true);
-        errorCounter = new JLabel(Long.toString(errors.get()));
-        addGridComponent(grid, errorCounter, true, true);
-
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.weighty = 1;
-        grid.add(Box.createVerticalGlue(), constraints);
+        addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_ERROR_LABEL_ID)), false, false, true);
+        errors = new JTextArea();
+        errors.setEditable(false);
+        addCopyMenu(errors);
+        addGridComponent(grid, new JScrollPane(errors), true, true, true);
 
         if (!analysisStarted) {
             analysisStarted = true;
@@ -177,7 +172,11 @@ class AnalysisPage extends WizardPage {
 
             @Override
             public void updateTargetException(Target target, TargetAction action, SweeperException e) {
-                errors.incrementAndGet();
+                try {
+                    errorQueue.put(e.getMessage());
+                } catch (InterruptedException ex) {
+                    // ignore
+                }
             }
         };
     }
@@ -188,11 +187,30 @@ class AnalysisPage extends WizardPage {
         if (operationMaxProgress > 0) {
             operationProgressBar.setValue((int) (100 * operationProgress / operationMaxProgress));
         }
-        errorCounter.setText(Long.toString(errors.get()));
-        if ((operation == SweeperOperation.RESOURCE_TRAVERSING || operation == SweeperOperation.SIZE_COMPUTATION ||
-                operation == SweeperOperation.HASH_COMPUTATION || operation == SweeperOperation.RESOURCE_DELETION) && currentTarget != null) {
-            setOperationTargetVisibility(true);
-            operationTarget.setText(currentTarget.getName());
+        if (operationProgress == operationMaxProgress) {
+            currentTarget = null;
+        }
+
+        operationTarget.setText(currentTarget != null ? currentTarget.getName() : "");
+
+        String err;
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        while ((err = errorQueue.poll()) != null) {
+            i++;
+            sb.append(err);
+            sb.append("\n");
+        }
+        if (sb.length() > 0) {
+            String counter = i18n.getString(I18n.PAGE_ANALYSIS_ERROR_COUNTER_ID, Integer.toString(errorCounter + i));
+            if (errorCounter > 0) {
+                errors.replaceRange(counter, 0, errorLineEnd);
+            } else {
+                errors.append(counter + "\n");
+            }
+            errorCounter += i;
+            errorLineEnd = counter.length();
+            errors.append(sb.toString());
         }
     }
 
@@ -288,17 +306,12 @@ class AnalysisPage extends WizardPage {
         }
     }
 
-    private void setOperationTargetVisibility(boolean visible) {
-        operationTargetLabel.setVisible(visible);
-        operationTarget.setVisible(visible);
-    }
-
-    private void addGridComponent(JPanel panel, JComponent component, boolean lastRowCell, boolean newGridSection) {
+    private void addGridComponent(JPanel panel, JComponent component, boolean fillHorizontally, boolean fillVertically, boolean newGridSection) {
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.LINE_START;
+        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         int topInset = newGridSection ? 15 : 7;
         int horizontalInset = 3;
-        if (lastRowCell) {
+        if (fillHorizontally) {
             constraints.weightx = 1;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -306,6 +319,11 @@ class AnalysisPage extends WizardPage {
         } else {
             constraints.gridwidth = GridBagConstraints.RELATIVE;
             constraints.insets = new Insets(topInset, 0, 0, horizontalInset);
+        }
+        if (fillVertically) {
+            constraints.weighty = 1;
+            constraints.fill = fillHorizontally ? GridBagConstraints.BOTH : GridBagConstraints.VERTICAL;
+            constraints.insets.bottom = 10;
         }
         panel.add(alignLeft(component), constraints);
     }

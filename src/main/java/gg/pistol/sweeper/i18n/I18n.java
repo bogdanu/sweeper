@@ -107,6 +107,7 @@ public class I18n {
     public static final String PAGE_ANALYSIS_OPERATION_RESOURCE_DELETION_ID = "page.analysis.operationResourceDeletion";
     public static final String PAGE_ANALYSIS_OPERATION_PROGRESS_ID = "page.analysis.operationProgress";
     public static final String PAGE_ANALYSIS_OPERATION_TARGET_LABEL_ID = "page.analysis.operationTargetLabel";
+    public static final String PAGE_ANALYSIS_ERROR_LABEL_ID = "page.analysis.error.label";
     public static final String PAGE_ANALYSIS_ERROR_COUNTER_ID = "page.analysis.error.counter";
 
     public static final String FILE_CHOOSER_CURRENT_DIRECTORY_ID = "fileChooser.currentDirectory";
