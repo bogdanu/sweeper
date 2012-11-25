@@ -114,6 +114,9 @@ public class I18n {
     public static final String PAGE_ANALYSIS_CANCEL_CONFIRMATION_TITLE_ID = "page.analysis.cancel.confirmationTitle";
     public static final String PAGE_ANALYSIS_CANCEL_CONFIRMATION_MESSAGE_ID = "page.analysis.cancel.confirmationMessage";
 
+    public static final String PAGE_NO_DUPLICATE_HEADER_ID = "page.noDuplicate.header";
+    public static final String PAGE_NO_DUPLICATE_TEXT_ID = "page.noDuplicate.text";
+
     public static final String FILE_CHOOSER_CURRENT_DIRECTORY_ID = "fileChooser.currentDirectory";
     public static final String FILE_CHOOSER_UP_ID = "fileChooser.up";
     public static final String FILE_CHOOSER_HOME_ID = "fileChooser.home";

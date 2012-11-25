@@ -70,6 +70,9 @@
     <entry key="page.analysis.cancel.confirmationTitle">Please confirm</entry>
     <entry key="page.analysis.cancel.confirmationMessage">This action will cancel the currently running analysis, are you sure you want to continue?</entry>
 
+    <entry key="page.noDuplicate.header">No duplicate files</entry>
+    <entry key="page.noDuplicate.text">The analysis did not find any duplicate files in the provided locations.</entry>
+
     <entry key="fileChooser.currentDirectory">Current directory</entry>
     <entry key="fileChooser.up">Parent directory</entry>
     <entry key="fileChooser.home">Home directory</entry>
