@@ -246,6 +246,9 @@ public class Wizard implements WizardPageListener {
 
         finishButton.setVisible(!currentPage.isLastPage());
         closeButton.setVisible(currentPage.isLastPage());
+        if (currentPage.isLastPage()) {
+            closeButton.requestFocusInWindow();
+        }
         languagePanel.setVisible(currentPage.isLanguageSelectorVisible());
     }
 
