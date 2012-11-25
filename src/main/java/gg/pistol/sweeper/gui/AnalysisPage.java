@@ -265,16 +265,8 @@ class AnalysisPage extends WizardPage {
                 return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_RESOURCE_TRAVERSAL_ID);
             case SIZE_COMPUTATION:
                 return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_SIZE_COMPUTATION_ID);
-            case SIZE_DEDUPLICATION:
-                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_SIZE_DEDUPLICATION_ID);
             case HASH_COMPUTATION:
                 return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_HASH_COMPUTATION_ID);
-            case HASH_DEDUPLICATION:
-                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_HASH_DEDUPLICATION_ID);
-            case COUNTING:
-                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_COUNTING_ID);
-            case DUPLICATE_GROUPING:
-                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_DUPLICATE_GROUPING_ID);
             case RESOURCE_DELETION:
                 return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_RESOURCE_DELETION_ID);
         }

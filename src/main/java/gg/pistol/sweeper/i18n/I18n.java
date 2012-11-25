@@ -103,11 +103,7 @@ public class I18n {
     public static final String PAGE_ANALYSIS_OPERATION_LABEL_ID = "page.analysis.operationLabel";
     public static final String PAGE_ANALYSIS_OPERATION_RESOURCE_TRAVERSAL_ID = "page.analysis.operationResourceTraversing";
     public static final String PAGE_ANALYSIS_OPERATION_SIZE_COMPUTATION_ID = "page.analysis.operationSizeComputation";
-    public static final String PAGE_ANALYSIS_OPERATION_SIZE_DEDUPLICATION_ID = "page.analysis.operationSizeDeduplication";
     public static final String PAGE_ANALYSIS_OPERATION_HASH_COMPUTATION_ID = "page.analysis.operationHashComputation";
-    public static final String PAGE_ANALYSIS_OPERATION_HASH_DEDUPLICATION_ID = "page.analysis.operationHashDeduplication";
-    public static final String PAGE_ANALYSIS_OPERATION_COUNTING_ID = "page.analysis.operationCounting";
-    public static final String PAGE_ANALYSIS_OPERATION_DUPLICATE_GROUPING_ID = "page.analysis.operationDuplicateGrouping";
     public static final String PAGE_ANALYSIS_OPERATION_RESOURCE_DELETION_ID = "page.analysis.operationResourceDeletion";
     public static final String PAGE_ANALYSIS_OPERATION_PROGRESS_ID = "page.analysis.operationProgress";
     public static final String PAGE_ANALYSIS_OPERATION_TARGET_LABEL_ID = "page.analysis.operationTargetLabel";

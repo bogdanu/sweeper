@@ -21,16 +21,14 @@ package gg.pistol.sweeper.core;
  * Operation executed in the scope of {@link Sweeper#analyze} or {@link Sweeper#delete} method.
  *
  * <p><ul><li>The {@link Sweeper#analyze} method is doing the operations: {@link #RESOURCE_TRAVERSING},
- * {@link #SIZE_COMPUTATION}, {@link #SIZE_DEDUPLICATION}, {@link #HASH_COMPUTATION}, {@link #HASH_DEDUPLICATION},
- * {@link #COUNTING} and {@link #DUPLICATE_GROUPING}.</li>
+ * {@link #SIZE_COMPUTATION} and {@link #HASH_COMPUTATION}.</li>
  *
  * <li>The {@link Sweeper#delete} method is executing the {@link #RESOURCE_DELETION} operation.</li></ul>
  *
  * @author Bogdan Pistol
  */
 public enum SweeperOperation {
-    RESOURCE_TRAVERSING(29), SIZE_COMPUTATION(20), SIZE_DEDUPLICATION(1), HASH_COMPUTATION(47), HASH_DEDUPLICATION(1),
-    COUNTING(1), DUPLICATE_GROUPING(1), RESOURCE_DELETION(100);
+    RESOURCE_TRAVERSING(30), SIZE_COMPUTATION(10), HASH_COMPUTATION(60), RESOURCE_DELETION(100);
 
     private final int percentQuota;
 

@@ -176,7 +176,7 @@ public class OperationTrackingListenerTest {
             // expected because no operation is started
         }
 
-        trackingListener.updateOperation(SweeperOperation.COUNTING);
+        trackingListener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
 
         try {
             trackingListener.setOperationMaxProgress(-1);

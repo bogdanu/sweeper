@@ -107,13 +107,13 @@ class Analyzer {
 
         rootTarget = traverseResources(targetResources, totalTargets, trackingListener);
         Collection<TargetImpl> sized = computeSize(rootTarget, totalTargets.intValue(), trackingListener);
-        Multimap<Long, TargetImpl> sizeDups = filterDuplicateSize(sized, trackingListener);
+        Multimap<Long, TargetImpl> sizeDups = filterDuplicateSize(sized);
 
         computeHash(sizeDups.values(), trackingListener);
-        Multimap<String, TargetImpl> hashDups = filterDuplicateHash(sizeDups.values(), trackingListener);
+        Multimap<String, TargetImpl> hashDups = filterDuplicateHash(sizeDups.values());
 
-        count = computeCount(rootTarget, hashDups, trackingListener);
-        NavigableSet<DuplicateGroup> duplicates = createDuplicateGroups(hashDups, trackingListener);
+        count = computeCount(rootTarget, hashDups);
+        NavigableSet<DuplicateGroup> duplicates = createDuplicateGroups(hashDups);
         analyzing = false;
         return duplicates;
     }
@@ -268,10 +268,8 @@ class Analyzer {
      *
      * @return a multimap with sizes as keys and the targets with that same size as values for the key
      */
-    private Multimap<Long, TargetImpl> filterDuplicateSize(Collection<TargetImpl> list,
-                                                           OperationTrackingListener listener) throws SweeperAbortException {
+    private Multimap<Long, TargetImpl> filterDuplicateSize(Collection<TargetImpl> list) throws SweeperAbortException {
         log.trace("Deduplicating the size.");
-        listener.updateOperation(SweeperOperation.SIZE_DEDUPLICATION);
 
         Multimap<Long, TargetImpl> sizeDups = filterDuplicates(list, new Function<TargetImpl, Long>() {
             @Nullable
@@ -281,7 +279,6 @@ class Analyzer {
             }
         });
 
-        listener.operationCompleted();
         return sizeDups;
     }
 
@@ -415,10 +412,8 @@ class Analyzer {
      *
      * @return a multimap with hashes as keys and duplicate targets as values for the key
      */
-    private Multimap<String, TargetImpl> filterDuplicateHash(Collection<TargetImpl> targets,
-                                                             OperationTrackingListener listener) throws SweeperAbortException {
+    private Multimap<String, TargetImpl> filterDuplicateHash(Collection<TargetImpl> targets) throws SweeperAbortException {
         log.trace("Deduplicating the hash for {} targets.", targets.size());
-        listener.updateOperation(SweeperOperation.HASH_DEDUPLICATION);
 
         Multimap<String, TargetImpl> hashDups = filterDuplicates(targets,
                 new Function<TargetImpl, String>() {
@@ -429,14 +424,11 @@ class Analyzer {
                     }
                 });
 
-        listener.operationCompleted();
         return hashDups;
     }
 
-    private SweeperCountImpl computeCount(TargetImpl root, Multimap<String, TargetImpl> hashDups,
-                                          OperationTrackingListener listener) throws SweeperAbortException {
-        log.trace("Counting the root {} and the hash duplicates {}.", root, hashDups);
-        listener.updateOperation(SweeperOperation.COUNTING);
+    private SweeperCountImpl computeCount(TargetImpl root, Multimap<String, TargetImpl> hashDups) throws SweeperAbortException {
+        log.trace("Counting {} hash duplicates.", hashDups.size());
 
         int totalTargets = root.getTotalTargets();
         int totalTargetFiles = root.getTotalTargetFiles();
@@ -451,7 +443,7 @@ class Analyzer {
         Collection<TargetImpl> hashDupUpperTargets = filterUpperTargets(hashDups.values());
 
         // Group the duplicate targets by hash.
-        Multimap<String, TargetImpl> dups = filterDuplicateHash(hashDupUpperTargets, OperationTrackingListener.NOOP_LISTENER);
+        Multimap<String, TargetImpl> dups = filterDuplicateHash(hashDupUpperTargets);
 
         for (String key : dups.keySet()) {
             Iterator<TargetImpl> iterator = dups.get(key).iterator();
@@ -473,14 +465,11 @@ class Analyzer {
         SweeperCountImpl count = new SweeperCountImpl(totalTargets, totalTargetFiles, totalSize, duplicateTargets,
                 duplicateTargetFiles, duplicateSize);
 
-        listener.operationCompleted();
         return count;
     }
 
-    private NavigableSet<DuplicateGroup> createDuplicateGroups(Multimap<String, TargetImpl> hashDups,
-                                                               OperationTrackingListener listener) {
+    private NavigableSet<DuplicateGroup> createDuplicateGroups(Multimap<String, TargetImpl> hashDups) {
         log.trace("Duplicate grouping.");
-        listener.updateOperation(SweeperOperation.DUPLICATE_GROUPING);
 
         NavigableSet<DuplicateGroup> ret = new TreeSet<DuplicateGroup>();
         for (String key : hashDups.keySet()) {
@@ -489,7 +478,6 @@ class Analyzer {
             ret.add(dup);
         }
 
-        listener.operationCompleted();
         return ret;
     }
 

@@ -183,14 +183,9 @@ public class AnalyzerTest {
         verify(listener).updateOperation(SweeperOperation.SIZE_COMPUTATION);
         verify(listener, atLeastOnce()).updateTargetAction(any(TargetImpl.class), eq(TargetAction.COMPUTE_SIZE));
 
-        verify(listener).updateOperation(SweeperOperation.SIZE_DEDUPLICATION);
-
         verify(listener).updateOperation(SweeperOperation.HASH_COMPUTATION);
         verify(listener, atLeastOnce()).updateTargetAction(any(TargetImpl.class), eq(TargetAction.COMPUTE_HASH));
 
-        verify(listener).updateOperation(SweeperOperation.HASH_DEDUPLICATION);
-        verify(listener).updateOperation(SweeperOperation.COUNTING);
-        verify(listener).updateOperation(SweeperOperation.DUPLICATE_GROUPING);
         verify(listener).updateOperationProgress(anyLong(), anyLong(), eq(100));
     }
 
