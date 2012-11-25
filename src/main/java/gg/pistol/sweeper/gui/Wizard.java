@@ -239,6 +239,9 @@ public class Wizard implements WizardPageListener {
         cancelButton.setEnabled(currentPage.isCancelButtonEnabled());
         backButton.setEnabled(currentPage.isBackButtonEnabled());
         nextButton.setEnabled(currentPage.isNextButtonEnabled());
+        if (currentPage.isNextButtonEnabled()) {
+            nextButton.requestFocusInWindow();
+        }
         finishButton.setEnabled(currentPage.isFinishButtonEnabled());
 
         finishButton.setVisible(!currentPage.isLastPage());

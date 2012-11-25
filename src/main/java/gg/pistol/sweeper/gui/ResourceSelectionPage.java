@@ -92,7 +92,11 @@ class ResourceSelectionPage extends WizardPage {
 
         JPanel buttons = createVerticalPanel();
         selectionPanel.add(buttons);
-        buttons.add(createButton(i18n.getString(I18n.BUTTON_ADD_ID), addAction(), BUTTON_GROUP));
+        JButton addButton = createButton(i18n.getString(I18n.BUTTON_ADD_ID), addAction(), BUTTON_GROUP);
+        buttons.add(addButton);
+        if (!isNextButtonEnabled()) {
+            addButton.requestFocusInWindow();
+        }
         buttons.add(createVerticalStrut(5));
         buttons.add(removeButton = createButton(i18n.getString(I18n.BUTTON_REMOVE_ID), removeAction(), BUTTON_GROUP));
         removeButton.setEnabled(!resources.isEmpty());
