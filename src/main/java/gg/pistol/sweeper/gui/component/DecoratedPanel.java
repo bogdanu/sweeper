@@ -476,6 +476,7 @@ public abstract class DecoratedPanel extends DynamicPanel {
         selector.setMinimumSize(new Dimension(width, height));
         selector.setMaximumSize(new Dimension(width, height));
         selector.setPreferredSize(new Dimension(width, height));
+        selector.setMaximumRowCount(i18n.getSupportedLocales().size());
         selector.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
         return selector;
     }
