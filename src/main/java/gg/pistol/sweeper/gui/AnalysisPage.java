@@ -204,7 +204,7 @@ class AnalysisPage extends WizardPage {
             sb.append(err);
             sb.append("\n");
         }
-        if (sb.length() > 0) {
+        if (i > 0 || errorLineEnd == 0) {
             String counter = i18n.getString(I18n.PAGE_ANALYSIS_ERROR_COUNTER_ID, Integer.toString(errorCounter + i));
             if (errorCounter > 0) {
                 errors.replaceRange(counter, 0, errorLineEnd);
@@ -213,6 +213,8 @@ class AnalysisPage extends WizardPage {
             }
             errorCounter += i;
             errorLineEnd = counter.length();
+        }
+        if (sb.length() > 0) {
             errors.append(sb.toString());
         }
     }
