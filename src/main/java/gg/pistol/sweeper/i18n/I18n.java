@@ -74,6 +74,8 @@ public class I18n {
     public static final String BUTTON_ABOUT_ID = "button.about";
     public static final String BUTTON_FINISH_ID = "button.finish";
     public static final String BUTTON_CLOSE_ID = "button.close";
+    public static final String BUTTON_YES_ID = "button.yes";
+    public static final String BUTTON_NO_ID = "button.no";
 
     public static final String WIZARD_TITLE_ID = "wizard.title";
     public static final String WIZARD_CHANGE_LANGUAGE_ID = "wizard.languageSelector";
@@ -109,6 +111,8 @@ public class I18n {
     public static final String PAGE_ANALYSIS_OPERATION_TARGET_LABEL_ID = "page.analysis.operationTargetLabel";
     public static final String PAGE_ANALYSIS_ERROR_LABEL_ID = "page.analysis.error.label";
     public static final String PAGE_ANALYSIS_ERROR_COUNTER_ID = "page.analysis.error.counter";
+    public static final String PAGE_ANALYSIS_BACK_BUTTON_CONFIRMATION_TITLE_ID = "page.analysis.backButton.confirmationTitle";
+    public static final String PAGE_ANALYSIS_BACK_BUTTON_CONFIRMATION_MESSAGE_ID = "page.analysis.backButton.confirmationMessage";
 
     public static final String FILE_CHOOSER_CURRENT_DIRECTORY_ID = "fileChooser.currentDirectory";
     public static final String FILE_CHOOSER_UP_ID = "fileChooser.up";

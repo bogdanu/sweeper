@@ -26,6 +26,7 @@ import gg.pistol.sweeper.core.SweeperOperationListener;
 import gg.pistol.sweeper.core.Target;
 import gg.pistol.sweeper.core.TargetAction;
 import gg.pistol.sweeper.core.resource.Resource;
+import gg.pistol.sweeper.gui.component.ConfirmationDialog;
 import gg.pistol.sweeper.i18n.I18n;
 
 import javax.annotation.Nullable;
@@ -381,7 +382,13 @@ class AnalysisPage extends WizardPage {
 
     @Override
     WizardPage back() {
-        return previousPage;
+        if (new ConfirmationDialog(getParentWindow(), i18n, i18n.getString(I18n.PAGE_ANALYSIS_BACK_BUTTON_CONFIRMATION_TITLE_ID),
+                i18n.getString(I18n.PAGE_ANALYSIS_BACK_BUTTON_CONFIRMATION_MESSAGE_ID)).isConfirmed()) {
+            sweeper.abortAnalysis();
+            return previousPage;
+        } else {
+            return null;
+        }
     }
 
     @Override

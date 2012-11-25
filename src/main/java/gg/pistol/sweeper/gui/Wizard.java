@@ -145,14 +145,14 @@ public class Wizard implements WizardPageListener {
 
     private WizardPage getCurrentPage() {
         if (currentPage == null) {
-//            currentPage = new WelcomePage(i18n, this, sweeper);
-//            currentPage.setParentWindow(window);
-            try {
-                currentPage = new AnalysisPage(new WelcomePage(i18n, this, sweeper), i18n, this, sweeper, Collections.singleton(new ResourceDirectoryFs(new File("/usr"))));
-                currentPage.setParentWindow(window);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            currentPage = new WelcomePage(i18n, this, sweeper);
+            currentPage.setParentWindow(window);
+//            try {
+//                currentPage = new AnalysisPage(new WelcomePage(i18n, this, sweeper), i18n, this, sweeper, Collections.singleton(new ResourceDirectoryFs(new File("/home"))));
+//                currentPage.setParentWindow(window);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
         return currentPage;
     }
@@ -210,10 +210,13 @@ public class Wizard implements WizardPageListener {
         };
     }
 
-    private void updatePage(WizardPage page) {
+    private void updatePage(@Nullable WizardPage page) {
         Preconditions.checkState(pageContainer != null);
         Preconditions.checkState(currentPage != null);
-        Preconditions.checkState(page != null);
+
+        if (page == null) {
+            return;
+        }
 
         pageContainer.remove(currentPage);
         currentPage = page;

@@ -70,9 +70,9 @@ public class ConfirmationDialog {
                 contentPanel.add(alignCenter((buttons)));
 
                 buttons.add(Box.createHorizontalGlue());
-                buttons.add(createButton(i18n.getString(I18n.BUTTON_OK_ID), okAction(parentWindow), BUTTON_GROUP));
+                buttons.add(createButton(i18n.getString(I18n.BUTTON_YES_ID), okAction(parentWindow), BUTTON_GROUP));
                 buttons.add(createHorizontalStrut(20));
-                buttons.add(createButton(i18n.getString(I18n.BUTTON_CANCEL_ID), closeAction(), BUTTON_GROUP));
+                buttons.add(createButton(i18n.getString(I18n.BUTTON_NO_ID), closeAction(), BUTTON_GROUP));
                 buttons.add(Box.createHorizontalGlue());
             }
         };
