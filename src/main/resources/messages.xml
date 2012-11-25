@@ -67,8 +67,8 @@
     <entry key="page.analysis.operationTargetLabel">Processing file:</entry>
     <entry key="page.analysis.error.label">Errors:</entry>
     <entry key="page.analysis.error.counter">{0} errors</entry>
-    <entry key="page.analysis.backButton.confirmationTitle">Please confirm</entry>
-    <entry key="page.analysis.backButton.confirmationMessage">Going back will cancel the currently running analysis, are you sure you want to go back?</entry>
+    <entry key="page.analysis.cancel.confirmationTitle">Please confirm</entry>
+    <entry key="page.analysis.cancel.confirmationMessage">This action will cancel the currently running analysis, are you sure you want to continue?</entry>
 
     <entry key="fileChooser.currentDirectory">Current directory</entry>
     <entry key="fileChooser.up">Parent directory</entry>

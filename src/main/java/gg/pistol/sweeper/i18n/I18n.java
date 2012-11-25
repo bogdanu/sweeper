@@ -111,8 +111,8 @@ public class I18n {
     public static final String PAGE_ANALYSIS_OPERATION_TARGET_LABEL_ID = "page.analysis.operationTargetLabel";
     public static final String PAGE_ANALYSIS_ERROR_LABEL_ID = "page.analysis.error.label";
     public static final String PAGE_ANALYSIS_ERROR_COUNTER_ID = "page.analysis.error.counter";
-    public static final String PAGE_ANALYSIS_BACK_BUTTON_CONFIRMATION_TITLE_ID = "page.analysis.backButton.confirmationTitle";
-    public static final String PAGE_ANALYSIS_BACK_BUTTON_CONFIRMATION_MESSAGE_ID = "page.analysis.backButton.confirmationMessage";
+    public static final String PAGE_ANALYSIS_CANCEL_CONFIRMATION_TITLE_ID = "page.analysis.cancel.confirmationTitle";
+    public static final String PAGE_ANALYSIS_CANCEL_CONFIRMATION_MESSAGE_ID = "page.analysis.cancel.confirmationMessage";
 
     public static final String FILE_CHOOSER_CURRENT_DIRECTORY_ID = "fileChooser.currentDirectory";
     public static final String FILE_CHOOSER_UP_ID = "fileChooser.up";

@@ -61,6 +61,7 @@ class AnalysisPage extends WizardPage {
     private final ExecutorService executor;
     private boolean analysisStarted;
     private volatile boolean analysisDone;
+    private volatile boolean analysisCanceled;
 
     private int errorLineEnd;
     private int errorCounter;
@@ -190,6 +191,7 @@ class AnalysisPage extends WizardPage {
         }
         if (operationProgress == operationMaxProgress) {
             currentTarget = null;
+            listener.onButtonStateChange();
         }
 
         operationTarget.setText(currentTarget != null ? currentTarget.getName() : "");
@@ -226,7 +228,7 @@ class AnalysisPage extends WizardPage {
         return new Runnable() {
             @Override
             public void run() {
-                while (!analysisDone) {
+                while (!analysisDone && !analysisCanceled) {
                     try {
                         Thread.sleep(PROGRESS_UPDATE_FREQUENCY);
                     } catch (InterruptedException e) {
@@ -251,19 +253,22 @@ class AnalysisPage extends WizardPage {
                 WindowListener windowListener = new WindowAdapter() {
                     @Override
                     public void windowClosing(WindowEvent e) {
-                        sweeper.abortAnalysis();
+                        if (!analysisDone && !analysisCanceled) {
+                            sweeper.abortAnalysis();
+                        }
                     }
                 };
                 getParentWindow().addWindowListener(windowListener);
 
                 try {
                     sweeper.analyze(resources, operationListener);
+                    analysisDone = true;
                 } catch (SweeperAbortException e) {
-                    // ignore
+                    analysisCanceled = true;
                 } catch (Exception e) {
+                    analysisCanceled = true;
                     e.printStackTrace();
                 } finally {
-                    analysisDone = true;
                     getParentWindow().removeWindowListener(windowListener);
                 }
             }
@@ -343,12 +348,12 @@ class AnalysisPage extends WizardPage {
 
     @Override
     boolean isCancelButtonVisible() {
-        return false;
+        return true;
     }
 
     @Override
     boolean isCancelButtonEnabled() {
-        return false;
+        return !analysisCanceled && !analysisDone;
     }
 
     @Override
@@ -358,7 +363,7 @@ class AnalysisPage extends WizardPage {
 
     @Override
     boolean isNextButtonEnabled() {
-        return false;
+        return analysisDone;
     }
 
     @Override
@@ -378,12 +383,20 @@ class AnalysisPage extends WizardPage {
 
     @Override
     void cancel() {
+        if (back() != null) {
+            listener.onButtonStateChange();
+        }
     }
 
     @Override
+    @Nullable
     WizardPage back() {
-        if (new ConfirmationDialog(getParentWindow(), i18n, i18n.getString(I18n.PAGE_ANALYSIS_BACK_BUTTON_CONFIRMATION_TITLE_ID),
-                i18n.getString(I18n.PAGE_ANALYSIS_BACK_BUTTON_CONFIRMATION_MESSAGE_ID)).isConfirmed()) {
+        if (analysisCanceled) {
+            return previousPage;
+        }
+        if (new ConfirmationDialog(getParentWindow(), i18n, i18n.getString(I18n.PAGE_ANALYSIS_CANCEL_CONFIRMATION_TITLE_ID),
+                i18n.getString(I18n.PAGE_ANALYSIS_CANCEL_CONFIRMATION_MESSAGE_ID)).isConfirmed()) {
+            analysisCanceled = true;
             sweeper.abortAnalysis();
             return previousPage;
         } else {
