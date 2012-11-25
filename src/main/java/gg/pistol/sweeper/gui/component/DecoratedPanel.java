@@ -42,6 +42,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.JTextComponent;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
@@ -220,28 +221,39 @@ public abstract class DecoratedPanel extends DynamicPanel {
         textLabel.setEditable(false);
         textLabel.setBorder(null);
         textLabel.setOpaque(false);
-        textLabel.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         textLabel.setHorizontalAlignment(JTextField.CENTER);
 
+        addCopyMenu(textLabel);
+        return textLabel;
+    }
+
+    /**
+     * Helper method to add a contextual menu on a text component that will allow for Copy & Select All text actions.
+     */
+    protected void addCopyMenu(final JTextComponent component) {
+        Preconditions.checkNotNull(component);
+
+        if (!component.isEditable()) {
+            component.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+        }
+
         final JPopupMenu contextMenu = new JPopupMenu();
-        JMenuItem copy = new JMenuItem(textLabel.getActionMap().get(DefaultEditorKit.copyAction));
+        JMenuItem copy = new JMenuItem(component.getActionMap().get(DefaultEditorKit.copyAction));
         copy.setText(i18n.getString(I18n.TEXT_COPY_ID));
         contextMenu.add(copy);
         contextMenu.addSeparator();
 
-        JMenuItem selectAll = new JMenuItem(textLabel.getActionMap().get(DefaultEditorKit.selectAllAction));
+        JMenuItem selectAll = new JMenuItem(component.getActionMap().get(DefaultEditorKit.selectAllAction));
         selectAll.setText(i18n.getString(I18n.TEXT_SELECT_ALL_ID));
         contextMenu.add(selectAll);
 
-        textLabel.addMouseListener(new MouseAdapter() {
+        component.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON3) {
-                    contextMenu.show(DecoratedPanel.this, e.getX() + contextMenu.getPreferredSize().width / 2,
-                            e.getY() + contextMenu.getPreferredSize().height / 2);
+                    contextMenu.show(component, e.getX(), e.getY());
                 }
             }
         });
-        return textLabel;
     }
 
     /**
