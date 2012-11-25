@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Sweeper - Duplicate file cleaner
+  ~ Copyright (C) 2012 Bogdan Ciprian Pistol
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="language.name">עברית</entry>
+
+    <entry key="label.error">Error</entry>
+
+    <entry key="button.ok">OK</entry>
+    <entry key="button.cancel">Cancel</entry>
+    <entry key="button.add">Add</entry>
+    <entry key="button.remove">Remove</entry>
+    <entry key="button.help">Help</entry>
+    <entry key="button.about">About</entry>
+    <entry key="button.finish">Finish</entry>
+    <entry key="button.close">Close</entry>
+    <entry key="button.yes">Yes</entry>
+    <entry key="button.no">No</entry>
+
+    <entry key="wizard.title">{0} - Duplicate file cleaner</entry>
+    <entry key="wizard.languageSelector">Language</entry>
+    <entry key="wizard.error.open">The application cannot start because an error occurred. The error message is:</entry>
+    <entry key="wizard.button.back">&lt; Back</entry>
+    <entry key="wizard.button.next">Next &gt;</entry>
+
+    <entry key="webBrowserLauncher.error">Could not open the web browser! To view the content please visit:</entry>
+
+    <entry key="about.website">Website:</entry>
+    <entry key="about.button.license">License</entry>
+
+    <entry key="page.welcome.header">Welcome</entry>
+    <entry key="page.welcome.introduction">This wizard will guide you to discover and clean your duplicate files and directories.</entry>
+    <entry key="page.welcome.changeLanguage">Please choose your preferred language</entry>
+
+    <entry key="page.resourceSelection.header">Choose the files and directories to analyze</entry>
+    <entry key="page.resourceSelection.introduction">The analysis will search for duplicate files and directories.</entry>
+    <entry key="page.resourceSelection.fileChooser.title">Select files and directories</entry>
+    <entry key="page.resourceSelection.fileChooser.resourceError">Encountered errors while trying to read the following resources:</entry>
+
+    <entry key="page.analysis.header">Analysis</entry>
+    <entry key="page.analysis.introduction">Analyzing the files and directories to find duplicates.</entry>
+    <entry key="page.analysis.totalProgress">Total progress:</entry>
+    <entry key="page.analysis.totalElapsedTime">Total elapsed time:</entry>
+    <entry key="page.analysis.totalRemainingTime">Total remaining time:</entry>
+    <entry key="page.analysis.operationLabel">Current operation:</entry>
+    <entry key="page.analysis.operationResourceTraversing">Traversing the files and directories</entry>
+    <entry key="page.analysis.operationSizeComputation">Computing the size of files and directories</entry>
+    <entry key="page.analysis.operationHashComputation">Computing the hash for the files and directories that have the same size</entry>
+    <entry key="page.analysis.operationResourceDeletion">Deleting the duplicate files and directories</entry>
+    <entry key="page.analysis.operationProgress">Operation progress:</entry>
+    <entry key="page.analysis.operationTargetLabel">Processing file:</entry>
+    <entry key="page.analysis.error.label">Errors:</entry>
+    <entry key="page.analysis.error.counter">{0} errors</entry>
+    <entry key="page.analysis.cancel.confirmationTitle">Please confirm</entry>
+    <entry key="page.analysis.cancel.confirmationMessage">This action will cancel the currently running analysis, are you sure you want to continue?</entry>
+
+    <entry key="page.noDuplicate.header">No duplicate files</entry>
+    <entry key="page.noDuplicate.text">The analysis did not find any duplicate files in the provided locations.</entry>
+
+    <entry key="fileChooser.currentDirectory">Current directory</entry>
+    <entry key="fileChooser.up">Parent directory</entry>
+    <entry key="fileChooser.home">Home directory</entry>
+    <entry key="fileChooser.showList">Show as list</entry>
+    <entry key="fileChooser.showDetails">Show with details</entry>
+    <entry key="fileChooser.name">Name:</entry>
+    <entry key="fileChooser.filterLabel">Filter:</entry>
+    <entry key="fileChooser.filterAll">All files and directories</entry>
+    <entry key="fileChooser.detailsName">Name</entry>
+    <entry key="fileChooser.detailsSize">Size</entry>
+    <entry key="fileChooser.detailsModified">Date modified</entry>
+    <entry key="fileChooser.menuView">View</entry>
+    <entry key="fileChooser.menuRefresh">Refresh</entry>
+
+    <entry key="text.copy">Copy</entry>
+    <entry key="text.selectAll">Select all</entry>
+
+    <entry key="time.description.hours">{0} hours, {1} minutes and {2} seconds</entry>
+    <entry key="time.description.minutes">{0} minutes and {1} seconds</entry>
+    <entry key="time.description.seconds">{0} seconds</entry>
+</properties>
