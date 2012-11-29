@@ -189,9 +189,10 @@ class AnalysisPage extends WizardPage {
         if (operationMaxProgress > 0) {
             operationProgressBar.setValue((int) (100 * operationProgress / operationMaxProgress));
         }
-        if (operationProgress == operationMaxProgress) {
+        if (totalProgressPercent == 100) {
             currentTarget = null;
             listener.onButtonStateChange();
+            errors.setCaretPosition(0);
         }
 
         operationTarget.setText(currentTarget != null ? currentTarget.getName() : "");
@@ -401,9 +402,8 @@ class AnalysisPage extends WizardPage {
             analysisCanceled = true;
             sweeper.abortAnalysis();
             return previousPage;
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
