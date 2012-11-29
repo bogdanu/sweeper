@@ -101,7 +101,6 @@ public class Wizard implements WizardPageListener {
                 pageContainer = createHorizontalPanel();
                 contentPanel.add(pageContainer, BorderLayout.CENTER);
                 pageContainer.add(getCurrentPage());
-                getCurrentPage().update();
 
                 JPanel northPanel = createHorizontalPanel();
                 contentPanel.add(northPanel, BorderLayout.NORTH);
