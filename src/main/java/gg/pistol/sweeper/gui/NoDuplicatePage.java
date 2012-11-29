@@ -28,7 +28,7 @@ import javax.swing.*;
 class NoDuplicatePage extends WizardPage {
 
     NoDuplicatePage(I18n i18n, WizardPageListener listener, Sweeper sweeper) {
-        super(i18n, listener, sweeper);
+        super(Preconditions.checkNotNull(i18n), Preconditions.checkNotNull(listener), Preconditions.checkNotNull(sweeper));
     }
 
     @Override
