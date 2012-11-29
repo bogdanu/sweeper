@@ -408,13 +408,14 @@ class AnalysisPage extends WizardPage {
 
     @Override
     WizardPage next() {
+        WizardPage page;
         if (sweeper.nextPoll() != null) {
-            return null;
+            page = new PollPage(i18n, listener, sweeper, 1, null);
         } else {
-            NoDuplicatePage noDuplicatePage = new NoDuplicatePage(i18n, listener, sweeper);
-            noDuplicatePage.setParentWindow(getParentWindow());
-            return noDuplicatePage;
+            page = new NoDuplicatePage(i18n, listener, sweeper);
         }
+        page.setParentWindow(getParentWindow());
+        return page;
     }
 
     @Override

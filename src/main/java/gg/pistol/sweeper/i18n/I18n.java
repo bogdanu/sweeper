@@ -117,6 +117,13 @@ public class I18n {
     public static final String PAGE_NO_DUPLICATE_HEADER_ID = "page.noDuplicate.header";
     public static final String PAGE_NO_DUPLICATE_TEXT_ID = "page.noDuplicate.text";
 
+    public static final String PAGE_POLL_HEADER_ID = "page.poll.header";
+    public static final String PAGE_POLL_DESCRIPTION = "page.poll.description";
+    public static final String PAGE_POLL_STAT_ANALYSED = "page.poll.statAnalysed";
+    public static final String PAGE_POLL_STAT_DELETE = "page.poll.statDelete";
+    public static final String PAGE_POLL_QUESTION = "page.poll.question";
+
+
     public static final String FILE_CHOOSER_CURRENT_DIRECTORY_ID = "fileChooser.currentDirectory";
     public static final String FILE_CHOOSER_UP_ID = "fileChooser.up";
     public static final String FILE_CHOOSER_HOME_ID = "fileChooser.home";
@@ -137,6 +144,11 @@ public class I18n {
     public static final String TIME_DESCRIPTION_HOURS_ID = "time.description.hours";
     public static final String TIME_DESCRIPTION_MINUTES_ID = "time.description.minutes";
     public static final String TIME_DESCRIPTION_SECONDS_ID = "time.description.seconds";
+
+    public static final String SIZE_DESCRIPTION_GB_ID = "size.description.gb";
+    public static final String SIZE_DESCRIPTION_MB_ID = "size.description.mb";
+    public static final String SIZE_DESCRIPTION_KB_ID = "size.description.kb";
+    public static final String SIZE_DESCRIPTION_BYTE_ID = "size.description.byte";
 
     private static final String MESSAGES_BASENAME = "messages";
     private static final String[] SUPPORTED_LANGUAGES = new String[]{"en", "es", "pt", "de", "fr", "ro", "zh_CN", "zh_TW", "hi", "ar", "ru", "ja", "iw"};

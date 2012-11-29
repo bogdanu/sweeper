@@ -73,6 +73,12 @@
     <entry key="page.noDuplicate.header">No duplicate files</entry>
     <entry key="page.noDuplicate.text">The analysis did not find any duplicate files in the provided locations.</entry>
 
+    <entry key="page.poll.header">What data is important?</entry>
+    <entry key="page.poll.description">Please choose what you want to keep and what to mark for deletion (you can change your mind later).</entry>
+    <entry key="page.poll.statAnalysed">The analysis checked {0} files and directories (having {1}), and found {2} duplicate files and directories (having {3}).</entry>
+    <entry key="page.poll.statDelete">You marked for deletion {0} files and directories (having {1}).</entry>
+    <entry key="page.poll.question">Question {0}</entry>
+
     <entry key="fileChooser.currentDirectory">Current directory</entry>
     <entry key="fileChooser.up">Parent directory</entry>
     <entry key="fileChooser.home">Home directory</entry>
@@ -93,4 +99,9 @@
     <entry key="time.description.hours">{0} hours, {1} minutes and {2} seconds</entry>
     <entry key="time.description.minutes">{0} minutes and {1} seconds</entry>
     <entry key="time.description.seconds">{0} seconds</entry>
+
+    <entry key="size.description.gb">{0} GB and {1} MB</entry>
+    <entry key="size.description.mb">{0} MB</entry>
+    <entry key="size.description.kb">{0} KB</entry>
+    <entry key="size.description.byte">{0} bytes</entry>
 </properties>

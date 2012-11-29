@@ -457,6 +457,13 @@ public abstract class DecoratedPanel extends DynamicPanel {
     }
 
     /**
+     * Helper method to create a {@link JLabel} with word-wrapping.
+     */
+    protected JLabel createLabel(String text) {
+        return new JLabel("<html>" + text + "</html>");
+    }
+
+    /**
      * Helper factory method for creating a language selector that provides functionality to change the locale.
      *
      * @param width
