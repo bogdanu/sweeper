@@ -45,24 +45,24 @@
     <entry key="about.button.license">License</entry>
 
     <entry key="page.welcome.header">Welcome</entry>
-    <entry key="page.welcome.introduction">This wizard will guide you to discover and clean your duplicate files and directories.</entry>
+    <entry key="page.welcome.introduction">This wizard will guide you to discover and clean your duplicate files and folders.</entry>
     <entry key="page.welcome.changeLanguage">Please choose your preferred language</entry>
 
-    <entry key="page.resourceSelection.header">Choose the files and directories to analyze</entry>
-    <entry key="page.resourceSelection.introduction">The analysis will search for duplicate files and directories.</entry>
-    <entry key="page.resourceSelection.fileChooser.title">Select files and directories</entry>
+    <entry key="page.resourceSelection.header">Choose the files and folders to analyze</entry>
+    <entry key="page.resourceSelection.introduction">The analysis will search for duplicate files and folders.</entry>
+    <entry key="page.resourceSelection.fileChooser.title">Select files and folders</entry>
     <entry key="page.resourceSelection.fileChooser.resourceError">Encountered errors while trying to read the following resources:</entry>
 
     <entry key="page.analysis.header">Analysis</entry>
-    <entry key="page.analysis.introduction">Analyzing the files and directories to find duplicates.</entry>
+    <entry key="page.analysis.introduction">Analyzing the files and folders to find duplicates.</entry>
     <entry key="page.analysis.totalProgress">Total progress:</entry>
     <entry key="page.analysis.totalElapsedTime">Total elapsed time:</entry>
     <entry key="page.analysis.totalRemainingTime">Total remaining time:</entry>
     <entry key="page.analysis.operationLabel">Current operation:</entry>
-    <entry key="page.analysis.operationResourceTraversing">Traversing the files and directories</entry>
-    <entry key="page.analysis.operationSizeComputation">Computing the size of files and directories</entry>
-    <entry key="page.analysis.operationHashComputation">Computing the hash for the files and directories that have the same size</entry>
-    <entry key="page.analysis.operationResourceDeletion">Deleting the duplicate files and directories</entry>
+    <entry key="page.analysis.operationResourceTraversing">Traversing the files and folders</entry>
+    <entry key="page.analysis.operationSizeComputation">Computing the size of files and folders</entry>
+    <entry key="page.analysis.operationHashComputation">Computing the hash for the files and folders that have the same size</entry>
+    <entry key="page.analysis.operationResourceDeletion">Deleting the duplicate files and folders</entry>
     <entry key="page.analysis.operationProgress">Operation progress:</entry>
     <entry key="page.analysis.operationTargetLabel">Processing file:</entry>
     <entry key="page.analysis.error.label">Errors:</entry>
@@ -75,18 +75,18 @@
 
     <entry key="page.poll.header">What data is important?</entry>
     <entry key="page.poll.description">Please choose what you want to keep and what to mark for deletion (you can change your mind later).</entry>
-    <entry key="page.poll.statAnalysed">The analysis checked {0} files and directories (having {1}), and found {2} duplicate files and directories (having {3}).</entry>
-    <entry key="page.poll.statDelete">You marked for deletion {0} files and directories (having {1}).</entry>
+    <entry key="page.poll.statAnalysed">The analysis checked {0} files and folders (having {1}), and found {2} duplicate files and folders (having {3}).</entry>
+    <entry key="page.poll.statDelete">You marked for deletion {0} files and folders (having {1}).</entry>
     <entry key="page.poll.question">Question {0}</entry>
 
-    <entry key="fileChooser.currentDirectory">Current directory</entry>
-    <entry key="fileChooser.up">Parent directory</entry>
-    <entry key="fileChooser.home">Home directory</entry>
+    <entry key="fileChooser.currentDirectory">Current folder</entry>
+    <entry key="fileChooser.up">Parent folder</entry>
+    <entry key="fileChooser.home">Home folder</entry>
     <entry key="fileChooser.showList">Show as list</entry>
     <entry key="fileChooser.showDetails">Show with details</entry>
     <entry key="fileChooser.name">Name:</entry>
     <entry key="fileChooser.filterLabel">Filter:</entry>
-    <entry key="fileChooser.filterAll">All files and directories</entry>
+    <entry key="fileChooser.filterAll">All files and folders</entry>
     <entry key="fileChooser.detailsName">Name</entry>
     <entry key="fileChooser.detailsSize">Size</entry>
     <entry key="fileChooser.detailsModified">Date modified</entry>
