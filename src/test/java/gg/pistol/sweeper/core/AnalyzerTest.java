@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.Set;
@@ -37,16 +36,10 @@ import java.util.Set;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Analyzer.class)
 public class AnalyzerTest {
 
     private Analyzer analyzer;
@@ -470,8 +463,8 @@ public class AnalyzerTest {
     public void testAbort() throws Exception {
         ResourceDirectory dir = mockDirectory("dir");
         Resource root = mockDirectory("root", dir);
-        analyzer = PowerMockito.spy(analyzer);
-        PowerMockito.when(analyzer, "checkAbortFlag").thenThrow(new SweeperAbortException());
+        analyzer = spy(new Analyzer());
+        doThrow(new SweeperAbortException()).when(analyzer).checkAbortFlag();
 
         try {
             analyzer.analyze(ImmutableSet.of(root), listener);

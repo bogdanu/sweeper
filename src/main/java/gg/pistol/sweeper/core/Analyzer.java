@@ -187,7 +187,8 @@ class Analyzer {
         return targetCount;
     }
 
-    private void checkAbortFlag() throws SweeperAbortException {
+    // package private for testing
+    void checkAbortFlag() throws SweeperAbortException {
         if (analyzing && abortAnalysis.get()) {
             log.info("Aborting the analysis.");
             throw new SweeperAbortException();
