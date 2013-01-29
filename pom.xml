@@ -56,25 +56,25 @@
         <project.javaVersion>1.6</project.javaVersion>
 
         <!-- Dependency versions -->
-        <version.slf4j.api>1.6.4</version.slf4j.api>
-        <version.logback.classic>1.0.2</version.logback.classic>
+        <version.slf4j.api>1.7.2</version.slf4j.api>
+        <version.logback.classic>1.0.9</version.logback.classic>
         <version.lumberjack>0.0.2</version.lumberjack>
         <version.joda.time>2.1</version.joda.time>
         <version.guava>r09</version.guava>
-        <version.jsr305>2.0.0</version.jsr305>
+        <version.jsr305>2.0.1</version.jsr305>
 
-        <version.junit>4.10</version.junit>
-        <version.mockito.core>1.9.0</version.mockito.core>
+        <version.junit>4.11</version.junit>
+        <version.mockito.core>1.9.5</version.mockito.core>
 
         <!-- Plugin versions -->
-        <version.maven.compiler.plugin>2.3.2</version.maven.compiler.plugin>
-        <version.maven.surefire.plugin>2.12</version.maven.surefire.plugin>
-        <version.cobertura.maven.plugin>2.5.1</version.cobertura.maven.plugin>
-        <version.maven.source.plugin>2.1.2</version.maven.source.plugin>
-        <version.maven.javadoc.plugin>2.8.1</version.maven.javadoc.plugin>
+        <version.maven.compiler.plugin>3.0</version.maven.compiler.plugin>
+        <version.maven.surefire.plugin>2.13</version.maven.surefire.plugin>
+        <version.cobertura.maven.plugin>2.5.2</version.cobertura.maven.plugin>
+        <version.maven.source.plugin>2.2.1</version.maven.source.plugin>
+        <version.maven.javadoc.plugin>2.9</version.maven.javadoc.plugin>
         <version.maven.jxr.plugin>2.3</version.maven.jxr.plugin>
         <version.maven.pmd.plugin>2.7.1</version.maven.pmd.plugin>
-        <version.findbugs.maven.plugin>2.4.0</version.findbugs.maven.plugin>
+        <version.findbugs.maven.plugin>2.5.2</version.findbugs.maven.plugin>
     </properties>
 
     <dependencies>
