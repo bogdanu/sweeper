@@ -47,6 +47,7 @@ import javax.swing.text.JTextComponent;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * Extension of {@link DynamicPanel} that provides decorations: border, side image and/or close button.
@@ -459,8 +460,8 @@ public abstract class DecoratedPanel extends DynamicPanel {
     /**
      * Helper method to create a {@link JLabel} with word-wrapping.
      */
-    protected JLabel createLabel(String text) {
-        return new JLabel("<html>" + text + "</html>");
+    protected JLabel createWordWrappingLabel(String text) {
+        return new JLabel("<html>" + StringEscapeUtils.escapeHtml4(text) + "</html>");
     }
 
     /**
