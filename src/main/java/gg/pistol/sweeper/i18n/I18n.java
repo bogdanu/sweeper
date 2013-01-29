@@ -50,7 +50,7 @@ import com.google.common.base.Preconditions;
 public class I18n {
 
     public static final String APPLICATION_NAME = "Sweeper";
-    public static final String COPYRIGHT = "Copyright (C) 2012 Bogdan Ciprian Pistol";
+    public static final String COPYRIGHT = "Copyright (C) 2012, 2013 Bogdan Ciprian Pistol";
 
     public static final String LICENSE = "Sweeper - Duplicate file cleaner\n"
             + COPYRIGHT + "\n\n"
