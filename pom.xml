@@ -54,8 +54,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.javaVersion>1.6</project.javaVersion>
-        <project.cobertura.minBranchCoverage>90</project.cobertura.minBranchCoverage>
-        <project.cobertura.minLineCoverage>90</project.cobertura.minLineCoverage>
 
         <!-- Dependency versions -->
         <version.slf4j.api>1.6.4</version.slf4j.api>
@@ -151,43 +149,6 @@
                     <forkMode>once</forkMode>
                     <runOrder>random</runOrder>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>${version.cobertura.maven.plugin}</version>
-                <configuration>
-                    <check>
-                        <branchRate>${project.cobertura.minBranchCoverage}</branchRate>
-                        <packageBranchRate>${project.cobertura.minBranchCoverage}</packageBranchRate>
-                        <totalBranchRate>${project.cobertura.minBranchCoverage}</totalBranchRate>
-
-                        <lineRate>${project.cobertura.minLineCoverage}</lineRate>
-                        <packageLineRate>${project.cobertura.minLineCoverage}</packageLineRate>
-                        <totalLineRate>${project.cobertura.minLineCoverage}</totalLineRate>
-
-                        <haltOnFailure>true</haltOnFailure>
-                    </check>
-                    <instrumentation>
-                        <excludes>
-                            <!-- NOOP listener, does not implement any operations -->
-                            <exclude>gg/pistol/sweeper/core/OperationTrackingListener$1.class</exclude>
-
-                            <!-- Simple Exception extension -->
-                            <exclude>gg/pistol/sweeper/core/SweeperException.class</exclude>
-                        </excludes>
-                    </instrumentation>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>cobertura-check</id>
-                        <goals>
-                            <goal>clean</goal>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
