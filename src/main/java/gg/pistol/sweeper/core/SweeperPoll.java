@@ -38,6 +38,15 @@ import java.util.Collection;
 public interface SweeperPoll {
 
     /**
+     * Retrieve the poll's position number.
+     *
+     * <p>The first poll is number 1, the second poll is number 2, etc.
+     *
+     * @return the position number
+     */
+    int getNumber();
+
+    /**
      * Retrieve the collection of duplicate targets.
      *
      * @return the duplicate targets

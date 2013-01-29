@@ -33,6 +33,8 @@ import com.google.common.base.Preconditions;
 // package private
 class Poll implements SweeperPoll, Cloneable {
 
+    private final int number;
+
     private final DuplicateGroup duplicateGroup;
 
     // A duplicate group target subset that does not have ancestors marked for deletion.
@@ -48,16 +50,24 @@ class Poll implements SweeperPoll, Cloneable {
     private boolean opened;
 
 
-    Poll(DuplicateGroup duplicateGroup, Collection<? extends Target> targets) {
+
+    Poll(int number, DuplicateGroup duplicateGroup, Collection<? extends Target> targets) {
+        Preconditions.checkArgument(number > 0);
         Preconditions.checkNotNull(duplicateGroup);
         Preconditions.checkNotNull(targets);
         Preconditions.checkArgument(!targets.isEmpty());
 
+        this.number = number;
         this.duplicateGroup = duplicateGroup;
         this.targets = new LinkedHashSet<Target>(targets);
         toDeleteTargets = new LinkedHashSet<TargetImpl>();
         retainedTargets = new LinkedHashSet<TargetImpl>();
         opened = true;
+    }
+
+    @Override
+    public int getNumber() {
+        return number;
     }
 
     public Collection<? extends Target> getTargets() {
@@ -120,13 +130,13 @@ class Poll implements SweeperPoll, Cloneable {
             return false;
         }
         Poll other = (Poll) obj;
-        return duplicateGroup.equals(other.duplicateGroup) && targets.equals(other.targets)
+        return number == other.number && duplicateGroup.equals(other.duplicateGroup) && targets.equals(other.targets)
                 && toDeleteTargets.equals(other.toDeleteTargets) && retainedTargets.equals(other.retainedTargets);
     }
 
     @Override
     public Poll clone() {
-        Poll clone = new Poll(duplicateGroup, targets);
+        Poll clone = new Poll(number, duplicateGroup, targets);
         clone.toDeleteTargets.addAll(toDeleteTargets);
         clone.retainedTargets.addAll(retainedTargets);
         return clone;

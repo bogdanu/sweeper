@@ -169,7 +169,7 @@ public class SweeperImpl implements Sweeper {
             return null;
         }
 
-        Poll poll = new Poll(dup, targets);
+        Poll poll = new Poll(polls.size() + 1, dup, targets);
 
         /*
          * In case there is more than one retained target it is necessary to de-duplicate the retained targets between

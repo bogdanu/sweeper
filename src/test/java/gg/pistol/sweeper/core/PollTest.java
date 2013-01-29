@@ -46,7 +46,7 @@ public class PollTest {
 
     private Poll createPoll(TargetImpl... targets) {
         DuplicateGroup duplicateGroup = mock(DuplicateGroup.class);
-        return new Poll(duplicateGroup, ImmutableSet.copyOf(targets));
+        return new Poll(1, duplicateGroup, ImmutableSet.copyOf(targets));
     }
 
     @Test
@@ -54,21 +54,21 @@ public class PollTest {
         assertEquals(2, poll.getTargets().size());
 
         try {
-            new Poll(null, Collections.<Target>emptySet());
+            new Poll(1, null, Collections.<Target>emptySet());
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            new Poll(mock(DuplicateGroup.class), null);
+            new Poll(1, mock(DuplicateGroup.class), null);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            new Poll(mock(DuplicateGroup.class), Collections.<Target>emptySet());
+            new Poll(1, mock(DuplicateGroup.class), Collections.<Target>emptySet());
             fail();
         } catch (IllegalArgumentException e) {
             // expected because the targets collection is empty
@@ -148,8 +148,8 @@ public class PollTest {
         otherPoll.mark(target1, Mark.RETAIN);
         verifyEquals(poll, pollCopy, otherPoll);
 
-        verifyEquals(poll, pollCopy, new Poll(poll.getDuplicateGroup(), ImmutableSet.of(target1)));
-        verifyEquals(poll, pollCopy, new Poll(mock(DuplicateGroup.class), ImmutableSet.of(target1)));
+        verifyEquals(poll, pollCopy, new Poll(1, poll.getDuplicateGroup(), ImmutableSet.of(target1)));
+        verifyEquals(poll, pollCopy, new Poll(1, mock(DuplicateGroup.class), ImmutableSet.of(target1)));
     }
 
 }
