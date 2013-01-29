@@ -30,14 +30,15 @@ import java.util.ResourceBundle;
 import com.google.common.base.Preconditions;
 import com.google.common.io.Closeables;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 /**
  * {@link ResourceBundle.Control} implementation that creates {@link XMLResourceBundle}s.
- *
- * <p>This class is thread safe.
  *
  * @author Bogdan Pistol
  */
 // package private
+@ThreadSafe
 class XMLResourceBundleControl extends ResourceBundle.Control {
 
     @Override

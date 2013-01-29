@@ -30,21 +30,22 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
 
 import com.google.common.base.Preconditions;
 
 /**
  * Resource bundle loaded from XML properties.
  *
- * <p>This class is thread safe.
- *
  * @author Bogdan Pistol
  */
 // package private
+@ThreadSafe
 class XMLResourceBundle extends ResourceBundle {
     private final Properties properties;
     private final Lock lock;
-    @Nullable private Collection<String> keys;
+    @GuardedBy("lock") @Nullable private Collection<String> keys;
 
     XMLResourceBundle(InputStream stream) throws IOException {
         Preconditions.checkNotNull(stream);

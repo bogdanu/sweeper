@@ -31,6 +31,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
 
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,7 @@ import com.google.common.base.Preconditions;
  *
  * @author Bogdan Pistol
  */
+@ThreadSafe
 public class I18n {
 
     public static final String APPLICATION_NAME = "Sweeper";
@@ -157,11 +160,11 @@ public class I18n {
     private final Lock lock;
 
     private final Collection<SupportedLocale> supportedLocales;
-    private final Collection<LocaleChangeListener> listeners;
-
     private final ResourceBundle.Control resourceBundleControl;
-    private ResourceBundle resourceBundle;
-    private SupportedLocale locale;
+
+    @GuardedBy("lock") private final Collection<LocaleChangeListener> listeners;
+    @GuardedBy("lock") private ResourceBundle resourceBundle;
+    @GuardedBy("lock") private SupportedLocale locale;
 
     /**
      * Initialize the internationalization using the default locale.

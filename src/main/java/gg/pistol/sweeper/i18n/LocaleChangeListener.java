@@ -20,6 +20,8 @@ package gg.pistol.sweeper.i18n;
 /**
  * Listener for changes of the locale.
  *
+ * <p>The implementations of this interface should be thread safe.
+ *
  * @author Bogdan Pistol
  */
 public interface LocaleChangeListener {

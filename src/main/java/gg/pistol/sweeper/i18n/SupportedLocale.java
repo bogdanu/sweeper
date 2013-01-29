@@ -20,6 +20,7 @@ package gg.pistol.sweeper.i18n;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 import com.google.common.base.Preconditions;
 
@@ -28,6 +29,7 @@ import com.google.common.base.Preconditions;
  *
  * @author Bogdan Pistol
  */
+@Immutable
 public class SupportedLocale {
 
     private final Locale locale;
