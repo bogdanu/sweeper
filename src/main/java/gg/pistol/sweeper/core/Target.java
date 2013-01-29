@@ -73,7 +73,14 @@ public interface Target extends Comparable<Target> {
      * The target types.
      */
     enum Type {
-        FILE, DIRECTORY, ROOT
+        FILE,
+        DIRECTORY,
+
+        /**
+         * Pseudo target type that represents the container for all the targets (excluding the root), which have been
+         * added to this container for easier manipulation.
+         */
+        ROOT
     }
 
 }
