@@ -75,6 +75,7 @@
         <version.maven.jxr.plugin>2.3</version.maven.jxr.plugin>
         <version.maven.pmd.plugin>2.7.1</version.maven.pmd.plugin>
         <version.findbugs.maven.plugin>2.5.2</version.findbugs.maven.plugin>
+        <version.exec.maven.plugin>1.2.1</version.exec.maven.plugin>
     </properties>
 
     <dependencies>
@@ -177,6 +178,15 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${version.exec.maven.plugin}</version>
+                <configuration>
+                    <mainClass>gg.pistol.sweeper.Main</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
