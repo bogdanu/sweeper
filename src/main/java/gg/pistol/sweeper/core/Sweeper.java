@@ -26,9 +26,7 @@ import javax.annotation.Nullable;
 /**
  * Duplicate file/directory cleaner.
  *
- * <p>This class is not thread safe and must be called from the same thread or using synchronization techniques,
- * the only exception are the {@link #abortAnalysis} and {@link #abortDeletion} methods which are thread safe and can
- * be called from any thread.
+ * <p>The implementations of this interface are thread safe.,
  *
  * <p>In order to clean a set of targets perform the following steps:
  *
@@ -43,7 +41,8 @@ import javax.annotation.Nullable;
 public interface Sweeper {
 
     /**
-     * Perform an analysis to find duplicate targets.
+     * Perform an analysis to find duplicate targets. In case the analysis is already in progress then calling this
+     * method will block until the currently running analysis finishes.
      *
      * @param resources
      *         perform the analysis on these resources and their descendants
@@ -56,15 +55,13 @@ public interface Sweeper {
     void analyze(Collection<? extends Resource> resources, SweeperOperationListener listener) throws SweeperAbortException;
 
     /**
-     * Abort the analysis.
-     *
-     * <p>This method is thread safe, it can be called from another thread at the same time while performing
-     * the analysis.
+     * Request to abort the analysis. This method returns immediately, the analysis will be aborted as soon as possible.
      */
     void abortAnalysis();
 
     /**
-     * Determine the next duplicate poll.
+     * Determine the next duplicate poll. In case the analysis is running then this method will block until the analysis
+     * finishes.
      *
      * @return the next duplicate poll or {@code null} if there are no more polls
      */
@@ -72,7 +69,8 @@ public interface Sweeper {
     SweeperPoll nextPoll();
 
     /**
-     * Return to the previous poll.
+     * Return to the previous poll. In case the analysis is running then this method will block until the analysis
+     * finishes.
      *
      * @return the previous duplicate poll or {@code null} if there are no more previous polls
      */
@@ -80,7 +78,8 @@ public interface Sweeper {
     SweeperPoll previousPoll();
 
     /**
-     * Retrieve the current poll instance.
+     * Retrieve the current poll instance. In case the analysis is running then this method will block until the analysis
+     * finishes.
      *
      * @return the current poll or {@code null} if there is no current poll yet
      */
@@ -97,15 +96,16 @@ public interface Sweeper {
     /**
      * Retrieve the collection of targets marked for deletion.
      *
-     * @return the targets marked for deletion
+     * @return the targets marked for deletion as an unmodifiable collection
      */
     Collection<? extends Target> getToDeleteTargets();
 
     /**
-     * Delete the provided {@code toDeleteTargets}.
+     * Delete the provided {@code toDeleteTargets}. In case the analysis or the deletion is already in progress then
+     * calling this method will block until the currently running operation finishes.
      *
-     * <p><b>Warning</b>: this operation is not reversible. Aborting the deletion stops the operation, but does not revert
-     * the already deleted targets.
+     * <p><b>Warning</b>: this operation is not reversible. Aborting the deletion stops the operation, but does not
+     * recover the already deleted targets.
      *
      * @param toDeleteTargets
      *         the targets of the delete operation
@@ -117,11 +117,8 @@ public interface Sweeper {
     void delete(Collection<? extends Target> toDeleteTargets, SweeperOperationListener listener) throws SweeperAbortException;
 
     /**
-     * Abort the deletion. This operation only stops the deletion in progress it does not reverse the already deleted
-     * targets.
-     *
-     * <p>This method is thread safe, it can be called from another thread at the same time while performing
-     * the deletion.
+     * Request to abort the deletion. This method returns immediately, the deletion will be aborted as soon as possible.
+     * This operation only stops the deletion in progress, it does not recover the already deleted targets.
      */
     void abortDeletion();
 

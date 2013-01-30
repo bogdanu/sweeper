@@ -22,13 +22,18 @@ import gg.pistol.sweeper.core.resource.Resource;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
 
 import com.google.common.base.Preconditions;
 
@@ -37,30 +42,32 @@ import com.google.common.base.Preconditions;
  *
  * @author Bogdan Pistol
  */
+@ThreadSafe
 public class SweeperImpl implements Sweeper {
 
-    private final Analyzer analyzer;
-    private boolean analyzed;
+    private final Lock lock;
+    @GuardedBy("lock") private final Analyzer analyzer;
+    @GuardedBy("lock") private boolean analyzed;
 
     /*
      * Marked targets.
      */
-    private final Set<TargetImpl> toDeleteTargets;
-    private final Set<TargetImpl> retainedTargets;
+    @GuardedBy("lock") private final Set<TargetImpl> toDeleteTargets;
+    @GuardedBy("lock") private final Set<TargetImpl> retainedTargets;
 
     // All the duplicates resulted from the analysis.
-    @Nullable private NavigableSet<DuplicateGroup> duplicates;
+    @GuardedBy("lock") @Nullable private NavigableSet<DuplicateGroup> duplicates;
 
     // Index used when walking the previous poll history.
-    private int pollHistoryIdx = -1;
+    @GuardedBy("lock") private int pollHistoryIdx = -1;
 
     // The stack of polls traversed.
-    private final List<Poll> polls;
+    @GuardedBy("lock") private final List<Poll> polls;
 
     // The currently opened poll.
-    @Nullable private Poll currentPoll;
+    @GuardedBy("lock") @Nullable private Poll currentPoll;
 
-    @Nullable private SweeperCountImpl count;
+    @GuardedBy("lock") @Nullable private SweeperCountImpl count;
 
 
     public SweeperImpl() throws SweeperException {
@@ -71,6 +78,7 @@ public class SweeperImpl implements Sweeper {
     SweeperImpl(Analyzer analyzer) {
         Preconditions.checkNotNull(analyzer);
 
+        lock = new ReentrantLock();
         this.analyzer = analyzer;
         toDeleteTargets = new LinkedHashSet<TargetImpl>();
         retainedTargets = new HashSet<TargetImpl>();
@@ -83,6 +91,15 @@ public class SweeperImpl implements Sweeper {
         Preconditions.checkNotNull(listener);
         Preconditions.checkArgument(!targetResources.isEmpty(), "The targetResources is empty");
 
+        lock.lock();
+        try {
+            analyze0(targetResources, listener);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private void analyze0(Collection<? extends Resource> targetResources, SweeperOperationListener listener) throws SweeperAbortException {
         analyzed = false;
         duplicates = analyzer.analyze(targetResources, listener);
 
@@ -98,11 +115,20 @@ public class SweeperImpl implements Sweeper {
     }
 
     public void abortAnalysis() {
-        analyzer.abortAnalysis();
+        analyzer.abortAnalysis(); // guaranteed to be thread safe by the Analyzer
     }
 
     @Nullable
     public SweeperPoll nextPoll() {
+        lock.lock();
+        try {
+            return nextPoll0();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private SweeperPoll nextPoll0() {
         Preconditions.checkState(analyzed, "not analyzed");
 
         saveCurrentPoll();
@@ -295,6 +321,15 @@ public class SweeperImpl implements Sweeper {
 
     @Nullable
     public SweeperPoll previousPoll() {
+        lock.lock();
+        try {
+            return previousPoll0();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private SweeperPoll previousPoll0() {
         Preconditions.checkState(analyzed, "not analyzed");
 
         saveCurrentPoll();
@@ -333,18 +368,33 @@ public class SweeperImpl implements Sweeper {
 
     @Nullable
     public SweeperPoll getCurrentPoll() {
-        Preconditions.checkState(analyzed, "not analyzed");
-        return currentPoll;
+        lock.lock();
+        try {
+            Preconditions.checkState(analyzed, "not analyzed");
+            return currentPoll;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public SweeperCountImpl getCount() {
-        Preconditions.checkState(analyzed, "not analyzed");
-        return count;
+        lock.lock();
+        try {
+            Preconditions.checkState(analyzed, "not analyzed");
+            return count;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public Collection<? extends Target> getToDeleteTargets() {
-        Preconditions.checkState(analyzed, "not analyzed");
-        return toDeleteTargets;
+        lock.lock();
+        try {
+            Preconditions.checkState(analyzed, "not analyzed");
+            return Collections.unmodifiableCollection(toDeleteTargets);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void delete(Collection<? extends Target> toDeleteTargets, SweeperOperationListener listener)
@@ -352,11 +402,17 @@ public class SweeperImpl implements Sweeper {
         Preconditions.checkNotNull(toDeleteTargets);
         Preconditions.checkNotNull(listener);
         Preconditions.checkArgument(!toDeleteTargets.isEmpty());
-        analyzer.delete(toDeleteTargets, listener);
+
+        lock.lock();
+        try {
+            analyzer.delete(toDeleteTargets, listener);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void abortDeletion() {
-        analyzer.abortDeletion();
+        analyzer.abortDeletion(); // guaranteed to be thread safe by the Analyzer
     }
 
 }
