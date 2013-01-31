@@ -116,14 +116,14 @@ public class OperationTrackingListenerTest {
         Target target = mock(Target.class);
 
         try {
-            trackingListener.updateTargetAction(null, TargetAction.EXPAND);
+            trackingListener.updateTarget(null);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            trackingListener.updateTargetAction(target, null);
+            trackingListener.updateTarget(target);
             fail();
         } catch (NullPointerException e) {
             // expected
@@ -131,8 +131,8 @@ public class OperationTrackingListenerTest {
 
         trackingListener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
         trackingListener.setOperationMaxProgress(1);
-        trackingListener.updateTargetAction(target, TargetAction.EXPAND);
-        verify(wrappedListener).updateTargetAction(target, TargetAction.EXPAND);
+        trackingListener.updateTarget(target);
+        verify(wrappedListener).updateTarget(target);
     }
 
     @Test
@@ -141,21 +141,21 @@ public class OperationTrackingListenerTest {
         SweeperException exception = new SweeperException("");
 
         try {
-            trackingListener.updateTargetException(null, TargetAction.EXPAND, exception);
+            trackingListener.updateException(null, exception);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            trackingListener.updateTargetException(target, null, exception);
+            trackingListener.updateException(target, exception);
             fail();
         } catch (NullPointerException e) {
             // expected
         }
 
         try {
-            trackingListener.updateTargetException(target, TargetAction.EXPAND, null);
+            trackingListener.updateException(target, null);
             fail();
         } catch (NullPointerException e) {
             // expected
@@ -163,8 +163,8 @@ public class OperationTrackingListenerTest {
 
         trackingListener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
         trackingListener.setOperationMaxProgress(1);
-        trackingListener.updateTargetException(target, TargetAction.EXPAND, exception);
-        verify(wrappedListener).updateTargetException(target, TargetAction.EXPAND, exception);
+        trackingListener.updateException(target, exception);
+        verify(wrappedListener).updateException(target, exception);
     }
 
     @Test

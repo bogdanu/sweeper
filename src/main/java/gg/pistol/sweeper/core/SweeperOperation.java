@@ -28,7 +28,13 @@ package gg.pistol.sweeper.core;
  * @author Bogdan Pistol
  */
 public enum SweeperOperation {
-    RESOURCE_TRAVERSING(30), SIZE_COMPUTATION(10), HASH_COMPUTATION(60), RESOURCE_DELETION(100);
+    // analysis operations
+    RESOURCE_TRAVERSING(30),
+    SIZE_COMPUTATION(10),
+    HASH_COMPUTATION(60),
+
+    // deletion operations
+    RESOURCE_DELETION(100);
 
     private final int percentQuota;
 

@@ -122,13 +122,13 @@ class TargetImpl implements Target {
         }
         partiallyExpanded = true;
         expanded = true;
-        listener.updateTargetAction(this, TargetAction.EXPAND);
+        listener.updateTarget(this);
 
         ResourceDirectory.ResourceCollectionResponse response = ((ResourceDirectory) resource).getSubresources();
         if (!response.getExceptions().isEmpty()) {
             expanded = false;
             for (Exception e : response.getExceptions()) {
-                listener.updateTargetException(this, TargetAction.EXPAND, new SweeperException(e));
+                listener.updateException(this, new SweeperException(e));
             }
         }
         doExpand(response.getResources());
@@ -154,7 +154,7 @@ class TargetImpl implements Target {
             return;
         }
         partiallySized = true;
-        listener.updateTargetAction(this, TargetAction.COMPUTE_SIZE);
+        listener.updateTarget(this);
 
         sized = isExpanded();
         try {
@@ -172,7 +172,7 @@ class TargetImpl implements Target {
             throw e;
         } catch (Exception e) {
             sized = false;
-            listener.updateTargetException(this, TargetAction.COMPUTE_SIZE, new SweeperException(e));
+            listener.updateException(this, new SweeperException(e));
         }
     }
 
@@ -212,7 +212,7 @@ class TargetImpl implements Target {
             return;
         }
         partiallyHashed = true;
-        listener.updateTargetAction(this, TargetAction.COMPUTE_HASH);
+        listener.updateTarget(this);
 
         hashed = true;
         try {
@@ -231,7 +231,7 @@ class TargetImpl implements Target {
             throw e;
         } catch (Exception e) {
             hashed = false;
-            listener.updateTargetException(this, TargetAction.COMPUTE_HASH, new SweeperException(e));
+            listener.updateException(this, new SweeperException(e));
         }
     }
 
@@ -286,11 +286,11 @@ class TargetImpl implements Target {
             }
         }
 
-        listener.updateTargetAction(this, TargetAction.DELETE);
+        listener.updateTarget(this);
         try {
             resource.delete();
         } catch (Exception e) {
-            listener.updateTargetException(this, TargetAction.DELETE, new SweeperException(e));
+            listener.updateException(this, new SweeperException(e));
         }
         deleted = true;
     }

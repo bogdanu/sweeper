@@ -166,7 +166,7 @@ public class TargetImplTest {
         assertEquals(resource1, children.next().getResource());
         assertEquals(resource2, children.next().getResource());
 
-        verify(listener).updateTargetAction(targetDir, TargetAction.EXPAND);
+        verify(listener).updateTarget(targetDir);
     }
 
     @Test
@@ -185,8 +185,8 @@ public class TargetImplTest {
 
         assertTrue(targetDir.isPartiallyExpanded());
         assertFalse(targetDir.isExpanded());
-        verify(listener).updateTargetAction(targetDir, TargetAction.EXPAND);
-        verify(listener).updateTargetException(eq(targetDir), eq(TargetAction.EXPAND), any(SweeperException.class));
+        verify(listener).updateTarget(targetDir);
+        verify(listener).updateException(eq(targetDir), any(SweeperException.class));
     }
 
     @Test
@@ -207,7 +207,7 @@ public class TargetImplTest {
             assertEquals(1, target1.getTotalTargets());
             assertEquals(1, target1.getTotalTargetFiles());
         }
-        verify(listener).updateTargetAction(target1, TargetAction.COMPUTE_SIZE);
+        verify(listener).updateTarget(target1);
     }
 
     @Test
@@ -241,7 +241,7 @@ public class TargetImplTest {
             assertEquals(1 + target1Subtargets + target2Subtargets, targetDirSpy.getTotalTargets());
             assertEquals(target1Files + target2Files, targetDirSpy.getTotalTargetFiles());
         }
-        verify(listener).updateTargetAction(targetDirSpy, TargetAction.COMPUTE_SIZE);
+        verify(listener).updateTarget(targetDirSpy);
     }
 
     private TargetImpl prepareChildToSize(TargetImpl target, long size, int totalTargets, int totalFiles) {
@@ -294,7 +294,7 @@ public class TargetImplTest {
         assertFalse(target1.isSized());
 
         // exception because target1 is not sized
-        verify(listener).updateTargetException(eq(target1), eq(TargetAction.COMPUTE_SIZE), any(SweeperException.class));
+        verify(listener).updateException(eq(target1), any(SweeperException.class));
     }
 
     @Test
@@ -321,7 +321,7 @@ public class TargetImplTest {
             assertEquals(size + "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", target1.getHash());
         }
 
-        verify(listener).updateTargetAction(target1, TargetAction.COMPUTE_HASH);
+        verify(listener).updateTarget(target1);
     }
 
     @Test
@@ -375,7 +375,7 @@ public class TargetImplTest {
         assertEquals(expectedLastModified, target.getModificationDate().getMillis());
         assertEquals(expectedHash, target.getHash());
 
-        verify(listener).updateTargetAction(target, TargetAction.COMPUTE_HASH);
+        verify(listener).updateTarget(target);
     }
 
     @Test
@@ -426,13 +426,13 @@ public class TargetImplTest {
         assertFalse(target1.isHashed());
 
         // exception because target1 is not hashed
-        verify(listener).updateTargetException(eq(targetDir), eq(TargetAction.COMPUTE_HASH), any(SweeperException.class));
+        verify(listener).updateException(eq(targetDir), any(SweeperException.class));
     }
 
     @Test
     public void testDelete() throws Exception {
         target1.delete(listener);
-        verify(listener).updateTargetAction(target1, TargetAction.DELETE);
+        verify(listener).updateTarget(target1);
         verify(resource1).delete();
 
         try {
@@ -467,7 +467,7 @@ public class TargetImplTest {
 
         doThrow(new IOException()).when(resource1).delete();
         target1.delete(listener);
-        verify(listener).updateTargetException(eq(target1), eq(TargetAction.DELETE), any(SweeperException.class));
+        verify(listener).updateException(eq(target1), any(SweeperException.class));
     }
 
     @Test

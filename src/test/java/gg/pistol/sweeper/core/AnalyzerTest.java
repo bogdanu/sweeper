@@ -170,14 +170,10 @@ public class AnalyzerTest {
     }
 
     private void verifyAnalyzeListener() {
+        verify(listener, atLeastOnce()).updateTarget(any(TargetImpl.class));
         verify(listener).updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
-        verify(listener, atLeastOnce()).updateTargetAction(any(TargetImpl.class), eq(TargetAction.EXPAND));
-
         verify(listener).updateOperation(SweeperOperation.SIZE_COMPUTATION);
-        verify(listener, atLeastOnce()).updateTargetAction(any(TargetImpl.class), eq(TargetAction.COMPUTE_SIZE));
-
         verify(listener).updateOperation(SweeperOperation.HASH_COMPUTATION);
-        verify(listener, atLeastOnce()).updateTargetAction(any(TargetImpl.class), eq(TargetAction.COMPUTE_HASH));
 
         verify(listener).updateOperationProgress(anyLong(), anyLong(), eq(100));
     }
@@ -395,7 +391,7 @@ public class AnalyzerTest {
         analyzer.delete(ImmutableSet.of(analyzer.getRootTarget()), listener);
 
         verify(listener).updateOperation(SweeperOperation.RESOURCE_DELETION);
-        verify(listener, times(6)).updateTargetAction(any(Target.class), eq(TargetAction.DELETE));
+        verify(listener, times(6)).updateTarget(any(Target.class));
         verify(listener).updateOperationProgress(anyLong(), anyLong(), eq(100));
         verify(file1).delete();
         verify(file2).delete();
@@ -428,7 +424,7 @@ public class AnalyzerTest {
         analyzer.delete(toDelete, listener);
 
         verify(listener).updateOperation(SweeperOperation.RESOURCE_DELETION);
-        verify(listener, times(1)).updateTargetAction(any(Target.class), eq(TargetAction.DELETE));
+        verify(listener, times(1)).updateTarget(any(Target.class));
         verify(listener).updateOperationProgress(anyLong(), anyLong(), eq(100));
         verify(file1, never()).delete();
         verify(file2, never()).delete();

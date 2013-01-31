@@ -38,9 +38,9 @@ class OperationTrackingListener implements SweeperOperationListener {
 
         public void updateOperationProgress(long progress, long maxProgress, int percentGlobal) { /* ignore */ }
 
-        public void updateTargetAction(Target target, TargetAction action) { /* ignore */ }
+        public void updateTarget(Target target) { /* ignore */ }
 
-        public void updateTargetException(Target target, TargetAction action, SweeperException e) { /* ignore */ }
+        public void updateException(Target target, SweeperException e) { /* ignore */ }
     });
 
     // The wrapped listener.
@@ -90,21 +90,19 @@ class OperationTrackingListener implements SweeperOperationListener {
         listener.updateOperationProgress(progress, maxProgress, percentGlobal);
     }
 
-    public void updateTargetAction(Target target, TargetAction action) {
+    public void updateTarget(Target target) {
         Preconditions.checkNotNull(target);
-        Preconditions.checkNotNull(action);
         checkOperation();
 
-        listener.updateTargetAction(target, action);
+        listener.updateTarget(target);
     }
 
-    public void updateTargetException(Target target, TargetAction action, SweeperException e) {
+    public void updateException(Target target, SweeperException e) {
         Preconditions.checkNotNull(target);
-        Preconditions.checkNotNull(action);
         Preconditions.checkNotNull(e);
         checkOperation();
 
-        listener.updateTargetException(target, action, e);
+        listener.updateException(target, e);
     }
 
     /**

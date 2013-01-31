@@ -45,26 +45,21 @@ public interface SweeperOperationListener {
     void updateOperationProgress(long progress, long maxProgress, int percentGlobal);
 
     /**
-     * Notification that an action for a target is started. A {@link SweeperOperation} can be composed of
-     * {@link TargetAction}s.
+     * Notification that the specified <code>target</code> is the subject of the operation.
      *
      * @param target
-     *         the subject of the action
-     * @param action
-     *         the newly started action
+     *         the subject of the operation
      */
-    void updateTargetAction(Target target, TargetAction action);
+    void updateTarget(Target target);
 
     /**
-     * Notification that an exception occurred while executing an action for a target.
+     * Notification that an exception occurred while executing the operation for a target.
      *
      * @param target
-     *         the subject of the action
-     * @param action
-     *         the context of the exception
+     *         the subject of the operation
      * @param e
      *         the encountered exception
      */
-    void updateTargetException(Target target, TargetAction action, SweeperException e);
+    void updateException(Target target, SweeperException e);
 
 }
