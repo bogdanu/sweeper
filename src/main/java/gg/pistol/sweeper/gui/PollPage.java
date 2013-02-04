@@ -19,24 +19,42 @@ package gg.pistol.sweeper.gui;
 
 import com.google.common.base.Preconditions;
 import gg.pistol.sweeper.core.Sweeper;
+import gg.pistol.sweeper.core.SweeperCount;
+import gg.pistol.sweeper.core.SweeperPoll;
+import gg.pistol.sweeper.core.Target;
+import gg.pistol.sweeper.gui.component.ConfirmationDialog;
 import gg.pistol.sweeper.i18n.I18n;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 // package private
 class PollPage extends WizardPage {
 
-    private final int number;
+    private WizardPage analysisPage;
 
-    @Nullable private PollPage prevPage;
+    private List<Target> targets;
 
-    PollPage(I18n i18n, WizardPageListener listener, Sweeper sweeper, int number, @Nullable PollPage prevPage) {
+    @Nullable private JLabel statDelete;
+
+    @Nullable private AbstractTableModel tableModel;
+
+    PollPage(WizardPage analysisPage, I18n i18n, WizardPageListener listener, Sweeper sweeper) {
         super(Preconditions.checkNotNull(i18n), Preconditions.checkNotNull(listener), Preconditions.checkNotNull(sweeper));
-        Preconditions.checkArgument(number >= 0);
+        Preconditions.checkNotNull(analysisPage);
 
-        this.number = number;
-        this.prevPage = prevPage;
+        this.analysisPage = analysisPage;
+        targets = new ArrayList<Target>(sweeper.getCurrentPoll().getTargets());
     }
 
     @Override
@@ -44,16 +62,215 @@ class PollPage extends WizardPage {
         Preconditions.checkNotNull(contentPanel);
         super.addComponents(contentPanel);
 
-        contentPanel.add(alignLeft(createLabel(i18n.getString(I18n.PAGE_POLL_DESCRIPTION))));
+        SweeperCount count = sweeper.getCount();
+
+        contentPanel.add(alignLeft(createWordWrappingLabel(i18n.getString(I18n.PAGE_POLL_DESCRIPTION_ID,
+                formatInt(count.getTotalTargets()), formatSize(count.getTotalSize()),
+                formatInt(count.getDuplicateTargets()), formatSize(count.getDuplicateSize())))));
         contentPanel.add(createVerticalStrut(20));
 
-        contentPanel.add(alignLeft(createLabel(i18n.getString(I18n.PAGE_POLL_STAT_ANALYSED,
-                formatInt(sweeper.getCount().getTotalTargets()), formatSize(sweeper.getCount().getTotalSize()),
-                formatInt(sweeper.getCount().getDuplicateTargets()), formatSize(sweeper.getCount().getDuplicateSize())))));
-        contentPanel.add(createVerticalStrut(20));
+        JPanel topTablePanel = createHorizontalPanel();
+        JPanel topLinkPanel = createVerticalPanel();
+        topLinkPanel.add(createLink(i18n.getString(I18n.PAGE_POLL_LINK_DECIDE_LATER_ALL_ID), markAllAction(SweeperPoll.Mark.DECIDE_LATER)));
+        topLinkPanel.add(createVerticalStrut(3));
+        topLinkPanel.add(createLink(i18n.getString(I18n.PAGE_POLL_LINK_RETAIN_ALL), markAllAction(SweeperPoll.Mark.RETAIN)));
+        topLinkPanel.add(createVerticalStrut(3));
+        topLinkPanel.add(createLink(i18n.getString(I18n.PAGE_POLL_LINK_DELETE_ALL_ID), markAllAction(SweeperPoll.Mark.DELETE)));
+        topTablePanel.add(topLinkPanel);
+        topTablePanel.add(Box.createHorizontalGlue());
+        topTablePanel.add(new JLabel(i18n.getString(I18n.PAGE_POLL_NUMBER_ID, Integer.toString(sweeper.getCurrentPoll().getNumber()))));
+        contentPanel.add(alignLeft(topTablePanel));
+        contentPanel.add(createVerticalStrut(5));
 
-        contentPanel.add(alignLeft(createLabel(i18n.getString(I18n.PAGE_POLL_STAT_DELETE,
-                formatInt(sweeper.getCount().getToDeleteTargets()), formatSize(sweeper.getCount().getToDeleteSize())))));
+        contentPanel.add(alignLeft(addScrollPane(createTable())));
+        contentPanel.add(createVerticalStrut(5));
+
+        statDelete = createWordWrappingLabel(i18n.getString(I18n.PAGE_POLL_STAT_DELETE_ID,
+                formatInt(count.getToDeleteTargets()), formatSize(count.getToDeleteSize())));
+        contentPanel.add(alignLeft(statDelete));
+        contentPanel.add(createVerticalStrut(15));
+    }
+
+    private Runnable markAllAction(final SweeperPoll.Mark mark) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                for (Target t : targets) {
+                    sweeper.getCurrentPoll().mark(t, mark);
+                }
+
+                sweeper.nextPoll();
+                sweeper.previousPoll();
+                targets = new ArrayList<Target>(sweeper.getCurrentPoll().getTargets());
+
+                statDelete.setText(i18n.getString(I18n.PAGE_POLL_STAT_DELETE_ID,
+                        formatInt(sweeper.getCount().getToDeleteTargets()), formatSize(sweeper.getCount().getToDeleteSize())));
+                tableModel.fireTableDataChanged();
+            }
+        };
+    }
+
+    private JTable createTable() {
+        tableModel = createTableModel();
+        JTable table = new JTable(tableModel) {
+            @Override
+            public String getToolTipText(MouseEvent e) {
+                String tooltip = null;
+                Point p = e.getPoint();
+                int rowIndex = rowAtPoint(p);
+                int colIndex = columnAtPoint(p);
+                int realColumnIndex = convertColumnIndexToModel(colIndex);
+
+                if (realColumnIndex == 3) {
+                    tooltip = getValueAt(rowIndex, colIndex).toString();
+                }
+                return tooltip;
+            }
+        };
+        table.getTableHeader().setReorderingAllowed(false);
+
+        final TableCellRenderer booleanRenderer = table.getDefaultRenderer(Boolean.class);
+        final TableCellRenderer stringRenderer = table.getDefaultRenderer(String.class);
+        table.setDefaultRenderer(Boolean.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                return booleanRenderer.getTableCellRendererComponent(table, value, false, false, row, column);
+            }
+        });
+        table.setDefaultRenderer(String.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                return stringRenderer.getTableCellRendererComponent(table, value, false, false, row, column);
+            }
+        });
+
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            packColumn(table, column, column == 3);
+        }
+        table.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
+        return table;
+    }
+
+    private void packColumn(JTable table, int column, boolean autoResize) {
+        TableColumn tableColumn = table.getColumnModel().getColumn(column);
+
+        TableCellRenderer renderer = table.getTableHeader().getDefaultRenderer();
+        Component rendererComponent = renderer.getTableCellRendererComponent(
+                table, tableColumn.getHeaderValue(), false, false, -1, column);
+        int width = rendererComponent.getPreferredSize().width;
+
+        for (int row = 0; row < table.getRowCount(); row++) {
+            renderer = table.getCellRenderer(row, column);
+            rendererComponent = renderer.getTableCellRendererComponent(
+                    table, table.getValueAt(row, column), false, false, row, column);
+            width = Math.max(width, rendererComponent.getPreferredSize().width);
+        }
+
+        width += 6;
+        table.getColumnModel().getColumn(column).setPreferredWidth(width);
+        if (!autoResize) {
+            table.getColumnModel().getColumn(column).setMinWidth(width);
+            table.getColumnModel().getColumn(column).setMaxWidth(width);
+        }
+    }
+
+    private AbstractTableModel createTableModel() {
+        return new AbstractTableModel() {
+
+            @Override
+            public int getRowCount() {
+                return targets.size();
+            }
+
+            @Override
+            public int getColumnCount() {
+                return 7;
+            }
+
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                switch (columnIndex)
+                {
+                    case 0:
+                        return sweeper.getCurrentPoll().getMark(targets.get(rowIndex)) == SweeperPoll.Mark.DECIDE_LATER;
+                    case 1:
+                        return sweeper.getCurrentPoll().getMark(targets.get(rowIndex)) == SweeperPoll.Mark.RETAIN;
+                    case 2:
+                        return sweeper.getCurrentPoll().getMark(targets.get(rowIndex)) == SweeperPoll.Mark.DELETE;
+                    case 3:
+                        return targets.get(rowIndex).getName();
+                    case 4:
+                        if (targets.get(rowIndex).getType() == Target.Type.FILE) {
+                            return i18n.getString(I18n.RESOURCE_TYPE_FILE_ID);
+                        } else {
+                            return i18n.getString(I18n.RESOURCE_TYPE_DIRECTORY_ID);
+                        }
+                    case 5:
+                        return formatSize(targets.get(rowIndex).getSize());
+                    case 6:
+                        DateTime date = targets.get(rowIndex).getModificationDate();
+                        return date == null ? i18n.getString(I18n.PAGE_POLL_TABLE_COLUMN_DATE_UNKNOWN_ID) :
+                                date.toString(DateTimeFormat.patternForStyle("MM", i18n.getLocale()));
+                }
+                return null;
+            }
+
+            @Override
+            public String getColumnName(int column) {
+                switch (column)
+                {
+                    case 0:
+                        return i18n.getString(I18n.PAGE_POLL_TABLE_COLUMN_DECIDE_LATER_ID);
+                    case 1:
+                        return i18n.getString(I18n.PAGE_POLL_TABLE_COLUMN_RETAIN_ID);
+                    case 2:
+                        return i18n.getString(I18n.PAGE_POLL_TABLE_COLUMN_DELETE_ID);
+                    case 3:
+                        return i18n.getString(I18n.RESOURCE_NAME_ID);
+                    case 4:
+                        return i18n.getString(I18n.PAGE_POLL_TABLE_COLUMN_TYPE_ID);
+                    case 5:
+                        return i18n.getString(I18n.RESOURCE_SIZE_ID);
+                    case 6:
+                        return i18n.getString(I18n.RESOURCE_MODIFIED_ID);
+                }
+                return null;
+            }
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return columnIndex < 3 ? Boolean.class : String.class;
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return columnIndex < 3;
+            }
+
+            @Override
+            public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+                SweeperPoll.Mark mark = null;
+                switch (columnIndex) {
+                    case 0:
+                        mark = SweeperPoll.Mark.DECIDE_LATER;
+                        break;
+                    case 1:
+                        mark = SweeperPoll.Mark.RETAIN;
+                        break;
+                    case 2:
+                        mark = SweeperPoll.Mark.DELETE;
+                        break;
+                }
+                sweeper.getCurrentPoll().mark(targets.get(rowIndex), mark);
+                sweeper.nextPoll();
+                sweeper.previousPoll();
+                targets = new ArrayList<Target>(sweeper.getCurrentPoll().getTargets());
+
+                statDelete.setText(i18n.getString(I18n.PAGE_POLL_STAT_DELETE_ID,
+                        formatInt(sweeper.getCount().getToDeleteTargets()), formatSize(sweeper.getCount().getToDeleteSize())));
+                fireTableRowsUpdated(rowIndex, rowIndex);
+            }
+        };
     }
 
     private String formatSize(long size) {
@@ -95,7 +312,7 @@ class PollPage extends WizardPage {
 
     @Override
     boolean isBackButtonEnabled() {
-        return number > 1;
+        return true;
     }
 
     @Override
@@ -126,23 +343,31 @@ class PollPage extends WizardPage {
     @Nullable
     WizardPage back() {
         if (sweeper.previousPoll() == null) {
-            return null;
+            if (new ConfirmationDialog(getParentWindow(), i18n, i18n.getString(I18n.LABEL_CONFIRMATION_ID),
+                    i18n.getString(I18n.PAGE_POLL_BACK_CONFIRMATION_MESSAGE_ID)).isConfirmed()) {
+                setParentWindow(null);
+                return analysisPage;
+            } else {
+                return null;
+            }
         }
-        freePrevPage();
-        PollPage page = new PollPage(i18n, listener, sweeper, number - 1, this);
+
+        PollPage page = new PollPage(analysisPage, i18n, listener, sweeper);
         page.setParentWindow(getParentWindow());
+        setParentWindow(null);
         return page;
     }
 
     @Override
     WizardPage next() {
-        freePrevPage();
         WizardPage page;
         if (sweeper.nextPoll() != null) {
-            page = new PollPage(i18n, listener, sweeper, number + 1, this);
+            page = new PollPage(analysisPage, i18n, listener, sweeper);
             page.setParentWindow(getParentWindow());
+            setParentWindow(null);
         } else {
             page = null;
+//            setParentWindow(null);
         }
         return page;
     }
@@ -152,10 +377,4 @@ class PollPage extends WizardPage {
         return null;
     }
 
-    private void freePrevPage() {
-        if (prevPage != null) {
-            prevPage.setParentWindow(null);
-            prevPage = null;
-        }
-    }
 }
