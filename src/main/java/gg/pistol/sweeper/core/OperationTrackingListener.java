@@ -148,22 +148,22 @@ class OperationTrackingListener implements SweeperOperationListener {
     }
 
     /**
-     * Notification that a target action progressed further.
+     * Notification that the operation for a target progressed further.
      *
-     * <p>The progress of the action is incremented in relative values, for example (considering a maximum of 130):
+     * <p>The progress is incremented in relative values, for example (considering a maximum of 130):
      *
-     * <ol><li>incrementTargetActionProgress(40)</li>
-     * <li>incrementTargetActionProgress(70)</li>
-     * <li>incrementTargetActionProgress(20)</li></ol>
+     * <ol><li>incrementTargetProgress(40)</li>
+     * <li>incrementTargetProgress(70)</li>
+     * <li>incrementTargetProgress(20)</li></ol>
      *
-     * At the end the progress will be 130 (the sum of all the relative action progress increments).
+     * At the end the progress will be 130 (the sum of all the relative progress increments).
      *
-     * @param actionProgress
-     *         a relative value representing the action progress increment
+     * @param relativeProgress
+     *         a relative value representing the progress increment
      */
-    void incrementTargetActionProgress(long actionProgress) {
+    void incrementTargetProgress(long relativeProgress) {
         checkOperation();
-        long operationProgress = progress + actionProgress;
+        long operationProgress = progress + relativeProgress;
         checkProgressArgument(operationProgress);
 
         incrementOperationProgress(operationProgress);

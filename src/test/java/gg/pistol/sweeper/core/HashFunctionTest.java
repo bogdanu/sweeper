@@ -20,8 +20,6 @@ package gg.pistol.sweeper.core;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import gg.pistol.sweeper.core.HashFunction;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -53,7 +51,7 @@ public class HashFunctionTest {
 
         inputStream = new ByteArrayInputStream(new byte[6 * (1 << 20)]); // 6 MB
         hash.compute(inputStream, listener, abortFlag);
-        verify(listener).incrementTargetActionProgress(anyLong());
+        verify(listener).incrementTargetProgress(anyLong());
     }
 
     @Test

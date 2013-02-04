@@ -112,18 +112,11 @@ public class OperationTrackingListenerTest {
     }
 
     @Test
-    public void testUpdateTargetAction() {
+    public void testUpdateTarget() {
         Target target = mock(Target.class);
 
         try {
             trackingListener.updateTarget(null);
-            fail();
-        } catch (NullPointerException e) {
-            // expected
-        }
-
-        try {
-            trackingListener.updateTarget(target);
             fail();
         } catch (NullPointerException e) {
             // expected
@@ -136,19 +129,12 @@ public class OperationTrackingListenerTest {
     }
 
     @Test
-    public void testUpdateTargetException() {
+    public void testUpdateException() {
         Target target = mock(Target.class);
         SweeperException exception = new SweeperException("");
 
         try {
             trackingListener.updateException(null, exception);
-            fail();
-        } catch (NullPointerException e) {
-            // expected
-        }
-
-        try {
-            trackingListener.updateException(target, exception);
             fail();
         } catch (NullPointerException e) {
             // expected
@@ -206,20 +192,20 @@ public class OperationTrackingListenerTest {
     }
 
     @Test
-    public void testIncrementTargetActionProgress() {
+    public void testIncrementTargetProgress() {
         trackingListener.updateOperation(SweeperOperation.RESOURCE_TRAVERSING);
         trackingListener.setOperationMaxProgress(100);
         trackingListener.incrementOperationProgress(50);
 
         try {
-            trackingListener.incrementTargetActionProgress(51);
+            trackingListener.incrementTargetProgress(51);
             fail();
         } catch (IllegalArgumentException e) {
             // expected because the progress is greater than maxProgress
         }
 
-        trackingListener.incrementTargetActionProgress(30);
-        trackingListener.incrementTargetActionProgress(20);
+        trackingListener.incrementTargetProgress(30);
+        trackingListener.incrementTargetProgress(20);
         verify(wrappedListener).updateOperationProgress(eq(100L), eq(100L), anyInt());
     }
 

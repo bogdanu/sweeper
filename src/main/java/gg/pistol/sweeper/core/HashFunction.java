@@ -85,9 +85,7 @@ class HashFunction {
 
             trackingSize += len;
             if (trackingSize >= TRACKING_THRESHOLD_SIZE) {
-                // The micro-progress is a subdivision of a target (from which the input stream is retrieved) action
-                // progress.
-                listener.incrementTargetActionProgress(trackingSize);
+                listener.incrementTargetProgress(trackingSize);
                 trackingSize = 0;
             }
 
