@@ -79,7 +79,6 @@ class AnalysisPage extends WizardPage {
     @Nullable private JLabel currentTargetLabel;
     @Nullable private JTextArea errorTextArea;
 
-
     AnalysisPage(WizardPage previousPage, I18n i18n, WizardPageListener listener, Sweeper sweeper, Collection<? extends Resource> resources) {
         super(Preconditions.checkNotNull(i18n), Preconditions.checkNotNull(listener), Preconditions.checkNotNull(sweeper));
         Preconditions.checkNotNull(previousPage);
@@ -294,7 +293,7 @@ class AnalysisPage extends WizardPage {
         SweeperException e;
         while ((e = errorQueue.poll()) != null) {
             newErrors++;
-            errorContent.append(e.getMessage());
+            errorContent.append(e.getLocalizedMessage());
             errorContent.append('\n');
         }
 
