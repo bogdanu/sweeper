@@ -69,9 +69,6 @@ class XMLResourceBundleControl extends ResourceBundle.Control {
         }
 
         String resourceName = toResourceName(bundleName, format);
-        if (resourceName == null) {
-            return null;
-        }
 
         InputStream stream = null;
         if (reload) {

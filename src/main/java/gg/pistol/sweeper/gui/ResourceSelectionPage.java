@@ -140,9 +140,7 @@ class ResourceSelectionPage extends WizardPage {
         }
         latestOpenedDirectory = opener.getCurrentDirectory();
         File[] files = opener.getSelectedFiles();
-        if (files != null) {
-            addResources(files);
-        }
+        addResources(files);
     }
 
     private void addResources(File[] files) {
@@ -199,7 +197,7 @@ class ResourceSelectionPage extends WizardPage {
 
     private void removeResource() {
         int[] indexes = resourceList.getSelectedIndices();
-        if (indexes == null || indexes.length == 0) {
+        if (indexes.length == 0) {
             return;
         }
         for (int i = indexes.length - 1; i >= 0; i--) {
