@@ -18,16 +18,19 @@
 package gg.pistol.sweeper.gui;
 
 import com.google.common.base.Preconditions;
+import gg.pistol.lumberjack.JackLogger;
+import gg.pistol.lumberjack.JackLoggerFactory;
 import gg.pistol.sweeper.core.Sweeper;
 import gg.pistol.sweeper.core.SweeperAbortException;
 import gg.pistol.sweeper.core.SweeperException;
 import gg.pistol.sweeper.core.SweeperOperation;
 import gg.pistol.sweeper.core.SweeperOperationListener;
+import gg.pistol.sweeper.core.SweeperPoll;
 import gg.pistol.sweeper.core.Target;
-import gg.pistol.sweeper.core.TargetAction;
 import gg.pistol.sweeper.core.resource.Resource;
 import gg.pistol.sweeper.gui.component.ConfirmationDialog;
 import gg.pistol.sweeper.i18n.I18n;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
@@ -44,36 +47,37 @@ import java.util.concurrent.LinkedBlockingDeque;
 // package private
 class AnalysisPage extends WizardPage {
 
+    private static final JackLogger LOG = JackLoggerFactory.getLogger(LoggerFactory.getLogger(AnalysisPage.class));
     private static final int PROGRESS_UPDATE_FREQUENCY = 40; // millis
 
     private final WizardPage previousPage;
 
     private final Collection<? extends Resource> resources;
     private final SweeperOperationListener operationListener;
+    private final ExecutorService executor;
 
     private final long startTime;
-    private volatile int totalProgressPercent;
-    private SweeperOperation operation;
-    private volatile long operationProgress;
-    private volatile long operationMaxProgress;
-    private volatile Target currentTarget;
-
-    private final ExecutorService executor;
-    private boolean analysisStarted;
-    private volatile boolean analysisDone;
+    private volatile long endTime;
+    private volatile boolean analysisFinished;
     private volatile boolean analysisCanceled;
 
-    private int errorLineEnd;
+    private volatile int totalProgressPercent;
+    private volatile long operationProgress;
+    private volatile long operationMaxProgress;
+    @Nullable private volatile SweeperOperation operation;
+    @Nullable private volatile Target currentTarget;
+
+    private final BlockingQueue<SweeperException> errorQueue;
     private int errorCounter;
-    private final BlockingQueue<String> errorQueue;
 
     @Nullable private JProgressBar totalProgressBar;
-    @Nullable private JLabel totalTime;
-    @Nullable private JLabel totalRemainingTime;
-    @Nullable private JLabel operationDescription;
+    @Nullable private JLabel timeLabel;
+    @Nullable private JLabel remainingTimeLabel;
+    @Nullable private JLabel operationLabel;
     @Nullable private JProgressBar operationProgressBar;
-    @Nullable private JLabel operationTarget;
-    @Nullable private JTextArea errors;
+    @Nullable private JLabel currentTargetLabel;
+    @Nullable private JTextArea errorTextArea;
+
 
     AnalysisPage(WizardPage previousPage, I18n i18n, WizardPageListener listener, Sweeper sweeper, Collection<? extends Resource> resources) {
         super(Preconditions.checkNotNull(i18n), Preconditions.checkNotNull(listener), Preconditions.checkNotNull(sweeper));
@@ -81,13 +85,12 @@ class AnalysisPage extends WizardPage {
 
         this.previousPage = previousPage;
         this.resources = resources;
-        operationListener = getOperationListener();
+        operationListener = buildOperationListener();
+        executor = Executors.newFixedThreadPool(2);
 
         startTime = System.currentTimeMillis();
-
-        executor = Executors.newFixedThreadPool(2);
-        operation = SweeperOperation.RESOURCE_TRAVERSING;
-        errorQueue = new LinkedBlockingDeque<String>();
+        endTime = -1;
+        errorQueue = new LinkedBlockingDeque<SweeperException>();
     }
 
     @Override
@@ -107,212 +110,32 @@ class AnalysisPage extends WizardPage {
         addGridComponent(grid, totalProgressBar, true, false, true);
 
         addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_TOTAL_ELAPSED_TIME_ID)), false, false, false);
-        totalTime = new JLabel(formatTime(getElapsedTime()));
-        addGridComponent(grid, totalTime, true, false, false);
+        timeLabel = new JLabel();
+        addGridComponent(grid, timeLabel, true, false, false);
 
         addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_TOTAL_REMAINING_TIME_ID)), false, false, false);
-        totalRemainingTime = new JLabel();
-        addGridComponent(grid, totalRemainingTime, true, false, false);
+        remainingTimeLabel = new JLabel();
+        addGridComponent(grid, remainingTimeLabel, true, false, false);
 
         addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_LABEL_ID)), false, false, true);
-        operationDescription = new JLabel(getOperationDescription(operation));
-        addGridComponent(grid, operationDescription, true, false, true);
+        operationLabel = new JLabel();
+        addGridComponent(grid, operationLabel, true, false, true);
 
         addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_PROGRESS_ID)), false, false, false);
         operationProgressBar = createProgressBar();
         addGridComponent(grid, operationProgressBar, true, false, false);
 
         addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_TARGET_LABEL_ID)), false, false, true);
-        operationTarget = new JLabel();
-        addGridComponent(grid, operationTarget, true, false, true);
+        currentTargetLabel = new JLabel();
+        addGridComponent(grid, currentTargetLabel, true, false, true);
 
         addGridComponent(grid, new JLabel(i18n.getString(I18n.PAGE_ANALYSIS_ERROR_LABEL_ID)), false, false, true);
-        errors = new JTextArea();
-        errors.setEditable(false);
-        addCopyMenu(errors);
-        addGridComponent(grid, new JScrollPane(errors), true, true, true);
+        errorTextArea = new JTextArea();
+        errorTextArea.setEditable(false);
+        addCopyMenu(errorTextArea);
+        addGridComponent(grid, new JScrollPane(errorTextArea), true, true, true);
 
-        if (!analysisStarted) {
-            analysisStarted = true;
-            executor.submit(getRunnableAnalysis());
-            executor.submit(getRunnableProgress());
-        }
-    }
-
-    private SweeperOperationListener getOperationListener() {
-        return new SweeperOperationListener() {
-            @Override
-            public void updateOperation(final SweeperOperation currentOperation) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        updateTimes();
-                        operation = currentOperation;
-                        operationDescription.setText(getOperationDescription(operation));
-                    }
-                });
-            }
-
-            @Override
-            public void updateOperationProgress(long progress, long maxProgress, int percentGlobal) {
-                operationProgress = progress;
-                operationMaxProgress = maxProgress;
-                totalProgressPercent = percentGlobal;
-                if (progress == 0 || progress == maxProgress) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateProgress();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void updateTargetAction(Target target, TargetAction action) {
-                currentTarget = target;
-            }
-
-            @Override
-            public void updateTargetException(Target target, TargetAction action, SweeperException e) {
-                try {
-                    errorQueue.put(e.getMessage());
-                } catch (InterruptedException ex) {
-                    // ignore
-                }
-            }
-        };
-    }
-
-    private void updateProgress() {
-        updateTimes();
-        totalProgressBar.setValue(totalProgressPercent);
-        if (operationMaxProgress > 0) {
-            operationProgressBar.setValue((int) (100 * operationProgress / operationMaxProgress));
-        }
-        if (totalProgressPercent == 100) {
-            currentTarget = null;
-            listener.onButtonStateChange();
-            errors.setCaretPosition(0);
-        }
-
-        operationTarget.setText(currentTarget != null ? currentTarget.getName() : "");
-
-        String err;
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        while ((err = errorQueue.poll()) != null) {
-            i++;
-            sb.append(err);
-            sb.append("\n");
-        }
-        if (i > 0 || errorLineEnd == 0) {
-            String counter = i18n.getString(I18n.PAGE_ANALYSIS_ERROR_COUNTER_ID, Integer.toString(errorCounter + i));
-            if (errorCounter > 0) {
-                errors.replaceRange(counter, 0, errorLineEnd);
-            } else {
-                errors.append(counter + "\n");
-            }
-            errorCounter += i;
-            errorLineEnd = counter.length();
-        }
-        if (sb.length() > 0) {
-            errors.append(sb.toString());
-        }
-    }
-
-    private void updateTimes() {
-        totalTime.setText(formatTime(getElapsedTime()));
-        if (totalProgressPercent > 0) {
-            totalRemainingTime.setText(formatTime(getRemainingTime()));
-        }
-    }
-
-    private Runnable getRunnableProgress() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                while (!analysisDone && !analysisCanceled) {
-                    try {
-                        Thread.sleep(PROGRESS_UPDATE_FREQUENCY);
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateProgress();
-                        }
-                    });
-                }
-                executor.shutdown();
-            }
-        };
-    }
-
-    private Runnable getRunnableAnalysis() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                WindowListener windowListener = new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                        if (!analysisDone && !analysisCanceled) {
-                            sweeper.abortAnalysis();
-                        }
-                    }
-                };
-                getParentWindow().addWindowListener(windowListener);
-
-                try {
-                    sweeper.analyze(resources, operationListener);
-                    analysisDone = true;
-                } catch (SweeperAbortException e) {
-                    analysisCanceled = true;
-                } catch (Exception e) {
-                    analysisCanceled = true;
-                    e.printStackTrace();
-                } finally {
-                    getParentWindow().removeWindowListener(windowListener);
-                }
-            }
-        };
-    }
-
-    private long getElapsedTime() {
-        return System.currentTimeMillis() - startTime;
-    }
-
-    private long getRemainingTime() {
-        return (100 - totalProgressPercent) * getElapsedTime() / totalProgressPercent;
-    }
-
-    private String getOperationDescription(SweeperOperation operation) {
-        switch (operation) {
-            case RESOURCE_TRAVERSING:
-                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_RESOURCE_TRAVERSAL_ID);
-            case SIZE_COMPUTATION:
-                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_SIZE_COMPUTATION_ID);
-            case HASH_COMPUTATION:
-                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_HASH_COMPUTATION_ID);
-            case RESOURCE_DELETION:
-                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_RESOURCE_DELETION_ID);
-        }
-        return null;
-    }
-
-    private String formatTime(long time) {
-        int hours = (int) (time / 3600000);
-        time %= 3600000;
-        int minutes = (int) (time / 60000);
-        time %= 60000;
-        int seconds = (int) (time / 1000);
-        if (hours > 0) {
-            return i18n.getString(I18n.TIME_DESCRIPTION_HOURS_ID, Integer.toString(hours), Integer.toString(minutes), Integer.toString(seconds));
-        } else if (minutes > 0) {
-            return i18n.getString(I18n.TIME_DESCRIPTION_MINUTES_ID, Integer.toString(minutes), Integer.toString(seconds));
-        } else {
-            return i18n.getString(I18n.TIME_DESCRIPTION_SECONDS_ID, Integer.toString(seconds));
-        }
+        updateProgress0();
     }
 
     private void addGridComponent(JPanel panel, JComponent component, boolean fillHorizontally, boolean fillVertically, boolean newGridSection) {
@@ -344,6 +167,187 @@ class AnalysisPage extends WizardPage {
         return bar;
     }
 
+    void startAnalysis() {
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                runAnalysis();
+            }
+        });
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                continuouslyUpdateProgress();
+            }
+        });
+    }
+
+    private void runAnalysis() {
+        WindowListener windowListener = new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (!analysisFinished && !analysisCanceled) {
+                    sweeper.abortAnalysis();
+                }
+            }
+        };
+        getParentWindow().addWindowListener(windowListener);
+
+        try {
+            sweeper.analyze(resources, operationListener);
+            analysisFinished = true;
+        } catch (SweeperAbortException e) {
+            analysisCanceled = true;
+        } catch (Exception e) {
+            analysisCanceled = true;
+            LOG.error("Error occurred while analyzing.", e);
+        }
+        endTime = System.currentTimeMillis();
+        currentTarget = null;
+        getParentWindow().removeWindowListener(windowListener);
+
+        updateProgress();
+        executor.shutdown();
+    }
+
+    private SweeperOperationListener buildOperationListener() {
+        return new SweeperOperationListener() {
+            @Override
+            public void updateOperation(SweeperOperation operation) {
+                AnalysisPage.this.operation = operation;
+                updateProgress();
+            }
+
+            @Override
+            public void updateOperationProgress(long progress, long maxProgress, int percentGlobal) {
+                operationProgress = progress;
+                operationMaxProgress = maxProgress;
+                totalProgressPercent = percentGlobal;
+                if (progress == 0 || progress == maxProgress) {
+                    updateProgress();
+                }
+            }
+
+            @Override
+            public void updateTarget(Target target) {
+                currentTarget = target;
+            }
+
+            @Override
+            public void updateException(Target target, SweeperException e) {
+                try {
+                    errorQueue.put(e);
+                } catch (InterruptedException ex) {
+                    // ignore
+                }
+            }
+        };
+    }
+
+    private void updateProgress() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                updateProgress0();
+            }
+        });
+    }
+
+    private void updateProgress0() {
+        // get the values of volatiles to be sure a value stays the same when using it multiple times
+        SweeperOperation oper = operation;
+        long maxProgress = operationMaxProgress;
+        long progress = operationProgress;
+        int progressGlobal = totalProgressPercent;
+        Target target = currentTarget;
+        long time = endTime;
+
+        operationLabel.setText(getOperationDescription(oper));
+        totalProgressBar.setValue(progressGlobal);
+        if (maxProgress > 0) {
+            operationProgressBar.setValue((int) (100 * progress / maxProgress));
+        }
+        currentTargetLabel.setText(target != null ? target.getName() : "");
+
+        long elapsedTime = (time != -1 ? time : System.currentTimeMillis()) - startTime;
+        timeLabel.setText(formatTime(elapsedTime));
+        if (oper != null && time == -1 && progressGlobal > 0) {
+            long remainingTime = elapsedTime * (100 - progressGlobal) / progressGlobal;
+            remainingTimeLabel.setText(formatTime(remainingTime));
+        } else {
+            remainingTimeLabel.setText("");
+        }
+
+        updateErrors();
+
+        if (time != -1) {
+            errorTextArea.setCaretPosition(0);
+            listener.onButtonStateChange();
+        }
+    }
+
+    private void updateErrors() {
+        SweeperException e;
+        StringBuilder errors = new StringBuilder();
+        while ((e = errorQueue.poll()) != null) {
+            errorCounter++;
+            errors.append(e.getMessage() + "\n");
+        }
+
+        if (errors.length() > 0 || errorTextArea.getText().isEmpty()) {
+            String errorCounterStr = i18n.getString(I18n.PAGE_ANALYSIS_ERROR_COUNTER_ID, Integer.toString(errorCounter)) + "\n";
+            int firstLineEnd = errorTextArea.getText().indexOf('\n') + 1;
+
+            errorTextArea.replaceRange(errorCounterStr, 0, firstLineEnd);
+            if (errors.length() > 0) {
+                errorTextArea.append(errors.toString());
+            }
+        }
+    }
+
+    private void continuouslyUpdateProgress() {
+        while (endTime == -1) {
+            try {
+                Thread.sleep(PROGRESS_UPDATE_FREQUENCY);
+            } catch (InterruptedException e) {
+                break;
+            }
+            updateProgress();
+        }
+    }
+
+    private String getOperationDescription(SweeperOperation operation) {
+        if (operation == null) {
+            return "";
+        }
+        switch (operation) {
+            case RESOURCE_TRAVERSING:
+                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_RESOURCE_TRAVERSAL_ID);
+            case SIZE_COMPUTATION:
+                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_SIZE_COMPUTATION_ID);
+            case HASH_COMPUTATION:
+                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_HASH_COMPUTATION_ID);
+            case RESOURCE_DELETION:
+                return i18n.getString(I18n.PAGE_ANALYSIS_OPERATION_RESOURCE_DELETION_ID);
+        }
+        return null;
+    }
+
+    private String formatTime(long time) {
+        int hours = (int) (time / 3600000);
+        time %= 3600000;
+        int minutes = (int) (time / 60000);
+        time %= 60000;
+        int seconds = (int) (time / 1000);
+        if (hours > 0) {
+            return i18n.getString(I18n.TIME_DESCRIPTION_HOURS_ID, Integer.toString(hours), Integer.toString(minutes), Integer.toString(seconds));
+        } else if (minutes > 0) {
+            return i18n.getString(I18n.TIME_DESCRIPTION_MINUTES_ID, Integer.toString(minutes), Integer.toString(seconds));
+        } else {
+            return i18n.getString(I18n.TIME_DESCRIPTION_SECONDS_ID, Integer.toString(seconds));
+        }
+    }
+
     @Override
     protected String getPageHeader() {
         return i18n.getString(I18n.PAGE_ANALYSIS_HEADER_ID);
@@ -356,7 +360,7 @@ class AnalysisPage extends WizardPage {
 
     @Override
     boolean isCancelButtonEnabled() {
-        return !analysisCanceled && !analysisDone;
+        return !analysisCanceled && !analysisFinished;
     }
 
     @Override
@@ -366,7 +370,7 @@ class AnalysisPage extends WizardPage {
 
     @Override
     boolean isNextButtonEnabled() {
-        return analysisDone;
+        return analysisFinished;
     }
 
     @Override
@@ -397,7 +401,7 @@ class AnalysisPage extends WizardPage {
         if (analysisCanceled) {
             return previousPage;
         }
-        if (new ConfirmationDialog(getParentWindow(), i18n, i18n.getString(I18n.PAGE_ANALYSIS_CANCEL_CONFIRMATION_TITLE_ID),
+        if (new ConfirmationDialog(getParentWindow(), i18n, i18n.getString(I18n.LABEL_CONFIRMATION_ID),
                 i18n.getString(I18n.PAGE_ANALYSIS_CANCEL_CONFIRMATION_MESSAGE_ID)).isConfirmed()) {
             analysisCanceled = true;
             sweeper.abortAnalysis();
@@ -408,14 +412,18 @@ class AnalysisPage extends WizardPage {
 
     @Override
     WizardPage next() {
-        WizardPage page;
-        if (sweeper.nextPoll() != null) {
-            page = new PollPage(i18n, listener, sweeper, 1, null);
-        } else {
-            page = new NoDuplicatePage(i18n, listener, sweeper);
+        WizardPage ret;
+        SweeperPoll poll = sweeper.getCurrentPoll();
+        if (poll == null) {
+            poll = sweeper.nextPoll();
         }
-        page.setParentWindow(getParentWindow());
-        return page;
+        if (poll != null) {
+            ret = new PollPage(this, i18n, listener, sweeper);
+        } else {
+            ret = new NoDuplicatePage(i18n, listener, sweeper);
+        }
+        ret.setParentWindow(getParentWindow());
+        return ret;
     }
 
     @Override

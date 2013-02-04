@@ -21,6 +21,7 @@
     <entry key="language.name">English</entry>
 
     <entry key="label.error">Error</entry>
+    <entry key="label.confirmation">Please confirm</entry>
 
     <entry key="button.ok">OK</entry>
     <entry key="button.cancel">Cancel</entry>

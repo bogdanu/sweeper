@@ -265,6 +265,7 @@ class ResourceSelectionPage extends WizardPage {
         }
         AnalysisPage analysisPage = new AnalysisPage(this, i18n, listener, sweeper, collection);
         analysisPage.setParentWindow(getParentWindow());
+        analysisPage.startAnalysis();
         return analysisPage;
     }
 

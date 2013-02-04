@@ -68,6 +68,7 @@ public class I18n {
     public static final String LANGUAGE_NAME_ID = "language.name";
 
     public static final String LABEL_ERROR_ID = "label.error";
+    public static final String LABEL_CONFIRMATION_ID = "label.confirmation";
 
     public static final String BUTTON_OK_ID = "button.ok";
     public static final String BUTTON_CANCEL_ID = "button.cancel";
@@ -114,7 +115,6 @@ public class I18n {
     public static final String PAGE_ANALYSIS_OPERATION_TARGET_LABEL_ID = "page.analysis.operationTargetLabel";
     public static final String PAGE_ANALYSIS_ERROR_LABEL_ID = "page.analysis.error.label";
     public static final String PAGE_ANALYSIS_ERROR_COUNTER_ID = "page.analysis.error.counter";
-    public static final String PAGE_ANALYSIS_CANCEL_CONFIRMATION_TITLE_ID = "page.analysis.cancel.confirmationTitle";
     public static final String PAGE_ANALYSIS_CANCEL_CONFIRMATION_MESSAGE_ID = "page.analysis.cancel.confirmationMessage";
 
     public static final String PAGE_NO_DUPLICATE_HEADER_ID = "page.noDuplicate.header";
