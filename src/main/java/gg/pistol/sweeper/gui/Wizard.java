@@ -17,12 +17,12 @@
  */
 package gg.pistol.sweeper.gui;
 
+import com.google.common.base.Preconditions;
 import gg.pistol.lumberjack.JackLogger;
 import gg.pistol.lumberjack.JackLoggerFactory;
 import gg.pistol.sweeper.core.Sweeper;
 import gg.pistol.sweeper.core.SweeperException;
 import gg.pistol.sweeper.core.SweeperImpl;
-import gg.pistol.sweeper.core.resource.ResourceDirectoryFs;
 import gg.pistol.sweeper.gui.WizardPage.WizardPageListener;
 import gg.pistol.sweeper.gui.component.BasicDialog;
 import gg.pistol.sweeper.gui.component.DecoratedPanel;
@@ -32,28 +32,13 @@ import gg.pistol.sweeper.gui.component.MessageDialog.MessageType;
 import gg.pistol.sweeper.gui.component.SwingMessages;
 import gg.pistol.sweeper.gui.component.WebBrowserLauncher;
 import gg.pistol.sweeper.i18n.I18n;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-
-import javax.annotation.Nullable;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.SwingUtilities;
-
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * The main application dialog that will guide the user into cleaning the files/directories.

@@ -17,23 +17,21 @@
  */
 package gg.pistol.sweeper.i18n;
 
+import com.google.common.base.Preconditions;
+
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.InvalidPropertiesFormatException;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.GuardedBy;
-import javax.annotation.concurrent.ThreadSafe;
-
-import com.google.common.base.Preconditions;
 
 /**
  * Resource bundle loaded from XML properties.
