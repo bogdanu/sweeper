@@ -68,6 +68,7 @@ class AnalysisPage extends WizardPage {
     @Nullable private volatile Target currentTarget;
 
     private final BlockingQueue<SweeperException> errorQueue;
+    private final StringBuilder errorContent;
     private int errorCounter;
 
     @Nullable private JProgressBar totalProgressBar;
@@ -91,6 +92,7 @@ class AnalysisPage extends WizardPage {
         startTime = System.currentTimeMillis();
         endTime = -1;
         errorQueue = new LinkedBlockingDeque<SweeperException>();
+        errorContent = new StringBuilder(i18n.getString(I18n.PAGE_ANALYSIS_ERROR_COUNTER_ID, "0") + "\n");
     }
 
     @Override
@@ -287,21 +289,23 @@ class AnalysisPage extends WizardPage {
     }
 
     private void updateErrors() {
+        int newErrors = 0;
         SweeperException e;
-        StringBuilder errors = new StringBuilder();
         while ((e = errorQueue.poll()) != null) {
-            errorCounter++;
-            errors.append(e.getMessage() + "\n");
+            newErrors++;
+            errorContent.append(e.getMessage());
+            errorContent.append('\n');
         }
 
-        if (errors.length() > 0 || errorTextArea.getText().isEmpty()) {
+        if (newErrors > 0) {
+            errorCounter += newErrors;
+            int firstLineEnd = errorContent.indexOf("\n") + 1;
             String errorCounterStr = i18n.getString(I18n.PAGE_ANALYSIS_ERROR_COUNTER_ID, Integer.toString(errorCounter)) + "\n";
-            int firstLineEnd = errorTextArea.getText().indexOf('\n') + 1;
+            errorContent.replace(0, firstLineEnd, errorCounterStr);
+        }
 
-            errorTextArea.replaceRange(errorCounterStr, 0, firstLineEnd);
-            if (errors.length() > 0) {
-                errorTextArea.append(errors.toString());
-            }
+        if (newErrors > 0 || errorTextArea.getText().isEmpty()) {
+            errorTextArea.setText(errorContent.toString());
         }
     }
 
