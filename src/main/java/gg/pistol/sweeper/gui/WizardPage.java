@@ -23,7 +23,8 @@ import gg.pistol.sweeper.i18n.I18n;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Window;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import javax.annotation.Nullable;
 import javax.swing.JLabel;
@@ -34,8 +35,17 @@ import com.google.common.base.Preconditions;
 // package private
 abstract class WizardPage extends DecoratedPanel {
 
+    private static final int DEFAULT_WIDTH = 900;
+    private static final int DEFAULT_HEIGHT = 675;
+
     protected final WizardPageListener listener;
     protected final Sweeper sweeper;
+
+    /*
+     * The width and height are static to be also preserve the dimensions for new wizard pages.
+     */
+    private static int width = DEFAULT_WIDTH;
+    private static int height = DEFAULT_HEIGHT;
 
     WizardPage(I18n i18n, WizardPageListener listener, Sweeper sweeper) {
         super(Preconditions.checkNotNull(i18n), false, null);
@@ -55,7 +65,15 @@ abstract class WizardPage extends DecoratedPanel {
         contentPanel.add(alignLeft(header));
 
         contentPanel.add(createVerticalStrut(10));
-        contentPanel.setPreferredSize(new Dimension(700, 400));
+
+        contentPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                width = e.getComponent().getWidth();
+                height = e.getComponent().getHeight();
+            }
+        });
+        contentPanel.setPreferredSize(new Dimension(width, height));
     }
 
     protected abstract String getPageHeader();
