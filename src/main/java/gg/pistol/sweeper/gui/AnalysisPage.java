@@ -47,9 +47,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 // package private
 class AnalysisPage extends WizardPage {
 
-    private static final JackLogger LOG = JackLoggerFactory.getLogger(LoggerFactory.getLogger(AnalysisPage.class));
     private static final int PROGRESS_UPDATE_FREQUENCY = 40; // millis
 
+    private final JackLogger log;
     private final WizardPage previousPage;
 
     private final Collection<? extends Resource> resources;
@@ -84,6 +84,7 @@ class AnalysisPage extends WizardPage {
         super(Preconditions.checkNotNull(i18n), Preconditions.checkNotNull(listener), Preconditions.checkNotNull(sweeper));
         Preconditions.checkNotNull(previousPage);
 
+        log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(AnalysisPage.class));
         this.previousPage = previousPage;
         this.resources = resources;
         operationListener = buildOperationListener();
@@ -202,7 +203,7 @@ class AnalysisPage extends WizardPage {
             analysisCanceled = true;
         } catch (Exception e) {
             analysisCanceled = true;
-            LOG.error("Error occurred while analyzing.", e);
+            log.error("Error occurred while analyzing.", e);
         }
         endTime = System.currentTimeMillis();
         currentTarget = null;

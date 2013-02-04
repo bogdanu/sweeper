@@ -157,8 +157,8 @@ public class I18n {
     private static final String[] SUPPORTED_LANGUAGES = new String[]{"en", "es", "pt", "de", "fr", "ro", "zh_CN", "zh_TW", "hi", "ar", "ru", "ja", "iw"};
 
     private final JackLogger log;
-    private final Lock lock;
 
+    private final Lock lock;
     private final Collection<SupportedLocale> supportedLocales;
     private final ResourceBundle.Control resourceBundleControl;
 

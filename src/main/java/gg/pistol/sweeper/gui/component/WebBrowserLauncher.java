@@ -43,12 +43,13 @@ import com.google.common.base.Preconditions;
  */
 public class WebBrowserLauncher {
 
-    private final JackLogger log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(WebBrowserLauncher.class));
+    private final JackLogger log;
     private final I18n i18n;
 
     public WebBrowserLauncher(I18n i18n) {
         Preconditions.checkNotNull(i18n);
         this.i18n = i18n;
+        log = JackLoggerFactory.getLogger(LoggerFactory.getLogger(WebBrowserLauncher.class));
     }
 
     /**
