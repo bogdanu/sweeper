@@ -67,7 +67,7 @@ public class ConfirmationDialog {
                 contentPanel.add(createVerticalStrut(20));
 
                 JPanel buttons = createHorizontalPanel();
-                contentPanel.add(alignCenter((buttons)));
+                contentPanel.add(alignCenter(buttons));
 
                 buttons.add(Box.createHorizontalGlue());
                 buttons.add(createButton(i18n.getString(I18n.BUTTON_YES_ID), okAction(parentWindow), BUTTON_GROUP));
