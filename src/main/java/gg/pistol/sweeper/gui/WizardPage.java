@@ -88,7 +88,5 @@ abstract class WizardPage extends DecoratedPanel {
 
     interface WizardPageListener {
         void onButtonStateChange();
-
-        Window getWindow();
     }
 }

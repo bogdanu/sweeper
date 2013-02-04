@@ -134,7 +134,7 @@ class ResourceSelectionPage extends WizardPage {
         opener.setApproveButtonText(i18n.getString(I18n.BUTTON_ADD_ID));
         opener.setApproveButtonToolTipText(i18n.getString(I18n.BUTTON_ADD_ID));
 
-        int ret = opener.showOpenDialog(listener.getWindow());
+        int ret = opener.showOpenDialog(parentWindow);
         if (ret != JFileChooser.APPROVE_OPTION) {
             return;
         }
@@ -178,7 +178,7 @@ class ResourceSelectionPage extends WizardPage {
 
         if (!erroneousFiles.isEmpty()) {
             String selectableMessage = Joiner.on(", ").join(erroneousFiles);
-            new MessageDialog(listener.getWindow(), MessageType.ERROR, i18n, i18n.getString(I18n.LABEL_ERROR_ID),
+            new MessageDialog(parentWindow, MessageType.ERROR, i18n, i18n.getString(I18n.LABEL_ERROR_ID),
                     i18n.getString(I18n.PAGE_RESOURCE_SELECTION_FILE_CHOOSER_RESOURCE_ERROR_ID), selectableMessage);
         }
 
