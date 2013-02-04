@@ -27,8 +27,13 @@ import javax.swing.*;
 // package private
 class NoDuplicatePage extends WizardPage {
 
-    NoDuplicatePage(I18n i18n, WizardPageListener listener, Sweeper sweeper) {
+    private final WizardPage previousPage;
+
+    NoDuplicatePage(WizardPage previousPage, I18n i18n, WizardPageListener listener, Sweeper sweeper) {
         super(Preconditions.checkNotNull(i18n), Preconditions.checkNotNull(listener), Preconditions.checkNotNull(sweeper));
+        Preconditions.checkNotNull(previousPage);
+
+        this.previousPage = previousPage;
     }
 
     @Override
@@ -56,7 +61,7 @@ class NoDuplicatePage extends WizardPage {
 
     @Override
     boolean isBackButtonEnabled() {
-        return false;
+        return true;
     }
 
     @Override
@@ -87,7 +92,7 @@ class NoDuplicatePage extends WizardPage {
     @Override
     @Nullable
     WizardPage back() {
-        return null;
+        return previousPage;
     }
 
     @Override

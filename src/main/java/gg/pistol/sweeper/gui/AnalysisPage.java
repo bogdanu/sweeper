@@ -424,7 +424,7 @@ class AnalysisPage extends WizardPage {
         if (poll != null) {
             ret = new PollPage(this, i18n, listener, sweeper);
         } else {
-            ret = new NoDuplicatePage(i18n, listener, sweeper);
+            ret = new NoDuplicatePage(this, i18n, listener, sweeper);
         }
         ret.setParentWindow(getParentWindow());
         return ret;
