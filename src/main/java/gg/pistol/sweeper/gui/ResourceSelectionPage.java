@@ -108,37 +108,41 @@ class ResourceSelectionPage extends WizardPage {
     private ActionListener addAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (latestOpenedDirectory == null) {
-                    File[] roots = File.listRoots();
-                    if (roots != null && roots.length > 0) {
-                        latestOpenedDirectory = roots[0];
-                    }
-                }
-                UIManager.put("FileChooser.readOnly", Boolean.TRUE);
-
-                JFileChooser opener = latestOpenedDirectory == null ? new JFileChooser() :
-                        new JFileChooser(latestOpenedDirectory);
-
-                opener.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
-                opener.setFileHidingEnabled(false);
-                opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                opener.setMultiSelectionEnabled(true);
-
-                opener.setDialogTitle(i18n.getString(I18n.PAGE_RESOURCE_SELECTION_FILE_CHOOSER_TITLE_ID));
-                opener.setApproveButtonText(i18n.getString(I18n.BUTTON_ADD_ID));
-                opener.setApproveButtonToolTipText(i18n.getString(I18n.BUTTON_ADD_ID));
-
-                int ret = opener.showOpenDialog(listener.getWindow());
-                if (ret != JFileChooser.APPROVE_OPTION) {
-                    return;
-                }
-                latestOpenedDirectory = opener.getCurrentDirectory();
-                File[] files = opener.getSelectedFiles();
-                if (files != null) {
-                    addResources(files);
-                }
+                chooseResource();
             }
         };
+    }
+
+    private void chooseResource() {
+        if (latestOpenedDirectory == null) {
+            File[] roots = File.listRoots();
+            if (roots != null && roots.length > 0) {
+                latestOpenedDirectory = roots[0];
+            }
+        }
+        UIManager.put("FileChooser.readOnly", Boolean.TRUE);
+
+        JFileChooser opener = latestOpenedDirectory == null ? new JFileChooser() :
+                new JFileChooser(latestOpenedDirectory);
+
+        opener.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
+        opener.setFileHidingEnabled(false);
+        opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        opener.setMultiSelectionEnabled(true);
+
+        opener.setDialogTitle(i18n.getString(I18n.PAGE_RESOURCE_SELECTION_FILE_CHOOSER_TITLE_ID));
+        opener.setApproveButtonText(i18n.getString(I18n.BUTTON_ADD_ID));
+        opener.setApproveButtonToolTipText(i18n.getString(I18n.BUTTON_ADD_ID));
+
+        int ret = opener.showOpenDialog(listener.getWindow());
+        if (ret != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        latestOpenedDirectory = opener.getCurrentDirectory();
+        File[] files = opener.getSelectedFiles();
+        if (files != null) {
+            addResources(files);
+        }
     }
 
     private void addResources(File[] files) {
@@ -188,23 +192,27 @@ class ResourceSelectionPage extends WizardPage {
     private ActionListener removeAction() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int[] indexes = resourceList.getSelectedIndices();
-                if (indexes == null || indexes.length == 0) {
-                    return;
-                }
-                for (int i = indexes.length - 1; i >= 0; i--) {
-                    resources.remove(indexes[i]);
-                }
-                if (indexes[0] > 0) {
-                    resourceList.setSelectedValue(resources.get(indexes[0] - 1), true);
-                } else if (!resources.isEmpty()) {
-                    resourceList.setSelectedValue(resources.get(0), true);
-                } else {
-                    removeButton.setEnabled(false);
-                    listener.onButtonStateChange();
-                }
+                removeResource();
             }
         };
+    }
+
+    private void removeResource() {
+        int[] indexes = resourceList.getSelectedIndices();
+        if (indexes == null || indexes.length == 0) {
+            return;
+        }
+        for (int i = indexes.length - 1; i >= 0; i--) {
+            resources.remove(indexes[i]);
+        }
+        if (indexes[0] > 0) {
+            resourceList.setSelectedValue(resources.get(indexes[0] - 1), true);
+        } else if (!resources.isEmpty()) {
+            resourceList.setSelectedValue(resources.get(0), true);
+        } else {
+            removeButton.setEnabled(false);
+            listener.onButtonStateChange();
+        }
     }
 
     @Override
