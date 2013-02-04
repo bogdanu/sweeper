@@ -121,11 +121,18 @@ public class I18n {
     public static final String PAGE_NO_DUPLICATE_TEXT_ID = "page.noDuplicate.text";
 
     public static final String PAGE_POLL_HEADER_ID = "page.poll.header";
-    public static final String PAGE_POLL_DESCRIPTION = "page.poll.description";
-    public static final String PAGE_POLL_STAT_ANALYSED = "page.poll.statAnalysed";
-    public static final String PAGE_POLL_STAT_DELETE = "page.poll.statDelete";
-    public static final String PAGE_POLL_QUESTION = "page.poll.question";
-
+    public static final String PAGE_POLL_DESCRIPTION_ID = "page.poll.description";
+    public static final String PAGE_POLL_NUMBER_ID = "page.poll.pageNumber";
+    public static final String PAGE_POLL_STAT_DELETE_ID = "page.poll.statDelete";
+    public static final String PAGE_POLL_TABLE_COLUMN_DECIDE_LATER_ID = "page.poll.table.columnDecideLater";
+    public static final String PAGE_POLL_TABLE_COLUMN_RETAIN_ID = "page.poll.table.columnRetain";
+    public static final String PAGE_POLL_TABLE_COLUMN_DELETE_ID = "page.poll.table.columnDelete";
+    public static final String PAGE_POLL_TABLE_COLUMN_TYPE_ID = "page.poll.table.columnType";
+    public static final String PAGE_POLL_TABLE_COLUMN_DATE_UNKNOWN_ID = "page.poll.table.columnDate.unknown";
+    public static final String PAGE_POLL_BACK_CONFIRMATION_MESSAGE_ID = "page.poll.back.confirmationMessage";
+    public static final String PAGE_POLL_LINK_DECIDE_LATER_ALL_ID = "page.poll.link.decideLaterAll";
+    public static final String PAGE_POLL_LINK_RETAIN_ALL = "page.poll.link.retainAll";
+    public static final String PAGE_POLL_LINK_DELETE_ALL_ID = "page.poll.link.deleteAll";
 
     public static final String FILE_CHOOSER_CURRENT_DIRECTORY_ID = "fileChooser.currentDirectory";
     public static final String FILE_CHOOSER_UP_ID = "fileChooser.up";
@@ -135,9 +142,6 @@ public class I18n {
     public static final String FILE_CHOOSER_NAME_ID = "fileChooser.name";
     public static final String FILE_CHOOSER_FILTER_LABEL_ID = "fileChooser.filterLabel";
     public static final String FILE_CHOOSER_FILTER_ALL_ID = "fileChooser.filterAll";
-    public static final String FILE_CHOOSER_DETAILS_NAME_ID = "fileChooser.detailsName";
-    public static final String FILE_CHOOSER_DETAILS_SIZE_ID = "fileChooser.detailsSize";
-    public static final String FILE_CHOOSER_DETAILS_MODIFIED_ID = "fileChooser.detailsModified";
     public static final String FILE_CHOOSER_MENU_VIEW_ID = "fileChooser.menuView";
     public static final String FILE_CHOOSER_MENU_REFRESH_ID = "fileChooser.menuRefresh";
 
@@ -152,6 +156,13 @@ public class I18n {
     public static final String SIZE_DESCRIPTION_MB_ID = "size.description.mb";
     public static final String SIZE_DESCRIPTION_KB_ID = "size.description.kb";
     public static final String SIZE_DESCRIPTION_BYTE_ID = "size.description.byte";
+
+    public static final String RESOURCE_TYPE_FILE_ID = "resource.type.file";
+    public static final String RESOURCE_TYPE_DIRECTORY_ID = "resource.type.directory";
+    public static final String RESOURCE_NAME_ID = "resource.name";
+    public static final String RESOURCE_SIZE_ID = "resource.size";
+    public static final String RESOURCE_MODIFIED_ID = "resource.modified";
+
 
     private static final String MESSAGES_BASENAME = "messages";
     private static final String[] SUPPORTED_LANGUAGES = new String[]{"en", "es", "pt", "de", "fr", "ro", "zh_CN", "zh_TW", "hi", "ar", "ru", "ja", "iw"};

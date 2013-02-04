@@ -74,10 +74,18 @@
     <entry key="page.noDuplicate.text">The analysis did not find any duplicate files in the provided locations.</entry>
 
     <entry key="page.poll.header">What data is important?</entry>
-    <entry key="page.poll.description">Please choose what you want to keep and what to mark for deletion (you can change your mind later).</entry>
-    <entry key="page.poll.statAnalysed">The analysis checked {0} files and folders (having {1}), and found {2} duplicate files and folders (having {3}).</entry>
+    <entry key="page.poll.description">The analysis checked {0} files and folders (having {1}), and found {2} duplicate files and folders (having {3}). Please choose what you want to keep and what to mark for deletion (you can change your mind later).</entry>
+    <entry key="page.poll.pageNumber">Duplicate resolution #{0}</entry>
     <entry key="page.poll.statDelete">You marked for deletion {0} files and folders (having {1}).</entry>
-    <entry key="page.poll.question">Question {0}</entry>
+    <entry key="page.poll.table.columnDecideLater">Decide later</entry>
+    <entry key="page.poll.table.columnRetain">Retain</entry>
+    <entry key="page.poll.table.columnDelete">Mark for deletion</entry>
+    <entry key="page.poll.table.columnType">Type</entry>
+    <entry key="page.poll.table.columnDate.unknown">unknown</entry>
+    <entry key="page.poll.back.confirmationMessage">There are no more previous duplicate resolutions, are you sure you want to go back to the analysis page?</entry>
+    <entry key="page.poll.link.decideLaterAll">Decide later all</entry>
+    <entry key="page.poll.link.retainAll">Retain all</entry>
+    <entry key="page.poll.link.deleteAll">Mark for deletion all</entry>
 
     <entry key="fileChooser.currentDirectory">Current folder</entry>
     <entry key="fileChooser.up">Parent folder</entry>
@@ -87,9 +95,6 @@
     <entry key="fileChooser.name">Name:</entry>
     <entry key="fileChooser.filterLabel">Filter:</entry>
     <entry key="fileChooser.filterAll">All files and folders</entry>
-    <entry key="fileChooser.detailsName">Name</entry>
-    <entry key="fileChooser.detailsSize">Size</entry>
-    <entry key="fileChooser.detailsModified">Date modified</entry>
     <entry key="fileChooser.menuView">View</entry>
     <entry key="fileChooser.menuRefresh">Refresh</entry>
 
@@ -104,4 +109,10 @@
     <entry key="size.description.mb">{0} MB</entry>
     <entry key="size.description.kb">{0} KB</entry>
     <entry key="size.description.byte">{0} bytes</entry>
+
+    <entry key="resource.type.file">file</entry>
+    <entry key="resource.type.directory">folder</entry>
+    <entry key="resource.name">Name</entry>
+    <entry key="resource.size">Size</entry>
+    <entry key="resource.modified">Date modified</entry>
 </properties>

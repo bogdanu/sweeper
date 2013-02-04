@@ -75,9 +75,9 @@ public class SwingMessages implements LocaleChangeListener {
         UIManager.put("FileChooser.cancelButtonToolTipText", i18n.getString(I18n.BUTTON_CANCEL_ID));
         UIManager.put("FileChooser.viewMenuLabelText", i18n.getString(I18n.FILE_CHOOSER_MENU_VIEW_ID));
         UIManager.put("FileChooser.refreshActionLabelText", i18n.getString(I18n.FILE_CHOOSER_MENU_REFRESH_ID));
-        UIManager.put("FileChooser.fileNameHeaderText", i18n.getString(I18n.FILE_CHOOSER_DETAILS_NAME_ID));
-        UIManager.put("FileChooser.fileSizeHeaderText", i18n.getString(I18n.FILE_CHOOSER_DETAILS_SIZE_ID));
-        UIManager.put("FileChooser.fileDateHeaderText", i18n.getString(I18n.FILE_CHOOSER_DETAILS_MODIFIED_ID));
+        UIManager.put("FileChooser.fileNameHeaderText", i18n.getString(I18n.RESOURCE_NAME_ID));
+        UIManager.put("FileChooser.fileSizeHeaderText", i18n.getString(I18n.RESOURCE_SIZE_ID));
+        UIManager.put("FileChooser.fileDateHeaderText", i18n.getString(I18n.RESOURCE_MODIFIED_ID));
     }
 
 }
