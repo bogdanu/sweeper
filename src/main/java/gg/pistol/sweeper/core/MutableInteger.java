@@ -30,6 +30,8 @@ import com.google.common.primitives.Ints;
 // package private
 class MutableInteger extends Number implements Comparable<MutableInteger> {
 
+    private static final long serialVersionUID = 1L;
+
     private int value;
 
     MutableInteger(int value) {
