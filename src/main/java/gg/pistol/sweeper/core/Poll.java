@@ -135,6 +135,16 @@ class Poll implements SweeperPoll, Cloneable {
     }
 
     @Override
+    public int hashCode() {
+        int result = number;
+        result = 31 * result + duplicateGroup.hashCode();
+        result = 31 * result + targets.hashCode();
+        result = 31 * result + toDeleteTargets.hashCode();
+        result = 31 * result + retainedTargets.hashCode();
+        return result;
+    }
+
+    @Override
     public Poll clone() {
         Poll clone = new Poll(number, duplicateGroup, targets);
         clone.toDeleteTargets.addAll(toDeleteTargets);
