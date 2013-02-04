@@ -238,10 +238,6 @@ public class Wizard implements WizardPageListener {
         languagePanel.setVisible(currentPage.isLanguageSelectorVisible());
     }
 
-    public Window getWindow() {
-        return window;
-    }
-
     /**
      * Open the wizard window.
      */
