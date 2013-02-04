@@ -58,8 +58,12 @@ public class ResourceFileFs extends AbstractResource implements ResourceFile {
         return resource.length();
     }
 
-    public DateTime getModificationDate() {
-        return new DateTime(resource.lastModified());
+    public DateTime getModificationDate() throws IOException {
+        long time = resource.lastModified();
+        if (time == 0L) {
+            throw new IOException("Could not retrieve the modification date for the file <" + name + ">");
+        }
+        return new DateTime(time);
     }
 
     public void delete() throws IOException {
