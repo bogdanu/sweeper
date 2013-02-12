@@ -94,26 +94,30 @@ class PollPage extends WizardPage {
         return new Runnable() {
             @Override
             public void run() {
-                for (Target t : targets) {
-                    sweeper.getCurrentPoll().mark(t, mark);
-                }
-
-                /*
-                 * The statistics about targets are computed when advancing to the next poll, in this way the Sweeper
-                 * implementation knows that the user made a decision for all the targets in the current poll.
-                 * But we would like to provide real time statistics, whenever the user marks a target the statistics
-                 * should change to reflect that and not wait until the user marked all the targets and advanced to
-                 * the next poll. To simulate this we advance to the next poll and back and we have access to
-                 * the statistics while the user's perception about the current poll is not changed.
-                 */
-                sweeper.nextPoll();
-                sweeper.previousPoll();
-
-                statDelete.setText(i18n.getString(I18n.PAGE_POLL_STAT_DELETE_ID,
-                        formatInt(sweeper.getCount().getToDeleteTargets()), formatSize(sweeper.getCount().getToDeleteSize())));
-                tableModel.fireTableDataChanged();
+                markAllAction0(mark);
             }
         };
+    }
+
+    private void markAllAction0(SweeperPoll.Mark mark) {
+        for (Target t : targets) {
+            sweeper.getCurrentPoll().mark(t, mark);
+        }
+
+        /*
+         * The statistics about targets are computed when advancing to the next poll, in this way the Sweeper
+         * implementation knows that the user made a decision for all the targets in the current poll.
+         * But we would like to provide real time statistics, whenever the user marks a target the statistics
+         * should change to reflect that and not wait until the user marked all the targets and advanced to
+         * the next poll. To simulate this we advance to the next poll and back and we have access to
+         * the statistics while the user's perception about the current poll is not changed.
+         */
+        sweeper.nextPoll();
+        sweeper.previousPoll();
+
+        statDelete.setText(i18n.getString(I18n.PAGE_POLL_STAT_DELETE_ID,
+                formatInt(sweeper.getCount().getToDeleteTargets()), formatSize(sweeper.getCount().getToDeleteSize())));
+        tableModel.fireTableDataChanged();
     }
 
     private JTable createTable() {
@@ -121,13 +125,16 @@ class PollPage extends WizardPage {
         JTable table = new JTable(tableModel) {
             @Override
             public String getToolTipText(MouseEvent e) {
+                /*
+                 * Have a tooltip for the filename field only and the value of the tooltip will be the full filename.
+                 */
                 String tooltip = null;
                 Point p = e.getPoint();
                 int rowIndex = rowAtPoint(p);
                 int colIndex = columnAtPoint(p);
                 int realColumnIndex = convertColumnIndexToModel(colIndex);
 
-                if (realColumnIndex == 3) {
+                if (isFilenameColumnNo(realColumnIndex)) {
                     tooltip = getValueAt(rowIndex, colIndex).toString();
                 }
                 return tooltip;
@@ -151,10 +158,14 @@ class PollPage extends WizardPage {
         });
 
         for (int column = 0; column < table.getColumnCount(); column++) {
-            packColumn(table, column, column == 3);
+            packColumn(table, column, isFilenameColumnNo(column));
         }
         table.setComponentOrientation(ComponentOrientation.getOrientation(i18n.getLocale()));
         return table;
+    }
+
+    private boolean isFilenameColumnNo(int columnNo) {
+        return columnNo == 3;
     }
 
     private void packColumn(JTable table, int column, boolean autoResize) {
@@ -268,6 +279,8 @@ class PollPage extends WizardPage {
                         break;
                 }
                 sweeper.getCurrentPoll().mark(targets.get(rowIndex), mark);
+
+                // Go to the next poll and back to update the statistics.
                 sweeper.nextPoll();
                 sweeper.previousPoll();
 
