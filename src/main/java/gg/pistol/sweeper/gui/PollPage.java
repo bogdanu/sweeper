@@ -41,12 +41,11 @@ import java.util.List;
 // package private
 class PollPage extends WizardPage {
 
-    private WizardPage analysisPage;
+    private final WizardPage analysisPage;
 
-    private List<Target> targets;
+    private final List<Target> targets;
 
     @Nullable private JLabel statDelete;
-
     @Nullable private AbstractTableModel tableModel;
 
     PollPage(WizardPage analysisPage, I18n i18n, WizardPageListener listener, Sweeper sweeper) {
@@ -101,7 +100,6 @@ class PollPage extends WizardPage {
 
                 sweeper.nextPoll();
                 sweeper.previousPoll();
-                targets = new ArrayList<Target>(sweeper.getCurrentPoll().getTargets());
 
                 statDelete.setText(i18n.getString(I18n.PAGE_POLL_STAT_DELETE_ID,
                         formatInt(sweeper.getCount().getToDeleteTargets()), formatSize(sweeper.getCount().getToDeleteSize())));
@@ -264,7 +262,6 @@ class PollPage extends WizardPage {
                 sweeper.getCurrentPoll().mark(targets.get(rowIndex), mark);
                 sweeper.nextPoll();
                 sweeper.previousPoll();
-                targets = new ArrayList<Target>(sweeper.getCurrentPoll().getTargets());
 
                 statDelete.setText(i18n.getString(I18n.PAGE_POLL_STAT_DELETE_ID,
                         formatInt(sweeper.getCount().getToDeleteTargets()), formatSize(sweeper.getCount().getToDeleteSize())));
