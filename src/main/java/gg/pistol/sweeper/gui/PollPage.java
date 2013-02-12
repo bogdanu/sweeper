@@ -98,6 +98,14 @@ class PollPage extends WizardPage {
                     sweeper.getCurrentPoll().mark(t, mark);
                 }
 
+                /*
+                 * The statistics about targets are computed when advancing to the next poll, in this way the Sweeper
+                 * implementation knows that the user made a decision for all the targets in the current poll.
+                 * But we would like to provide real time statistics, whenever the user marks a target the statistics
+                 * should change to reflect that and not wait until the user marked all the targets and advanced to
+                 * the next poll. To simulate this we advance to the next poll and back and we have access to
+                 * the statistics while the user's perception about the current poll is not changed.
+                 */
                 sweeper.nextPoll();
                 sweeper.previousPoll();
 
