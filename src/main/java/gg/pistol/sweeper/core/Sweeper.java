@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 /**
  * Duplicate file/directory cleaner.
  *
- * <p>The implementations of this interface are thread safe.,
+ * <p>The implementations of this interface are thread safe.
  *
  * <p>In order to clean a set of targets perform the following steps:
  *
